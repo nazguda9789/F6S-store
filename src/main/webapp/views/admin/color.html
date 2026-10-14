@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Admin Dashboard" />
+    <meta name="author" content="Your Name" />
+    <title>Màu sắc</title>
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid">
+                <h1 class="mt-4">Quản lý Màu sắc</h1>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        Danh Sách Màu Sắc
+                        <button onclick="truyenGT('', '','')" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-plus"></i> Thêm màu sắc</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3 align-items-center">
+                        </div>
+                        <div class="table-responsive">
+                            <table id="datatablesSimple" class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th>id</th>
+                                    <th>Tên màu</th>
+                                    <th>Mã màu</th>
+                                    <th>Hiển thị</th>
+                                    <th class="sticky-col">Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="c : ${listcolor}">
+                                    <td th:text="${c.id}"></td>
+                                    <td th:text="${c.name}"></td>
+                                    <td th:text="${c.code}"></td>
+                                    <td>
+                                        <div th:style="'width: 30px; height: 30px; border-radius: 50%; background-color: ' + ${c.code}"></div>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{delete(id=${c.id})}" class="btn btn-outline-danger btn-sm btn-action" onclick="return confirm('Bạn có chắc chắn muốn xóa màu sắc này?');"><i class="fas fa-trash-alt"></i></a>
+                                        <button data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                                th:onclick="truyenGT([[${c.id}]], [[${c.name}]], [[${c.code}]])"
+                                                th:data-id="${c.id}" th:data-name="${c.name}" th:data-code="${c.code}"
+                                                class="btn btn-outline-primary btn-sm btn-action"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Thêm màu sắc</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form th:object="${color}" action="save" method="post" id="formadd">
+                    <label class="lb-form">Tên màu</label>
+                    <input id="idmau" type="hidden" th:field="*{id}">
+                    <input id="tenmau" class="form-control" th:field="*{name}">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="lb-form">Mã màu</label>
+                            <input class="form-control" id="mamau" th:field="*{code}">
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="lb-form">&ThinSpace;</label>
+                            <div id="picker"></div>
+                            <span id="hexInput"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button form="formadd" type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', event => {
+        $(document).ready(function() {
+            $('#datatablesSimple').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true, // Enable DataTables responsive features
+                "language": {
+                    "lengthMenu": "Showing _MENU_ entries",
+                    "search": "", // Keep search box label empty
+                    "searchPlaceholder": "Search...", // Custom placeholder
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "infoEmpty": "Showing 0 to 0 of 0 entries",
+                    "infoFiltered": "(filtered from _MAX_ total entries)",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    }
+                }
+            });
+            $('#showEntries').on('change', function() {
+                $('#datatablesSimple').DataTable().page.len($(this).val()).draw();
+            });
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+<script>
+    var colorPicker = new iro.ColorPicker("#picker", {
+        width: 200,
+        color: "#f00"
+    });
+
+    var hexInput = document.getElementById("hexInput");
+
+    colorPicker.on("color:change", function(color) {
+        document.getElementById("mamau").value = color.hexString;
+    });
+
+    function truyenGT(id, name, code){
+        document.getElementById("tenmau").value = name
+        document.getElementById("mamau").value = code
+        document.getElementById("idmau").value = id
+    }
+</script>
+<script th:inline="javascript">
+    var error = /*[[${error}]]*/ 'default';
+    if(error != null){
+        swal({
+                title: "Thông báo",
+                text: error,
+                type: "error"
+            },
+            function() {
+            });
+    }
+</script>
+</body>
+</html>

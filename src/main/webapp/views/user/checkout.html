@@ -1,0 +1,339 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:include="common/user/libuser :: libheader"></th:block>
+    <link rel="stylesheet" href="css/checkout.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="/js/checkout.js"></script>
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+<div class="container shipping-section">
+    <nav aria-label="breadcrumb" class="breadcrumb-container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item">
+                <a href="/cart">Giỏ hàng</a>
+            </li>
+            <li class="breadcrumb-item breadcrumb-product-name active" aria-current="page"> Xác nhận đặt hàng</li>
+        </ol>
+    </nav>
+
+    <main class="main-content">
+        <div class="order-summary-column">
+            <div class="checkout-section order-summary">
+                <h2>Đơn hàng của bạn</h2>
+                <div th:each="c:${cartResponse.cartDetails}" class="product-item">
+                    <div class="block-image-item-checkout">
+                        <img th:src="${c.image}" class="product-image-checkout" th:alt="${c.productName}">
+                        <span th:text="${c.quantity}" class="quantity-item-checkout"></span>
+                    </div>
+                    <div class="product-info">
+                        <h3 th:text="${c.productName}"></h3>
+                        <p><span th:text="${c.colorName}"></span> / <span th:text="${c.sizeName}"></span></p>
+                    </div>
+                    <span class="product-price">[[${#numbers.formatDecimal(c.price * c.quantity, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                </div>
+
+                <div class="discount-section">
+                    <div class="input-group-checkout">
+                        <input form="form-create-order" name="voucher" type="text" placeholder="Mã giảm giá">
+                        <button class="btn-use-voucher">Sử dụng</button>
+                    </div>
+                    <div class="discount-codes">
+                        <div class="d-flex" style="position: relative">
+                            <p style="color: #000">Voucher khả dụng</p>
+                            <p style="position: absolute; right: 0">Xem thêm mã giảm giá</p>
+                        </div>
+                        <div class="tags" th:if="${voucherAvailable.size() > 0}">
+                            <span th:each="v : ${voucherAvailable}" class="tag" th:data-discount="${v.discount}" th:data-voucherCode="${v.code}">Giảm [[${#numbers.formatDecimal(v.discount, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                        </div>
+                        <div class="tags" th:if="${voucherAvailable.size() == 0}">
+                            <div class="voucher-empty">
+                                <h5>Hiện tại không có voucher nào khả dụng</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="price-details">
+                    <div class="price-row">
+                        <span>Khối lượng đơn hàng</span>
+                        <span th:text="${weight}+' KG'"></span>
+                    </div>
+                    <div class="price-row">
+                        <span>Tạm tính</span>
+                        <span th:data-provisional="${cartResponse.totalAmount}" id="total-tam-tinh">[[${#numbers.formatDecimal(cartResponse.totalAmount, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Phí vận chuyển</span>
+                        <span th:data-shipcost="${shippingCost}" class="ship-cost-change" id="ship-cost-change" th:if="${cartResponse.totalAmount < 500000}">[[${#numbers.formatDecimal(shippingCost, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                        <span data-shipcost="0" th:if="${cartResponse.totalAmount >= 500000}" class="ship-cost-change">Miễn phí</span>
+                        <input type="hidden" form="form-create-order" th:value="${shippingCost}" name="phiShip" id="phiship" th:if="${cartResponse.totalAmount < 500000}">
+                        <input type="hidden" form="form-create-order" value="0" name="phiShip" th:if="${cartResponse.totalAmount >= 500000}">
+                    </div>
+                    <div class="price-row">
+                        <span>Khuyến mại</span>
+                        <span data-voucher="0" class="discount-vc" id="discount-vc">0₫</span>
+                    </div>
+                    <div class="total-price">
+                        <strong>Tổng cộng</strong>
+                        <strong th:if="${cartResponse.totalAmount < 500000}" class="total-amount-co" th:data-total="${cartResponse.totalAmount + shippingCost}">[[${#numbers.formatDecimal(cartResponse.totalAmount + shippingCost, 0, 'POINT', 0, 'POINT')}]] đ</strong>
+                        <strong th:if="${cartResponse.totalAmount >= 500000}" class="total-amount-co" th:data-total="${cartResponse.totalAmount}">[[${#numbers.formatDecimal(cartResponse.totalAmount, 0, 'POINT', 0, 'POINT')}]] đ</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="shipping-info-column">
+            <div class="checkout-section shipping-info">
+                <h2>Thông tin giao hàng</h2>
+                <p th:if="${userCheckout == null}">Bạn đã có tài khoản? <a href="/login">Đăng nhập để theo dõi đơn dễ dàng</a></p>
+                <form id="form-create-order" action="/checkout" method="post" onsubmit="return validateCheckoutForm()">
+                    <input type="hidden" th:each="c : ${param.detail}" th:value="${c}" name="detail"/>                    <div class="form-group">
+                    <div class="form-floating mb-3">
+                        <input required name="fullName" th:value="${userCheckout == null?'':userCheckout.fullName}" type="text" class="form-control" id="fullName" placeholder="Họ tên của bạn">
+                        <label for="fullName">Họ tên của bạn</label>
+                    </div>
+                </div>
+                    <div class="form-group-inline">
+                        <div class="form-group">
+                            <div class="form-floating mb-3">
+                                <input name="email" th:value="${userCheckout == null?'':userCheckout.email}" type="email" class="form-control" id="email" placeholder="Email">
+                                <label for="email">Email nhận thông tin đơn hàng</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-floating mb-3">
+                                <input required name="phone" th:value="${userCheckout == null?'':userCheckout.phone}" type="text" class="form-control" id="phone" placeholder="Số điện thoại">
+                                <label for="phone">Số điện thoại</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group-inline">
+                        <div class="form-group">
+                            <select onchange="loadHuyen()" name="province" id="province" class="select2 select-province">
+                                <option value="-1" selected disabled>Chọn tỉnh</option>
+                                <option th:each="p: ${province.data}" th:value="${p.ProvinceID}" th:data-name="${p.ProvinceName}" th:text="${p.ProvinceName}"></option>
+                            </select>
+                            <input type="hidden" name="provinceName" id="provinceName">
+                        </div>
+                        <div class="form-group">
+                            <select onchange="loadXa()" id="district" class="select2 select-ward">
+                            </select>
+                            <input type="hidden" name="districtName" id="districtName">
+
+                        </div>
+                        <div class="form-group">
+                            <select onchange="calShipping()" name="ward" id="ward" class="select2 select-ward">
+                            </select>
+                            <input type="hidden" name="wardName" id="wardName">
+                        </div>
+                    </div>
+                    <input type="hidden" th:value="${roundedWeight}" id="khoiluong">
+                    <div class="form-group">
+                        <div class="form-floating mb-3">
+                            <input required name="addressDetail" type="text" class="form-control" id="address" placeholder="Địa chỉ chi tiêt: Số nhà, tên đường,...">
+                            <label for="address">Địa chỉ chi tiêt: Số nhà, tên đường,...</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-floating mb-3">
+                            <input name="note" type="text" class="form-control" id="note" placeholder="Ghi chú đơn hàng">
+                            <label for="note">Ghi chú đơn hàng</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="checkout-section methods">
+                <div class="shipping-methods">
+                    <h2>Phương thức vận chuyển</h2>
+                    <div class="radio-option ship-cost-checkout" th:if="${cartResponse.totalAmount < 500000}">
+                        <label>
+                            Đơn hàng sẽ được gửi qua đơn vị vận chuyển Giao hàng nhanh
+                        </label>
+                    </div>
+                </div>
+
+                <div class="payment-methods">
+                    <h2>Phương thức thanh toán</h2>
+                    <table class="table tablepay">
+
+                        <tr>
+                            <td><label class="radiocustom"> <span class="pay-type-label">Thanh toán qua Ví Vnpay</span>
+                                <input value="vnpay" id="vnpay" type="radio" name="paytype">
+                                <span class="checkmark-cus"></span></label></td>
+                            <td><img src="image/vnpay.jpg" class="momopay"></td>
+                        </tr>
+                        <tr>
+                            <td><label class="radiocustom"> <span class="pay-type-label">Thanh toán khi nhận hàng (COD)</span>
+                                <input value="cod" id="code" type="radio" name="paytype" checked>
+                                <span class="checkmark-cus"></span></label></td>
+                            <td><i class="fa fa-money paycode"></i></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <button form="form-create-order" type="submit" class="place-order-btn place-order-btn-desktop">Xác Nhận Đặt Hàng</button>
+        </div>
+    </main>
+
+    <div class="sticky-footer">
+        <div class="total-price-mobile">
+            <strong>Tổng cộng</strong>
+            <strong class="total-amount total-amount-co total-amount-mobile" th:if="${cartResponse.totalAmount < 500000}" th:data-total="${cartResponse.totalAmount + shippingCost}">[[${#numbers.formatDecimal(cartResponse.totalAmount + shippingCost, 0, 'POINT', 0, 'POINT')}]] đ</strong>
+            <strong class="total-amount total-amount-co total-amount-mobile" th:if="${cartResponse.totalAmount >= 500000}" th:data-total="${cartResponse.totalAmount}">[[${#numbers.formatDecimal(cartResponse.totalAmount, 0, 'POINT', 0, 'POINT')}]] đ</strong>
+        </div>
+        <button form="form-create-order" type="submit" class="place-order-btn place-order-btn-moblie">Hoàn tất đơn hàng</button>
+    </div>
+
+</div>
+<div th:insert="common/user/footeruser :: footerMain"></div>
+<script src="/js/cart.js"></script>
+</body>
+<script>
+    $(document).on('select2:open', () => {
+        document.querySelector('.select2-container--open .select2-search__field').focus();
+    });
+    $( document ).ready(function() {
+        $('.select-province').select2({
+            placeholder: "Chọn tỉnh, thành phố"
+        });
+        $("#district").select2({
+            placeholder: "Chọn huyện"
+        });
+        $("#ward").select2({
+            placeholder: "Chọn xã"
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const discountTags = document.querySelectorAll('.tags .tag');
+        const discountInput = document.querySelector('.discount-section input');
+        discountTags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                discountTags.forEach(t => t.classList.remove('active-voucher'));
+                tag.classList.add('active-voucher');
+                discountInput.value = tag.getAttribute("data-vouchercode");
+                $(".discount-vc").text(formatVND(tag.getAttribute("data-discount")))
+                $("#discount-vc").attr("data-voucher", tag.getAttribute("data-discount"))
+                calTotalPrice();
+            });
+        });
+    });
+
+    // HÀM ĐÃ SỬA: Khắc phục triệt để lỗi NaN cho đơn hàng >= 500k mà không cần đổi HTML
+    function calTotalPrice() {
+        // 1. Lấy ra các thẻ hiển thị tổng tiền (cả bản Desktop và Mobile)
+        var priceShow = $(".total-amount-co");
+
+        // 2. Ép kiểu dữ liệu về dạng Number an toàn (nếu lỗi hoặc trống sẽ tự động lấy 0)
+        var priceTT = Number($("#total-tam-tinh").attr("data-provisional")) || 0;
+        var discount = Number($("#discount-vc").attr("data-voucher")) || 0;
+
+        // 3. THAY ĐỔI QUAN TRỌNG: Tìm theo class '.ship-cost-change' thay vì ID '#'
+        // Hệ thống sẽ lấy đúng data-shipcost của thẻ span đang hiển thị (0 hoặc phí ship thực tế)
+        var shipCost = Number($(".ship-cost-change:not([style*='display: none'])").attr("data-shipcost")) || 0;
+
+        // Nếu kiểm tra theo cách trên vẫn chưa chắc chắn, bạn có thể lấy trực tiếp từ thuộc tính th:if logic:
+        if (priceTT >= 500000) {
+            shipCost = 0;
+        }
+
+        // 4. Cập nhật lại giá trị vào input ẩn để gửi lên Backend không bị lỗi thiếu tham số
+        $("#phiship").val(shipCost);
+
+        // 5. Tính toán tổng tiền cuối cùng sau giảm giá
+        var totalPrice = priceTT + shipCost - discount;
+
+        // Phòng trường hợp voucher giảm giá lớn hơn tổng tiền đơn hàng
+        if (totalPrice < 0) {
+            totalPrice = 0;
+        }
+
+        // 6. Hiển thị lại chuỗi tiền tệ đã định dạng ra giao diện công cộng
+        priceShow.text(formatVND(totalPrice));
+
+        // Cập nhật cả data-total của các thẻ tổng cộng để đồng bộ cấu trúc dữ liệu dữ phòng
+        priceShow.attr("data-total", totalPrice);
+    }
+
+    function validateCheckoutForm() {
+        const email = document.querySelector("#email").value.trim();
+        const phone = document.querySelector("#phone").value.trim();
+        const fullName = document.querySelector("#fullName").value.trim();
+        const address = document.querySelector("#address").value.trim();
+
+        // Regex đơn giản để check email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // Regex số điện thoại VN (10 số, bắt đầu từ 03,05,07,08,09)
+        const phoneRegex = /^(03|05|07|08|09)\d{8}$/;
+
+        if (fullName.length < 2) {
+            toastr.error("Vui lòng nhập họ tên hợp lệ.");
+            return false;
+        }
+
+        if(email != ''){
+            if (!emailRegex.test(email)) {
+                toastr.error("Email không hợp lệ.");
+                return false;
+            }
+        }
+
+        if (!phoneRegex.test(phone)) {
+            toastr.error("Số điện thoại không hợp lệ (phải là 10 số, đầu 03/05/07/08/09).");
+            return false;
+        }
+
+        if (address.length < 10) {
+            toastr.error("Địa chỉ quá ngắn, vui lòng nhập đầy đủ.");
+            return false;
+        }
+
+        return true;
+    }
+
+</script>
+
+<script th:inline="javascript">
+    var error = /*[[${error}]]*/ 'default';
+    if(error != null){
+        swal({
+                title: "Thông báo",
+                text: error,
+                type: "error"
+            },
+            function() {
+            });
+    }
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("form-create-order");
+        const btn = document.querySelector(".place-order-btn");
+
+        btn.addEventListener("click", function (e) {
+            // tìm radio đang được chọn
+            let payType = document.querySelector("input[name='paytype']:checked").value;
+
+            if (payType === "cod") {
+                form.action = "/checkout";
+            } else if (payType === "vnpay") {
+                form.action = "/checkout-vnpay";
+            } else if (payType === "momo") {
+                swal({ title: "Thông báo", text: "Xin lỗi, loại thanh toán này chưa được hỗ trợ", type: "error" }, function() { });
+            }
+
+            // cho phép submit tiếp tục
+        });
+    });
+</script>
+
+</html>

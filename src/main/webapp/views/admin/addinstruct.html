@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tài Khoản</title>
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+        <div id="layoutSidenav_content">
+            <form class="main row" method="post" action="addinstruct" onsubmit="return beforeSubmit()"
+                  th:object="${instruct}" enctype="multipart/form-data">
+                <div class="col-sm-5">
+                    <label class="lb-form">Tiêu đề blog</label>
+                    <input th:field="*{title}" type="text" class="form-control">
+                    <input th:field="*{id}" type="hidden" class="form-control">
+                    <label class="lb-form">Ảnh bài viết</label>
+                    <input name="file" id="fileimage" type="file" class="form-control">
+                    <img th:src="${instruct.imageBanner}" id="imgpreview" style="width: 120px; margin-top: 15px;margin-bottom: 15px;display: block;">
+                    <label class="lb-form">Mô tả</label>
+                    <textarea th:field="*{description}" class="form-control" style="height: 200px;"></textarea>
+                </div>
+                <div class="col-md-7">
+                    <label>Nội dung</label>
+                    <textarea th:field="*{content}" id="editor" name="content"></textarea>
+                    <div id="loading">
+                        <div class="bar1 bar"></div>
+                    </div><br>
+                    <button class="btn btn-success form-control action-btn">Thêm/ Cập nhật bài viết</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+<script>
+    fileimage.onchange = evt => {
+        const [file] = fileimage.files
+        if (file) {
+            imgpreview.src = URL.createObjectURL(file)
+        }
+    }
+</script>
+<script src="https://cdn.tiny.cloud/1/f6s0gxhkpepxkws8jawvfwtj0l9lv0xjgq1swbv4lgcy3au3/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    tinymce.init({
+        selector: 'textarea#editor',
+    });
+    function beforeSubmit(){
+        document.getElementById("loading").style.display = 'block';
+    }
+</script>
+
+</html>

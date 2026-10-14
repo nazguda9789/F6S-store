@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Blog | F6S</title>
+  <meta name="description" content="" />
+  <link rel="canonical" href="/contact" />
+
+  <meta property="og:type" content="contact" />
+  <meta property="og:title" content="Liên hệ " />
+  <meta property="og:url" content="/contact" />
+  <meta property="og:type" content="article" />
+
+  <th:block th:include="common/user/libuser :: libheader"></th:block>
+  <link rel="stylesheet" href="/css/contact.css">
+
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+<div class="container my-4 shipping-section">
+  <nav aria-label="breadcrumb" class="breadcrumb-container">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+      <li class="breadcrumb-item breadcrumb-product-name active" aria-current="page"> Liên hệ</li>
+    </ol>
+  </nav>
+
+  <div class="contact-container">
+    <h1>Liên hệ với F6S Shop</h1>
+    <p>Hãy để lại thông tin, chúng tôi sẽ phản hồi bạn sớm nhất.</p>
+
+    <!-- Thông báo thành công -->
+    <div th:if="${success}" class="alert success" th:text="${success}"></div>
+
+    <!-- Form liên hệ -->
+    <form th:action="@{/contact}" th:object="${contact}" method="post" class="contact-form">
+      <div class="form-group">
+        <label>Họ tên</label>
+        <input type="text" th:field="*{fullName}" placeholder="Nhập họ tên" />
+        <span class="error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" th:field="*{email}" placeholder="Nhập email" />
+        <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+      </div>
+
+      <div class="form-group">
+        <label>Số điện thoại</label>
+        <input type="text" th:field="*{phone}" placeholder="Nhập số điện thoại" />
+        <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+      </div>
+
+      <div class="form-group">
+        <label>Nội dung</label>
+        <textarea th:field="*{content}" placeholder="Nhập nội dung liên hệ..."></textarea>
+        <span class="error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></span>
+      </div>
+
+      <button type="submit" class="btn-submit">Gửi liên hệ</button>
+    </form>
+
+    <!-- Thông tin shop -->
+    <div class="shop-info">
+      <h2>Fashion Shop</h2>
+      <p><strong>Địa chỉ:</strong> 123 Nguyễn Trãi, Hà Nội</p>
+      <p><strong>Hotline:</strong> 0909 123 456</p>
+      <p><strong>Email:</strong> Đang cập nhật</p>
+    </div>
+  </div>
+
+</div>
+
+<div th:replace="common/user/footeruser :: footerMain"></div>
+</body>
+
+</html>

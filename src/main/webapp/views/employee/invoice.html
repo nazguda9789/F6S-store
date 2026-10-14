@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đơn hàng</title>
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+    <link rel="stylesheet" type="text/css" href="/admin/css/invoice.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+</head>
+
+<body class="sb-nav-fixed">
+<div th:replace="common/employee/navbarEmployee :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/employee/navbarEmployee :: sidenavAdmin"></div>
+        <div id="layoutSidenav_content">
+            <main class="main">
+                <div class="container-fuild">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between header-bar">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="input-group" style="width: 350px;">
+                                        <input id="search" type="text" class="form-control search-input" placeholder="Nhập SĐT - Mã ĐH - Tên người nhận">
+                                        <button onclick="filterInvoice(0)" class="btn btn-outline-primary">Lọc</button>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 header-actions mobile-none">
+                                    <div style="font-size: 1.5rem; font-weight: bold;">Danh Sách Đơn Hàng</div>
+                                </div>
+                            </div>
+
+                            <div class="nav-status nav-tabs-status nav-tabs-custom">
+                                <button th:each="c, iterStat : ${listStatus}" th:data-status="${iterStat.index == 0} ? ${c.name} : ''"
+                                        th:classappend="${iterStat.index == 0} ? ' active-status-list' : ''" th:data-stt="${c.name}" class="btn-status-list">
+                                    <span th:text="${c.label}"></span>
+                                    <span class="tab-number number-element-sing" th:text="${c.quantity}" th:id="'stt-quantity-'+${c.name}"></span>
+                                </button>
+                                <button class="btn-status-list" data-stt="">
+                                    <span>Tất cả</span>
+                                    <span class="tab-number" th:text="${totalInvoice}" id="tat-ca-num-donhang"></span>
+                                </button>
+                            </div>
+
+                            <div class="headcontent-invoice filter-section d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="text-muted mobile-none">Thời gian tạo đơn</span>
+                                    <div class="row container-head-time d-flex gap-2">
+                                        <div class="col-sm-auto date-input-container">
+                                            <input onchange="filterNotSearch()" type="text" id="fromDate" class="form-control date-input" placeholder="Từ">
+                                            <i class="bi bi-calendar-date date-input-icon"></i>
+                                        </div>
+                                        <div class="col-sm-auto date-input-container">
+                                            <input onchange="filterNotSearch()" type="text" id="toDate" class="form-control date-input" placeholder="Đến">
+                                            <i class="bi bi-calendar-date date-input-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row row-pageable-head">
+                                    <div class="col-sm-auto d-flex align-items-center">
+                                        <label for="showEntries" class="me-2 mb-0 mobile-none">Showing</label>
+                                        <select onchange="filterInvoice(0)" class="form-select form-select-sm" id="showEntries">
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-auto d-flex align-items-center">
+                                        <label for="showEntries" class="me-2 mb-0 mobile-none">Sort</label>
+                                        <select onchange="filterInvoice(0)" class="form-select form-select-sm" id="sortby">
+                                            <option value="id,desc">Mới nhất</option>
+                                            <option value="id,asc">Cũ nhất</option>
+                                            <option value="price,desc">giá cao đến thấp</option>
+                                            <option value="price,asc">giá thấp đến cao</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-auto d-flex align-items-center">
+                                        <div class="stat-container">
+                                            <div class="stat-box">Tổng: <strong th:text="${totalProduct}">0</strong> </div>
+                                            <div class="stat-box">Tìm thấy: <strong id="timthay">0</strong></div>
+                                            <div class="stat-box">Đang hiển thị: <strong id="hienthi">0</strong></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="order-table mt-4">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 50px;"><input type="checkbox"> STT</th>
+                                        <th>Vận đơn</th>
+                                        <th>Khách hàng</th>
+                                        <th>Thanh toán</th>
+                                        <th>KL, tỉnh phí</th>
+                                        <th>Tùy chọn thanh toán</th>
+                                        <th>Chức năng</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="list-invoice">
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+
+                            <nav aria-label="Page navigation example" style="margin-top: 50px">
+                                <ul class="pagination" id="pageable">
+                                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="lichSuModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered  modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Trạng thái đơn hàng <span id="ma-code-donhang"></span></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="status-update-card">
+                        <h4 class="mb-3">⚙️ Cập nhật trạng thái đơn hàng</h4>
+                        <div class="d-flex flex-wrap gap-3" id="list-status-update">
+                        </div>
+                    </div>
+                    <div class="status-history-card">
+                        <h4 class="mb-3">📜 Lịch sử cập nhật trạng thái</h4>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Trạng thái</th>
+                                    <th>Người cập nhật</th>
+                                    <th>Lý do</th>
+                                </tr>
+                                </thead>
+                                <tbody id="list-history">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+<script src="/admin/js/invoice.js"></script>
+<script>
+    $( document ).ready(function() {
+        filterInvoice(0);
+        $(document).on("click", ".btn-status-list", function() {
+            $(".btn-status-list").removeClass("active-status-list");
+            $(this).addClass("active-status-list");
+            $(this).attr("data-status", $(this).attr("data-stt"))
+            filterNotSearch();
+        });
+    });
+</script>
+<script>
+    flatpickr("#fromDate", {
+        dateFormat: "d/m/Y",
+        locale: "vn"
+    });
+    flatpickr("#toDate", {
+        dateFormat: "d/m/Y",
+        locale: "vn",
+        maxDate: "today",       // Ngày tối đa là hôm nay
+        defaultDate: "today"    // Mặc định là hôm nay
+    });
+</script>
+
+<script>
+    function connect() {
+        const socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log('Connected to count-order' );
+            stompClient.subscribe('/topic/count-order', function (message) {
+                var list = message.body;
+                if (typeof list === "string") {
+                    list = JSON.parse(list);
+                }
+                for(let i=0; i< list.length; i++){
+                    document.getElementById("stt-quantity-"+list[i].invoiceStatus).innerText = list[i].number
+                }
+                let sum = 0;
+                $('.number-element-sing').each(function() {
+                    let num = parseFloat($(this).text().trim()) || 0;
+                    sum = Number(sum) + Number(num);
+                });
+                document.getElementById("tat-ca-num-donhang").innerText = sum
+            });
+        }, function (error) {
+            console.error('Connection socket failed:', error);
+            setTimeout(connect, 5000);
+        });
+    }
+
+    connect();
+</script>
+</html>

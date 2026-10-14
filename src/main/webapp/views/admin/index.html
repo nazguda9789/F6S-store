@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Admin Dashboard" />
+  <meta name="author" content="Your Name" />
+  <title>Admin Dashboard</title>
+  <head th:replace="common/libadmin :: libheaderadmin"></head>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+  <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+  <div id="layoutSidenav_content">
+    <main>
+      <div class="container-fluid px-4">
+        <h1 class="mt-4">Order list</h1>
+        <ol class="breadcrumb mb-4">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item active">Order List</li>
+        </ol>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Order List
+            <a href="#" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-plus"></i> Add New Vendor</a>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3 align-items-center">
+              <div class="col-md-auto d-flex align-items-center">
+                <label for="showEntries" class="me-2 mb-0">Showing</label>
+                <select class="form-select form-select-sm" id="showEntries">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+              <div class="col-md-4 ms-auto">
+                <div class="input-group">
+                  <input type="text" class="form-control form-control-sm" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2">
+                  <button class="btn btn-outline-secondary btn-sm" type="button" id="button-addon2"><i class="fas fa-search"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table id="datatablesSimple" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                  <th><input type="checkbox"></th>
+                  <th>Order ID</th>
+                  <th>Customer Name</th>
+                  <th>Date</th>
+                  <th>Payment Status</th>
+                  <th>Total</th>
+                  <th>Payment Method</th>
+                  <th>Order Status</th>
+                  <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>#Kz025418</td>
+                  <td>Mendorcart</td>
+                  <td>Mar 24, 2022<br>04:26 PM</td>
+                  <td><span class="badge bg-success text-white">Paid</span></td>
+                  <td>$11250</td>
+                  <td>Mastercard</td>
+                  <td><span class="badge bg-info text-white">Shipped</span></td>
+                  <td>
+                    <button class="btn btn-outline-info btn-sm btn-action"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-outline-primary btn-sm btn-action"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline-danger btn-sm btn-action"><i class="fas fa-trash-alt"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>#Kz025419</td>
+                  <td>Margaret Ak</td>
+                  <td>Mar 24, 2022<br>04:26 PM</td>
+                  <td><span class="badge bg-warning text-dark">Processing</span></td>
+                  <td>$899</td>
+                  <td>Visa</td>
+                  <td><span class="badge bg-warning text-dark">Processing</span></td>
+                  <td>
+                    <button class="btn btn-outline-info btn-sm btn-action"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-outline-primary btn-sm btn-action"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline-danger btn-sm btn-action"><i class="fas fa-trash-alt"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>#Kz025420</td>
+                  <td>John Doe</td>
+                  <td>Mar 25, 2022<br>10:00 AM</td>
+                  <td><span class="badge bg-danger text-white">Pending</span></td>
+                  <td>$500</td>
+                  <td>Bank Transfer</td>
+                  <td><span class="badge bg-danger text-white">Pending</span></td>
+                  <td>
+                    <button class="btn btn-outline-info btn-sm btn-action"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-outline-primary btn-sm btn-action"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline-danger btn-sm btn-action"><i class="fas fa-trash-alt"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>#Kz025421</td>
+                  <td>Jane Smith</td>
+                  <td>Mar 26, 2022<br>01:30 PM</td>
+                  <td><span class="badge bg-success text-white">Paid</span></td>
+                  <td>$1500</td>
+                  <td>PayPal</td>
+                  <td><span class="badge bg-info text-white">Delivered</span></td>
+                  <td>
+                    <button class="btn btn-outline-info btn-sm btn-action"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-outline-primary btn-sm btn-action"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline-danger btn-sm btn-action"><i class="fas fa-trash-alt"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>#Kz025422</td>
+                  <td>Robert Brown</td>
+                  <td>Mar 27, 2022<br>09:15 AM</td>
+                  <td><span class="badge bg-warning text-dark">Processing</span></td>
+                  <td>$750</td>
+                  <td>Credit Card</td>
+                  <td><span class="badge bg-warning text-dark">Processing</span></td>
+                  <td>
+                    <button class="btn btn-outline-info btn-sm btn-action"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-outline-primary btn-sm btn-action"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline-danger btn-sm btn-action"><i class="fas fa-trash-alt"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>#Kz025423</td>
+                  <td>Emily White</td>
+                  <td>Mar 28, 2022<br>02:45 PM</td>
+                  <td><span class="badge bg-success text-white">Paid</span></td>
+                  <td>$200</td>
+                  <td>Cash</td>
+                  <td><span class="badge bg-info text-white">Shipped</span></td>
+                  <td>
+                    <button class="btn btn-outline-info btn-sm btn-action"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-outline-primary btn-sm btn-action"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline-danger btn-sm btn-action"><i class="fas fa-trash-alt"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>#Kz025424</td>
+                  <td>David Green</td>
+                  <td>Mar 29, 2022<br>11:00 AM</td>
+                  <td><span class="badge bg-danger text-white">Cancelled</span></td>
+                  <td>$1000</td>
+                  <td>PayPal</td>
+                  <td><span class="badge bg-danger text-white">Cancelled</span></td>
+                  <td>
+                    <button class="btn btn-outline-info btn-sm btn-action"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-outline-primary btn-sm btn-action"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline-danger btn-sm btn-action"><i class="fas fa-trash-alt"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>#Kz025425</td>
+                  <td>Linda Black</td>
+                  <td>Mar 30, 2022<br>03:20 PM</td>
+                  <td><span class="badge bg-success text-white">Paid</span></td>
+                  <td>$350</td>
+                  <td>Mastercard</td>
+                  <td><span class="badge bg-info text-white">Delivered</span></td>
+                  <td>
+                    <button class="btn btn-outline-info btn-sm btn-action"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-outline-primary btn-sm btn-action"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-outline-danger btn-sm btn-action"><i class="fas fa-trash-alt"></i></button>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+
+</body>
+</html>

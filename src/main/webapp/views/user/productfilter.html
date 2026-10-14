@@ -1,0 +1,229 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="${category.name} + ' | ' +'F6S'"></title>
+    <meta name="description" th:content="${category.metaDescription}" />
+    <link rel="canonical" th:href="@{'/category/' + ${category.slug}}" />
+
+    <!-- ✅ Open Graph cho MXH -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" th:content="${category.name}" />
+    <meta property="og:description" th:content="${category.metaDescription}" />
+    <meta property="og:image" th:content="${category.image}" />
+    <meta property="og:url" th:content="@{/category/{slug}(slug=${category.slug})}" />
+
+    <th:block th:include="common/user/libuser :: libheader"></th:block>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
+    <script type="application/ld+json" th:utext="${jsonLd}"></script>
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+
+
+<div class="container shipping-section">
+    <div class="voucher-container" id="voucherList">
+        <div class="voucher-card" th:each="v : ${vouchers}">
+            <div class="voucher-left">
+                <div class="ticket" th:text="${v.discount >= 1000000 ? (v.discount / 1000000) + 'Tr' : (v.discount / 1000) + 'K'}"></div>
+            </div>
+            <div class="voucher-right">
+                <div>
+                    <h4>NHẬP MÃ: <span th:text="${v.code}"></span></h4>
+                    <p>Mã giảm
+                        <span th:text="${v.discount >= 1000000 ? (v.discount / 1000000) + 'Tr' : (v.discount / 1000) + 'K'}"></span>
+                        cho đơn hàng tối thiểu
+                        <span th:text="${v.minAmount >= 1000000 ? (v.minAmount / 1000000) + 'Tr' : (v.minAmount / 1000) + 'K'}"></span>
+                    </p>
+                </div>
+                <div class="voucher-actions">
+                    <button class="btn-copy" th:data-code="${v.code}" onclick="copyCode(this)">Sao chép</button>
+                    <button class="btn-condition">Điều kiện</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="container py-5">
+    <div class="collection-container">
+        <h2 class="collection-title" th:text="${category.name}"></h2>
+        <div class="sort-bar">
+            <label for="sort" class="lb-sort-product">Sắp xếp: </label>
+            <select id="sort" name="sort">
+                <option value="price,asc">Giá tăng dần</option>
+                <option value="price,desc">Giá giảm dần</option>
+                <option value="p.name,asc">Tên A → Z</option>
+                <option value="p.name,desc">Tên Z → A</option>
+            </select>
+            <button data-bs-toggle="modal" data-bs-target="#filterProductModal" class="btn btn-outline-primary btn-sm filter-bar-button"><i class="fa fa-filter"></i> Lọc</button>
+        </div>
+    </div>
+</section>
+
+<section class="container">
+    <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-12 col-12" id="price-container-des">
+            <div class="filter" id="filter-main">
+                <div class="price-filter" id="price-filter">
+                    <div class="head-price-filter">
+                        <h3>Bộ lọc</h3>
+                        <button onclick="searchFull(0)" class="btn btn-outline-primary btn-sm btn-search-large"><i class="fa fa-filter"></i> Lọc</button>
+                    </div>
+                    <h3>Chọn khoảng giá</h3>
+                    <div id="price-slider"></div>
+                    <div class="price-values">
+                        <span id="min-price"></span>
+                        <span id="max-price"></span>
+                    </div>
+
+                    <h3 class="lb-chon-danhmuc">Chọn danh mục</h3>
+                    <div th:each="c : ${categories}" th:if="${c.children.size() > 0}" class="singlelistmenu">
+                        <div class="note-centered">
+                            <strong th:text="${c.name}"></strong>
+                        </div>
+                        <label th:each="child : ${c.children}" class="checkbox-custom cateparent">
+                            <span th:text="${child.name}"></span>
+                            <input th:checked="${child.id == category.id}" class="checkbox-category" th:value="${child.id}" type="checkbox">
+                            <span class="checkmark-checkbox"></span>
+                        </label>
+                    </div>
+                    <div th:if="${#lists.size(categories.?[children.size() == 0]) > 0}" class="singlelistmenu">
+                        <div class="note-centered">
+                            <strong>Khác</strong>
+                        </div>
+                        <label th:each="c : ${categories.?[children.size() == 0]}" class="checkbox-custom cateparent">
+                            <span th:text="${c.name}"></span>
+                            <input th:checked="${c.id == category.id}" th:value="${c.id}" class="checkbox-category" type="checkbox">
+                            <span class="checkmark-checkbox"></span>
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-9 col-md-9 col-sm-12 col-12">
+            <div class="row g-3 g-md-4" id="list-product-filter">
+                <article th:each="p: ${productList}" class="col-6 col-sm-6 col-md-4 col-lg-3">
+                    <div class="product-card h-100" itemscope itemtype="https://schema.org/Product">
+                        <figure class="product-media m-0">
+                            <a th:href="@{/product/{slug}(slug=${p.slug})}" itemprop="url" th:aria-label="${p.name}">
+                                <img class="img-product-list"
+                                     th:src="${p.image}"
+                                     loading="lazy" decoding="async"
+                                     th:alt="${p.name}"
+                                     itemprop="image" />
+                            </a>
+                        </figure>
+                        <div class="product-body">
+                            <div class="product-meta">
+                                <span itemprop="sku">F6S</span>
+                            </div>
+                            <h3 class="product-title h6" itemprop="name">
+                                <a th:href="@{/product/{slug}(slug=${p.slug})}" th:text="${p.name}" class="product-name-list"></a>
+                            </h3>
+                            <div class="product-price">
+                                <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                                    <span itemprop="price" th:content="${p.price}">[[${#numbers.formatDecimal(p.finalPrice, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                                    <meta itemprop="priceCurrency" content="VND" />
+                                    <link itemprop="availability" href="https://schema.org/InStock" />
+                                                <!--                        <span class="oldprice-product-list" th:if="${p.olePrice != null}" itemprop="price" th:content="${p.olePrice}">[[${#numbers.formatDecimal(p.olePrice, 0, 'POINT', 0, 'POINT')}]] đ</span>-->
+                                    <span class="discount-product-list" th:if="${p.discountAmount != null && p.discountAmount > 0}">- [[${#numbers.formatDecimal(p.discountAmount, 0, 'POINT', 0, 'POINT')}]] đ
+                                    <span th:if="${p.discountPercent != null && p.discountPercent > 0}" th:text="'- '+${p.discountPercent}+' %'" class="badge bg-danger"></span>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <nav aria-label="Page navigation" class="navigationpage">
+                <ul class="pagination justify-content-center" id="pageable">
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+</section>
+
+
+<div class="modal fade modal-mobile-right" id="filterProductModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tensanpham"></h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-search-filter">
+            </div>
+            <div class="modal-footer">
+                <button onclick="searchFull(0)" type="button" class="btn btn-outline-primary form-control"><i class="fa fa-filter"></i> Lọc sản phẩm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div th:insert="common/user/footeruser :: footerMain"></div>
+<script src="/js/product.js"></script>
+<div class="native-total-elm" id="native-total-elm" th:data-str="${tongSoTrang}"></div>
+</body>
+<script>
+    function copyCode(button) {
+        const code = button.getAttribute("data-code");
+        navigator.clipboard.writeText(code).then(() => {
+            toastr.success("Đã sao chép mã: " + code)
+        });
+    }
+</script>
+<script>
+    var slider = document.getElementById('price-slider');
+
+    noUiSlider.create(slider, {
+        start: [0, 2000000],
+        connect: true,
+        range: {
+            'min': 0,
+            'max': 2000000
+        },
+        step: 50000,
+        tooltips: false
+    });
+
+    var minPrice = document.getElementById('min-price');
+    var maxPrice = document.getElementById('max-price');
+
+    slider.noUiSlider.on('update', function(values, handle) {
+        var formatted = Number(values[handle]).toLocaleString("vi-VN") + " đ";
+        if (handle === 0) {
+            minPrice.innerHTML = formatted;
+        } else {
+            maxPrice.innerHTML = formatted;
+        }
+    });
+</script>
+<script>
+    $( document ).ready(function() {
+        renderPagination(0, $("#native-total-elm").attr("data-str"))
+        $("#sort").change(function() {
+            searchFull(0)
+        });
+    });
+    function moveDiv() {
+        const priceFilter = document.getElementById("price-filter");
+        const container1 = document.getElementById("filter-main");
+        const container2 = document.getElementById("modal-search-filter");
+
+        if (window.innerWidth <= 768) {
+            container2.appendChild(priceFilter);
+        } else {
+            container1.appendChild(priceFilter);
+        }
+    }
+    window.addEventListener("load", moveDiv);
+    window.addEventListener("resize", moveDiv);
+</script>
+</html>

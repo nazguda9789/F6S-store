@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Admin Dashboard" />
+    <meta name="author" content="Your Name" />
+    <title th:text="'Đơn hàng - '+${invoice.code}"></title>
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+    <link rel="stylesheet" type="text/css" href="/admin/css/invoice.css">
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid">
+                <div class="container py-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="mb-0">
+                            <span class="text-primary">Đơn hàng <span th:text="${invoice.code}"></span></span>
+                            <span class="badge bg-danger ms-2" th:text="${invoice.labelStatus}"></span>
+                        </h3>
+                        <div class="d-flex gap-2">
+                            <button onclick="printShippingLabel()" class="btn btn-outline-secondary"><i class="fa fa-print"></i></button>
+                            <button class="btn btn-primary">Tạo Đơn Hàng Mới</button>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="inv-detail-card">
+                                <div class="inv-detail-card-header">Thông tin Người gửi & Người nhận</div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-secondary">Người gửi</h6>
+                                            <p class="mb-0"><span class="inv-detail-value">038.226.7161</span></p>
+                                            <p class="mb-0 text-muted">Xã Nam Lý, Tỉnh Ninh Bình</p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-secondary">Người nhận</h6>
+                                            <p class="mb-0"><span class="inv-detail-value" th:text="${invoice.fullName}"></span></p>
+                                            <p class="mb-0 text-muted"  th:text="${@formatUtils.formatPhone(invoice.phone)}"></p>
+                                            <p class="mb-0 text-muted" th:text="${invoice.addressDetail}+', '+${invoice.wardName}+', '+${invoice.provinceName}" th:if="${invoice.districtName == null || invoice.districtName == ''}"></p>
+                                            <p class="mb-0 text-muted" th:text="${invoice.addressDetail}+', '+${invoice.wardName}+', '+ ${invoice.districtName}+', '+${invoice.provinceName}" th:if="${invoice.districtName != null && invoice.districtName != ''}"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="inv-detail-card" th:if="${invoice.note != null}">
+                                <div class="inv-detail-card-header">Ghi chú riêng</div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="inv-detail-notes-value" th:text="${invoice.note}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="inv-detail-card">
+                                <div class="inv-detail-card-header">Thông tin Vận chuyển & Thanh toán</div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6 mb-3">
+                                            <div class="inv-detail-label">Tạm tính</div>
+                                            <div class="inv-detail-value"><strong>[[${#numbers.formatDecimal(invoice.totalAmount, 0, 'POINT', 0, 'POINT')}]] đ</strong></div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="inv-detail-label">Phí vận chuyển</div>
+                                            <div class="inv-detail-value"><strong class="text-red">[[${#numbers.formatDecimal(invoice.shipCost, 0, 'POINT', 0, 'POINT')}]] đ</strong></div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="inv-detail-label">Giảm giá</div>
+                                            <div class="inv-detail-value"><strong class="text-red">[[${#numbers.formatDecimal(invoice.discount, 0, 'POINT', 0, 'POINT')}]] đ</strong></div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="inv-detail-label">Tổng tiền khách phải trả</div>
+                                            <div class="inv-detail-value"><h3 class="text-green">[[${#numbers.formatDecimal(invoice.totalAmount + invoice.shipCost - invoice.discount, 0, 'POINT', 0, 'POINT')}]] đ</h3></div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="inv-detail-label">Ghi chú vận chuyển</div>
+                                            <p class="inv-detail-notes-value">Cho kiểm hàng</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inv-detail-card">
+                        <div class="inv-detail-card-header text-center">Thông tin Sản phẩm</div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered checkout-success-table">
+                                <thead class="table-light">
+                                <tr>
+                                    <th></th>
+                                    <th>Sản phẩm</th>
+                                    <th>Phân loại</th>
+                                    <th>SL</th>
+                                    <th>Đơn giá</th>
+                                    <th>Thành tiền</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="d : ${invoiceDetails}">
+                                    <td><img th:src="${d.productImage}" class="img-table"></td>
+                                    <td th:text="${d.productName}"></td>
+                                    <td>Màu <span th:text="${d.colorName}"></span> - Size <span th:text="${d.sizeName}"></span></td>
+                                    <td th:text="${d.quantity}"></td>
+                                    <td>[[${#numbers.formatDecimal(d.price, 0, 'POINT', 0, 'POINT')}]] đ</td>
+                                    <td>[[${#numbers.formatDecimal(d.price * d.quantity, 0, 'POINT', 0, 'POINT')}]] đ</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <script>
+                    function printShippingLabel() {
+                        window.print();
+                    }
+                </script>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

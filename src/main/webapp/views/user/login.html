@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="common/user/libuser :: libheader"></th:block>
+</head>
+<body>
+    <div th:replace="common/user/headerUser :: headerUser"></div>
+    <div class="section-bottom-menu"></div>
+
+    <div class="login-section">
+        <div class="block-img-login">
+            <img src="../../image/logo.png" alt="" class="img-logo-login">
+        </div>
+        <div class="content-modal-login">
+            <button class="btn-login-google w-100" onclick="window.location.href='/oauth2/authorization/google'"><img src="image/google-icon.png" alt=""> Tiếp tục với google</button>
+
+            <div class="divider"><span>Hoặc</span></div>
+            <form action="/perform_login" method="post">
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    <span th:text="${errorMessage}">Lỗi xảy ra</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <input type="text" name="username" class="form-control input-login" placeholder="Nhập email của bạn">
+                <input type="password" name="password" class="form-control input-login" placeholder="Mật khẩu">
+                <br><input type="checkbox" name="remember-me" checked id="remember-me"> <label for="remember-me">Ghi nhớ đăng nhập</label>
+                <button class="w-100 btn btn-primary btn-login-main form-control">Đăng Nhập</button>
+            </form>
+
+            <div class="auth-links">
+                <a href="/forgot" class="forgot-link">Quên mật khẩu?</a>
+                <a href="/register" class="register-link">Đăng ký</a>
+            </div>
+        </div>
+    </div>
+    <div id="footer"></div>
+    <script th:inline="javascript">
+        var success = /*[[${success}]]*/ 'default';
+        if(success != null){
+            swal({
+                    title: "Thông báo",
+                    text: success,
+                    type: "success"
+                },
+                function() {
+                });
+        }
+    </script>
+</body>
+</html>

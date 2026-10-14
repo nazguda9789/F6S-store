@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Tài khoản | F6S</title>
+  <th:block th:include="common/user/libuser :: libheader"></th:block>
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+<div class="container my-4 shipping-section">
+  <nav aria-label="breadcrumb" class="breadcrumb-container">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+      <li class="breadcrumb-item breadcrumb-product-name active" aria-current="page"> Tài khoản</li>
+    </ol>
+  </nav>
+  <div class="account-container">
+      <!-- Sidebar -->
+      <div class="account-sidebar">
+        <div class="list-group">
+          <a class="list-group-item" th:classappend="${successChange == null && errorChange == null ?' active':''}" data-bs-toggle="tab" href="#account-orders">Đơn hàng đã đặt</a>
+          <a class="list-group-item" th:classappend="${successChange != null || errorChange != null ?' active':''}" data-bs-toggle="tab" href="#account-info">Thông tin tài khoản</a>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="account-content tab-content">
+        <!-- Tab Orders -->
+        <div class="tab-pane fade" th:classappend="${successChange == null && errorChange == null ?' show active':''}" id="account-orders">
+          <h4 class="mb-4">Đơn hàng đã đặt</h4>
+
+          <!-- Desktop table -->
+          <div class="account-orders-table table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-dark">
+              <tr>
+                <th>Mã đơn</th>
+                <th>Ngày đặt</th>
+                <th>Tạm tính</th>
+                <th>Phí ship</th>
+                <th>Giảm giá</th>
+                <th>Tổng phải trả</th>
+                <th>Trạng thái</th>
+              </tr>
+              </thead>
+              <tbody>
+                <th:block th:each="c : ${InvoiceUserResponse}">
+                  <tr class="account-tr-invoice-info">
+                    <td th:text="${c.invoice.code}"></td>
+                    <td th:text="${#temporals.format(c.invoice.createdDate, 'HH:mm dd/MM/yyyy')}"></td>
+                    <td>[[${#numbers.formatDecimal(c.invoice.totalAmount, 0, 'POINT', 0, 'POINT')}]] đ</td>
+                    <td>[[${#numbers.formatDecimal(c.invoice.shipCost, 0, 'POINT', 0, 'POINT')}]] đ</td>
+                    <td>[[${#numbers.formatDecimal(c.invoice.discount, 0, 'POINT', 0, 'POINT')}]] đ</td>
+                    <td>[[${#numbers.formatDecimal(c.invoice.totalAmount - c.invoice.discount + c.invoice.shipCost, 0, 'POINT', 0, 'POINT')}]] đ</td>
+                    <td><span class="badge" th:text="${c.invoice.invoiceStatus.label}" th:style="'background:' + ${c.invoice.invoiceStatus.color} + ';'" ></span></td>
+
+                  </tr>
+                  <tr th:each="d : ${c.invoiceDetails}">
+                    <td colspan="7">
+                      <div class="account-product-item">
+                        <img th:src="${d.productImage}" class="account-product-img" alt="">
+                        <div class="account-product-info">
+                          <div class="account-product-name" th:text="${d.productName}"></div>
+                          <div class="account-product-code" th:text="${d.colorName} + ' (' +${d.sizeName}+')' "></div>
+                        </div>
+                        <div class="text-end">
+                          <div class="account-product-price">[[${#numbers.formatDecimal(d.price, 0, 'POINT', 0, 'POINT')}]] đ</div>
+                          <div class="account-product-qty" th:text="'x '+${d.quantity}"></div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </th:block>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile cards -->
+          <div th:each="c : ${InvoiceUserResponse}" class="account-orders-card">
+            <div class="account-order-card">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="fw-bold" th:text="${c.invoice.code}"></span>
+                <span class="badge" th:text="${c.invoice.invoiceStatus.label}" th:style="'background:' + ${c.invoice.invoiceStatus.color} + ';'"></span>
+              </div>
+              <div class="small text-muted mb-1" th:text="${#temporals.format(c.invoice.createdDate, 'HH:mm dd/MM/yyyy')}"></div>
+              <div class="small">Tạm tính: <b>[[${#numbers.formatDecimal(c.invoice.totalAmount, 0, 'POINT', 0, 'POINT')}]] đ</b></div>
+              <div class="small">Phí ship: <b>[[${#numbers.formatDecimal(c.invoice.shipCost, 0, 'POINT', 0, 'POINT')}]] đ</b></div>
+              <div class="small">Giảm giá: <b>[[${#numbers.formatDecimal(c.invoice.discount, 0, 'POINT', 0, 'POINT')}]] đ</b></div>
+              <div class="fw-semibold mt-2 mb-3">Tổng: [[${#numbers.formatDecimal(c.invoice.totalAmount - c.invoice.discount + c.invoice.shipCost, 0, 'POINT', 0, 'POINT')}]] đ</div>
+
+              <!-- Products -->
+              <div class="account-product-item" th:each="d : ${c.invoiceDetails}">
+                <img th:src="${d.productImage}" class="account-product-img" alt="">
+                <div class="account-product-info">
+                  <div class="account-product-name" th:text="${d.productName}"></div>
+                  <div class="account-product-code" th:text="${d.colorName} + ' (' +${d.sizeName}+')' "></div>
+                </div>
+                <div class="text-end">
+                  <div class="account-product-price">[[${#numbers.formatDecimal(d.price, 0, 'POINT', 0, 'POINT')}]] đ</div>
+                  <div class="account-product-qty" th:text="'x '+${d.quantity}"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Tab Info -->
+        <div class="tab-pane fade" th:classappend="${successChange != null || errorChange != null ?' show active':''}" id="account-info">
+
+          <h4 class="mb-4">Quản lý tài khoản</h4>
+          <div th:if="${errorChange}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <span th:text="${errorChange}">Lỗi xảy ra</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <div th:if="${successChange}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <span th:text="${successChange}">Lỗi xảy ra</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <!-- Mobile Tabs -->
+          <ul class="nav nav-tabs d-sm-none mb-3" id="account-info-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-form" type="button" role="tab">Thông tin</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password-form" type="button" role="tab">Mật khẩu</button>
+            </li>
+          </ul>
+
+          <!-- Desktop Layout -->
+          <div class="row d-none d-sm-flex">
+            <!-- Update Info -->
+            <div class="col-sm-6">
+              <div class="account-form-box p-3">
+                <h5 class="mb-3">Cập nhật thông tin</h5>
+                <form action="/update-infor" method="post" class="account-form">
+                  <div class="mb-3">
+                    <label class="form-label">Họ tên</label>
+                    <input name="fullName" th:value="${fullName}" type="text" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input th:value="${email}" disabled type="email" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Số điện thoại</label>
+                    <input name="phone" th:value="${phone}" type="tel" class="form-control">
+                  </div>
+                  <button type="submit" class="btn btn-dark w-100">Cập nhật</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Change Password -->
+            <div class="col-sm-6">
+              <div class="account-form-box p-3">
+                <h5 class="mb-3">Đổi mật khẩu</h5>
+                <form action="/update-password" method="post" class="account-form">
+                  <div class="mb-3">
+                    <label class="form-label">Mật khẩu hiện tại</label>
+                    <input name="oldPassword" type="password" class="form-control" required>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Mật khẩu mới</label>
+                    <input name="newPassword" type="password" class="form-control" required minlength="6">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Nhập lại mật khẩu mới</label>
+                    <input name="confirmPassword" type="password" class="form-control" required minlength="6">
+                  </div>
+                  <button type="submit" class="btn btn-outline-dark w-100">Đổi mật khẩu</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Tabs Content -->
+          <div class="tab-content d-sm-none">
+            <div class="tab-pane fade show active" id="info-form" role="tabpanel">
+              <form action="/update-infor" method="post" class="account-form">
+                <div class="mb-3">
+                  <label class="form-label">Họ tên</label>
+                  <input name="fullName" th:value="${fullName}" type="text" class="form-control">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input th:value="${email}" disabled type="email" class="form-control">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Số điện thoại</label>
+                  <input name="phone" th:value="${phone}" type="tel" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-dark w-100">Cập nhật</button>
+              </form>
+            </div>
+            <div class="tab-pane fade" id="password-form" role="tabpanel">
+              <form action="/change-password" method="post" class="account-form">
+                <div class="mb-3">
+                  <label class="form-label">Mật khẩu hiện tại</label>
+                  <input name="oldPassword" type="password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Mật khẩu mới</label>
+                  <input name="newPassword" type="password" class="form-control" required minlength="6">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Nhập lại mật khẩu mới</label>
+                  <input name="confirmPassword" type="password" class="form-control" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-outline-dark w-100">Đổi mật khẩu</button>
+              </form>
+            </div>
+          </div>
+
+        </div>
+
+
+      </div>
+    </div>
+</div>
+
+<div th:replace="common/user/footeruser :: footerMain"></div>
+
+</body>
+
+</html>

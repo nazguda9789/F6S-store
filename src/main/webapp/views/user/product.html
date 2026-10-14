@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${product.name} + ' | ' +'F6S'"></title>
+    <meta name="description" th:content="${product.metaDescription}" />
+    <link rel="canonical" th:href="@{'/product/' + ${product.slug}}" />
+
+    <meta property="og:type" content="product" />
+    <meta property="og:title" th:content="${product.name}" />
+    <meta property="og:description" th:content="${product.metaDescription}" />
+    <meta property="og:image" th:content="${product.image}" />
+    <meta property="og:url" th:content="@{/product/{slug}(slug=${product.slug})}" />
+    <th:block th:include="common/user/libuser :: libheader"></th:block>
+    <script type="application/ld+json" th:utext="${jsonLd}"></script>
+</head>
+<body>
+<!-- Menu -->
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+<div class="container my-4 shipping-section">
+    <nav aria-label="breadcrumb" class="breadcrumb-container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item"
+                th:each="pc : ${product.productCategories}">
+                <a th:href="@{'/category/' + ${pc.category.slug}}"
+                   th:text="${pc.category.name}">
+                </a>
+            </li>
+            <li class="breadcrumb-item breadcrumb-product-name breadcrumb-product-detail active" aria-current="page" th:text="${product.name}"></li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-md-2">
+            <div class="list-image-product-left list-image-desktop">
+                <div class="thumbnail-container-lg">
+                    <img th:src="${product.image}" th:alt="${product.name}" class="img-thumbnail-lg img-thumbnail-active">
+                    <img th:each="c : ${listImage}" th:src="${c.linkImage}" th:alt="${product.name}" class="img-thumbnail-lg">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <img th:src="${product.image}" id="image-detail-main" th:alt="${product.name}" class="img-fluid rounded image-product-detail" />
+            <div class="scroll-wrapper list-image-mobile">
+                <button class="scroll-btn left" onclick="scrollImages(-1)">&#8249;</button>
+                <div class="thumbnail-container">
+                    <img th:src="${product.image}" th:alt="${product.name}" class="img-thumbnail img-thumbnail-active">
+                    <img th:each="c : ${listImage}" th:src="${c.linkImage}" th:alt="${product.name}" class="img-thumbnail">
+                </div>
+                <button class="scroll-btn right" onclick="scrollImages(1)">&#8250;</button>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h1 class="fw-bold product-name-dt" th:text="${product.name}"></h1>
+            <p>Mã sản phẩm  <span class="product-code" id="product-code"></span></p>
+            <p class="quantity-sold">Đã bán  <span><strong th:text="${product.sold}"></strong> sản phẩm</span></p>
+            <div class="d-flex">
+                <p class="text-danger h4 fw-bold" id="price-product">[[${#numbers.formatDecimal(product.price, 0, 'POINT', 0, 'POINT')}]] đ</p>
+                <p class="oldprice-detail h4 old-price-product-main" th:if="${product.olePrice != null}">[[${#numbers.formatDecimal(product.olePrice, 0, 'POINT', 0, 'POINT')}]] đ</p>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Màu sắc: <span class="color-name-detail" id="color-name-detail">Xám</span></label>
+                <div class="thumbnail-container" id="thumbnail-container">
+                </div>
+            </div>
+
+            <!-- Kích thước -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Kích thước:</label>
+                <div id="list-size">
+                </div>
+            </div>
+
+            <div class="product-detail-wrapper">
+                <div class="promo-box">
+                    <div class="promo-title">
+                        <i class="fa fa-gift" aria-hidden="true"></i> KHUYẾN MÃI - ƯU ĐÃI
+                    </div>
+                    <ul class="promo-list mt-2 list-unstyled">
+                        <li th:each="v : ${listVoucher}">✅ Nhập mã <span class="voucher-code" th:text="${v.code}"></span>
+                            giảm <span th:text="${v.discount >= 1000000 ? (v.discount / 1000000) + 'Tr' : (v.discount / 1000) + 'K'}"></span>
+                            cho đơn hàng
+                            <span th:text="${v.minAmount >= 1000000 ? (v.minAmount / 1000000) + 'Tr' : (v.minAmount / 1000) + 'K'}"></span>
+                            <a class="copy-link pointer" th:data-code="${v.code}" onclick="copyCode(this)">Sao chép</a></li>
+                        <li>✅ Nhận hàng, kiểm tra ưng ý mới thanh toán</li>
+                        <li>✅ Hỗ trợ đổi hàng lên tới 30 ngày</li>
+                        <li>✅ Miễn phí ship đơn hàng từ 500.000đ</li>
+                    </ul>
+                </div>
+                <div class="d-flex gap-2 action-box">
+                    <div class="d-flex divquantity-detail">
+                        <button class="btn-action-quantity" onclick="changeQuantity('DOWN')">-</button>
+                        <input class="inputquantity" id="inputquantity" value="1">
+                        <button class="btn-action-quantity" onclick="changeQuantity('UP')">+</button>
+                    </div>
+                    <button class="btn btn-danger btn-lg btn-buy-now" onclick="buyNow()">Mua ngay</button>
+                    <button class="btn btn-outline-dark btn-lg btn-buy-now" onclick="addCart()">Thêm vào giỏ</button>
+                </div>
+                <p class="callme-order">Gọi đặt mua <a href="tel:0382267161">038.226.7161</a> (8:00 - 22:00)</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Đánh giá sản phẩm -->
+    <div class="mt-5">
+        <!-- Tabs -->
+        <ul class="nav nav-tabs" id="productTab" role="tablist">
+            <li class="nav-item item-navtab" role="presentation">
+                <button class="nav-link btn-navtab active" id="mo-ta-tab" data-bs-toggle="tab" data-bs-target="#mo-ta" type="button" role="tab" aria-controls="mo-ta" aria-selected="true">
+                    MÔ TẢ SẢN PHẨM
+                </button>
+            </li>
+            <li class="nav-item item-navtab" role="presentation">
+                <button class="nav-link btn-navtab" id="giao-hang-tab" data-bs-toggle="tab" data-bs-target="#giao-hang" type="button" role="tab" aria-controls="giao-hang" aria-selected="false">
+                    CHÍNH SÁCH VẬN CHUYỂN
+                </button>
+            </li>
+            <li class="nav-item item-navtab" role="presentation">
+                <button class="nav-link btn-navtab" id="doi-tra-tab" data-bs-toggle="tab" data-bs-target="#doi-tra" type="button" role="tab" aria-controls="doi-tra" aria-selected="false">
+                    CHÍNH SÁCH ĐỔI TRẢ
+                </button>
+            </li>
+        </ul>
+        <!-- Nội dung -->
+        <div class="tab-content" id="productTabContent">
+            <div class="tab-pane fade show active" id="mo-ta" role="tabpanel" aria-labelledby="mo-ta-tab">
+                <h5>Thông tin sản phẩm:</h5>
+                <div class="description-container">
+                    <div class="description-product-detail" th:utext="${product.description}"></div>
+                </div>
+                <button class="btn btn-sm btn-outline-primary mt-2 toggle-desc">Đọc thêm</button>
+            </div>
+            <div class="tab-pane fade" id="giao-hang" role="tabpanel" aria-labelledby="giao-hang-tab">
+                <h5>Chính sách giao hàng:</h5>
+                <p>- Miễn phí ship cho đơn từ 500.000đ</p>
+                <p>- Giao hàng toàn quốc từ 2-5 ngày</p>
+            </div>
+            <div class="tab-pane fade" id="doi-tra" role="tabpanel" aria-labelledby="doi-tra-tab">
+                <h5>Chính sách đổi trả:</h5>
+                <p>- Đổi hàng trong 30 ngày nếu sản phẩm lỗi</p>
+                <p>- Hỗ trợ đổi size miễn phí</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container shipping-section">
+    <h2 class="text-center">Sản Phẩm Cùng Tầm Giá</h2>
+    <div id="dsmh_index">
+        <div class="listdmindex owl-2-style">
+            <div class="owl-carousel owl-2" id="listcategoryindex">
+                <div th:each="p: ${productSamePrice}" class="media-29101">
+                        <div class="product-card h-100" itemscope itemtype="https://schema.org/Product">
+                            <figure class="product-media m-0">
+                                <a th:href="@{/product/{slug}(slug=${p.slug})}" itemprop="url" th:aria-label="${p.name}">
+                                    <img class="img-product-list"
+                                         th:src="${p.image}"
+                                         loading="lazy" decoding="async"
+                                         th:alt="${p.name}"
+                                         itemprop="image" />
+                                </a>
+                            </figure>
+                            <div class="product-body">
+                                <div class="product-meta">
+                                    <span itemprop="sku">F6S</span>
+                                </div>
+                                <h3 class="product-title h6" itemprop="name">
+                                    <a th:href="@{/product/{slug}(slug=${p.slug})}" th:text="${p.name}" class="product-name-list"></a>
+                                </h3>
+                                <div class="product-price">
+                                    <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                                        <span itemprop="price" th:content="${p.price}">[[${#numbers.formatDecimal(p.price, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                                        <meta itemprop="priceCurrency" content="VND" />
+                                        <link itemprop="availability" href="https://schema.org/InStock" />
+                                        <span class="oldprice-product-list" th:if="${p.olePrice != null}" itemprop="price" th:content="${p.olePrice}">[[${#numbers.formatDecimal(p.olePrice, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g==" crossorigin="anonymous" referrerpolicy="no-referrer"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" integrity="sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/js/carousel.js"></script>
+<div th:replace="common/user/footeruser :: footerMain"></div>
+<script src="/js/product.js"></script>
+<script src="/js/cart.js"></script>
+</body>
+<script>
+    $( document ).ready(function() {
+        getVariant();
+    });
+    function scrollImages(direction) {
+        const container = document.querySelector('.thumbnail-container');
+        const scrollAmount = 120; // px mỗi lần cuộn
+        container.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+</script>
+
+<script>
+    function copyCode(button) {
+        const code = button.getAttribute("data-code");
+        navigator.clipboard.writeText(code).then(() => {
+            toastr.success("Đã sao chép mã: " + code)
+        });
+    }
+    const container = document.querySelector('.thumbnail-container-lg');
+    let isDown = false;
+    let startY;
+    let scrollTop;
+
+    container.addEventListener('mousedown', (e) => {
+        isDown = true;
+        container.style.cursor = 'grabbing';
+        startY = e.pageY - container.offsetTop;
+        scrollTop = container.scrollTop;
+        e.preventDefault(); // Tránh bôi đen ảnh khi kéo
+    });
+
+    container.addEventListener('mouseleave', () => {
+        isDown = false;
+        container.style.cursor = 'default';
+    });
+
+    container.addEventListener('mouseup', () => {
+        isDown = false;
+        container.style.cursor = 'default';
+    });
+
+    container.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const y = e.pageY - container.offsetTop;
+        const walk = (y - startY) * 1; // hệ số kéo, có thể tăng để cuộn nhanh hơn
+        container.scrollTop = scrollTop - walk;
+    });
+    $(document).ready(function(){
+        $('.toggle-desc').click(function(){
+            var $desc = $(this).siblings('.description-container');
+            $desc.toggleClass('expanded');
+            if($desc.hasClass('expanded')){
+                $(this).text('Thu gọn');
+            } else {
+                $(this).text('Đọc thêm');
+            }
+        });
+        $('.img-thumbnail, .img-thumbnail-lg').click(function(e){
+            $('.img-thumbnail, .img-thumbnail-lg').removeClass('img-thumbnail-active');
+            $(this).addClass('img-thumbnail-active');
+            $("#image-detail-main").attr("src", $(this).attr("src"));
+        });
+        // $('.img-thumbnail, .img-thumbnail-lg').click(function(e){
+        //     $('.img-thumbnail, .img-thumbnail-lg').removeClass('img-thumbnail-active');
+        //     $(this).addClass('img-thumbnail-active');
+        //     var newSrc = $(this).attr('src');
+        //     $("#image-detail-main").fadeOut(50, function() {
+        //         $(this).attr("src", newSrc).fadeIn(50);
+        //     });
+        // });
+
+    });
+
+</script>
+</html>

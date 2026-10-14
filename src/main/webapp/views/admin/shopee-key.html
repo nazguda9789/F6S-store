@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Admin Dashboard" />
+    <meta name="author" content="Your Name" />
+    <title>Shopee key</title>
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">Quản lý key shopee</h1>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <button data-bs-toggle="modal" data-bs-target="#shopeeKeyModal" onclick="openAddModal()" class="btn btn-primary">Thêm key</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row row-pageable-head">
+                            <div th:if="${success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                                <span th:text="${success}"></span>
+
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Shop Name</th>
+                                    <th>Key Token</th>
+                                    <th>Created Date</th>
+                                    <th>Updated Date</th>
+                                    <th>Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="key : ${listShopeeKey}">
+                                    <td th:text="${key.id}"></td>
+                                    <td th:text="${key.shopName}"></td>
+                                    <td th:text="${key.keyToken}"></td>
+                                    <td th:text="${#temporals.format(key.localDateTime, 'dd/MM/yyyy HH:mm')}"></td>
+                                    <td th:text="${#temporals.format(key.updatedDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-primary btn-sm edit-btn"
+                                                th:data-id="${key.id}"
+                                                th:data-shopname="${key.shopName}"
+                                                th:data-keytoken="${key.keyToken}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <a th:href="@{'delete/' + ${key.id}}" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div class="modal fade" id="shopeeKeyModal" tabindex="-1" aria-labelledby="shopeeKeyModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{add}" th:object="${shopeeKey}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="shopeeKeyModalLabel">Thêm / Sửa Shopee Key</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" th:field="*{id}" id="shopeeKeyId"/>
+                            <div class="mb-3">
+                                <label class="form-label">Shop Name</label>
+                                <input type="text" class="form-control" th:field="*{shopName}" id="shopeeName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Key Token</label>
+                                <input type="text" class="form-control" id="keyToken" th:field="*{keyToken}" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    function openAddModal() {
+        document.getElementById('shopeeKeyId').value = '';
+        document.getElementById('shopeeKeyId').value = '';
+        document.getElementById('shopeeName').value = ''
+        document.getElementById('keyToken').value = '';
+        document.getElementById('shopeeKeyModalLabel').innerText = 'Thêm Shopee Key';
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editButtons = document.querySelectorAll('.edit-btn');
+        editButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const shopName = this.getAttribute('data-shopname');
+                const keyToken = this.getAttribute('data-keytoken');
+
+                document.getElementById('shopeeKeyId').value = id;
+                document.getElementById('shopeeName').value = shopName;
+                document.getElementById('keyToken').value = keyToken;
+
+                new bootstrap.Modal(document.getElementById('shopeeKeyModal')).show();
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

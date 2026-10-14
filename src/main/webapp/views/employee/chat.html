@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Admin Dashboard" />
+  <meta name="author" content="Your Name" />
+  <title>Tin nhắn</title>
+  <head th:replace="common/libadmin :: libheaderadmin"></head>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/employee/navbarEmployee :: headerAdmin"></div>
+<div id="layoutSidenav">
+  <div th:replace="common/employee/navbarEmployee :: sidenavAdmin"></div>
+  <div id="layoutSidenav_content">
+    <main>
+      <div class="container-fluid px-4">
+        <div class="container-fluid p-0 h-100">
+          <div class="row g-0 staff-chat-container">
+            <!-- Sidebar - Danh sách user -->
+            <div class="col-md-4 col-lg-3 staff-chat-sidebar" id="staffChatSidebar">
+              <div class="staff-chat-sidebar-header">
+                <h5><i class="fas fa-comments me-2"></i> Khách hàng</h5>
+              </div>
+              <div class="staff-chat-search">
+                <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                  <input type="text" class="form-control staff-chat-search-input border-start-0"
+                         id="staffChatSearch" placeholder="Tìm kiếm khách hàng...">
+                </div>
+              </div>
+              <div class="staff-chat-user-list" id="staffChatUserList">
+                <div class="text-center py-4 text-muted">
+                  <i class="fas fa-users fa-2x mb-2 opacity-50"></i>
+                  <p>Đang tải danh sách...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat area -->
+            <div class="col-md-8 col-lg-9 staff-chat-area">
+              <!-- Empty state -->
+              <div id="staffChatEmptyState" class="staff-chat-empty">
+                <i class="fas fa-comment-dots"></i>
+                <h5>Chưa chọn khách hàng</h5>
+                <p class="text-muted">Chọn một khách hàng để bắt đầu chat</p>
+              </div>
+
+              <!-- Chat content (hidden by default) -->
+              <div id="staffChatContent" style="display: none; height: 100%; display: flex; flex-direction: column;">
+                <div class="staff-chat-header">
+                  <div class="staff-chat-header-avatar" id="staffChatAvatar">
+                    <span id="staffChatAvatarText">KH</span>
+                  </div>
+                  <div class="staff-chat-header-info flex-grow-1">
+                    <h6 id="staffChatUserName">Khách hàng</h6>
+                    <p id="staffChatUserEmail">user@example.com</p>
+                  </div>
+                </div>
+
+                <div class="staff-chat-messages" id="staffChatMessages">
+                  <div class="text-center text-muted py-4">
+                    <i class="fas fa-spinner fa-spin"></i> Đang tải tin nhắn...
+                  </div>
+                </div>
+
+                <div class="staff-chat-input-area">
+                  <textarea id="staffChatEditor" class="staff-chat-editor" placeholder="Nhập tin nhắn..."></textarea>
+                  <button class="staff-chat-send-btn" id="staffChatSendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  <script src="https://cdn.tiny.cloud/1/xqhz0tu1vx2a47ob4qdhwpyz39c09mrs2mfilfeahlm42vwa/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="/admin/js/chat.js"></script>
+  </div>
+
+</div>
+</body>
+</html>

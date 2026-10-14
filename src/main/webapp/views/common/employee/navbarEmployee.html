@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+</head>
+<body>
+
+<nav th:fragment="headerAdmin" class="sb-topnav navbar navbar-expand navbar-light bg-light">
+    <a class="navbar-brand ps-3" href="index.html">STORE</a>
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+    <div class="div-content-header">
+        <span>Đang truy cập <strong id="dangtruycap" class="text-green" th:text="${onlineUsers}"></strong></span>
+    </div>
+    <div class="d-flex d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+        <div class="input-group">
+            <input class="form-control" type="text" id="timkienket" placeholder="Tìm kiếm liên kết" aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+            <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
+        </div>
+        <ul id="searchResults" class="list-group position-absolute mt-2 bg-white shadow rounded"
+            style="z-index: 9999; width: 250px; display: none;"></ul>
+    </div>
+
+    <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="#!">Settings</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            </ul>
+        </li>
+    </ul>
+
+    <div id="new-orders-widget" class="draggable" th:if="${isInvoicePage == null}">
+        <div class="widget-header">
+        <span class="widget-title">
+            <i class="bi bi-box-seam"></i>
+            Đơn hàng mới
+        </span>
+            <button id="close-widget" class="close-btn">&times;</button>
+        </div>
+        <div class="widget-content">
+            <span class="order-count new-order-count" th:text="${donHangMoi}"></span>
+            <div><button class="btn btn-primary btn-sm">Làm mới</button></div>
+        </div>
+    </div>
+</nav>
+
+
+
+<div th:fragment="sidenavAdmin" id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <a class="nav-link" href="/">
+                    <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
+                    Trang chủ
+                </a>
+
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseCustomers" aria-expanded="false" aria-controls="collapseCustomers">
+                    <div class="sb-nav-link-icon"><i class="fas fa-user-friends"
+                    data-urls='["/emp-prj/qtht-001/customer/list" ]'
+                    ></i></div>
+                    Khách hàng
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseCustomers" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="navchild" href="/emp-prj/qtht-001/customer/list">Tất cả khách hàng</a>
+                    </nav>
+                </div>
+
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseProducts" aria-expanded="false" aria-controls="collapseProducts"
+                   data-urls='["/emp-prj/qtht-001/category/list", "/emp-prj/qtht-001/category/save",
+                   "/emp-prj/qtht-001/color/list", "/emp-prj/qtht-001/product/save","/emp-prj/qtht-001/product/list"]'>
+                    <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
+                    Sản phẩm
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseProducts" aria-labelledby="headingThree" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="navchild" href="/emp-prj/qtht-001/product/list">Tất cả sản phẩm</a>
+                    </nav>
+                </div>
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseInvoice" aria-expanded="false" aria-controls="collapseInvoice"
+                   data-urls='["/emp-prj/qtht-001/invoice/list", "/emp-prj/qtht-001/invoice/create","/emp-prj/qtht-001/invoice/detail"]'>
+                    <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
+                    Đơn hàng <span th:text="${donHangMoi}" class="number-counter-navbar new-order-count"></span>
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseInvoice" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="navchild" href="/emp-prj/qtht-001/invoice/list">Tất cả đơn hàng</a>
+                        <a class="navchild" href="/emp-prj/qtht-001/invoice/create">Đơn chờ</a>
+                    </nav>
+                </div>
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseBlog" aria-expanded="false" aria-controls="collapseVendors"
+                   data-urls='["/emp-prj/qtht-001/blog/list", "/emp-prj/qtht-001/blog/save"]'>
+                    <div class="sb-nav-link-icon"><i class="fa fa-newspaper"></i></div>
+                    Bài viết
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseBlog" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="navchild" href="/emp-prj/qtht-001/blog/list">Tất cả bài viết</a>
+                        <a class="navchild" href="/emp-prj/qtht-001/blog/save">Thêm bài viết mới</a>
+                    </nav>
+                </div>
+                <a data-urls='["/emp-prj/qtht-001/contact/list"]' class="nav-link" href="/emp-prj/qtht-001/contact/list">
+                    <div class="sb-nav-link-icon"><i class="fas fa-envelope"></i></div>
+                    Liên hệ <span th:text="${numberNewContact}" class="number-counter-navbar counter-contact"></span>
+                </a>
+                <a data-urls='["/emp-prj/qtht-001/chat/list"]' class="nav-link" href="/emp-prj/qtht-001/chat/list">
+                    <div class="sb-nav-link-icon"><i class="fas fa-envelope"></i></div>
+                    Tin Nhắn
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div id="order-notification-container"></div>
+    <script>
+        window.addEventListener('DOMContentLoaded', event => {
+            // Toggle the side navigation
+            const sidebarToggle = document.body.querySelector('#sidebarToggle');
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', event => {
+                    event.preventDefault();
+                    document.body.classList.toggle('sb-sidenav-toggled');
+                    // localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
+                });
+            }
+        });
+        function formatmoney(money) {
+            const VND = new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+            });
+            return VND.format(money);
+        }
+
+    </script>
+    <script>
+        window.addEventListener('load', () => {
+            let total = 0;
+            performance.getEntriesByType("resource").forEach(r => {
+                total += r.transferSize; // bytes tải về
+            });
+
+            function formatBytes(bytes) {
+                if (bytes < 1024) return bytes + " B";
+                else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
+                else return (bytes / (1024*1024)).toFixed(2) + " MB";
+            }
+
+            console.log("Total bandwidth used:", formatBytes(total));
+        });
+    </script>
+
+    <script th:inline="javascript">
+        var success = /*[[${success}]]*/ 'default';
+        if(success != null){
+            swal({
+                    title: "Thông báo",
+                    text: success,
+                    type: "success"
+                },
+                function() {
+                });
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('a.nav-link[data-urls]');
+            const child = document.querySelectorAll('a.navchild[href]');
+
+            navLinks.forEach(link => {
+                const urls = JSON.parse(link.getAttribute('data-urls') || '[]');
+                if (urls.includes(currentPath)) {
+                    // Xóa class active khỏi các link khác
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    // Thêm active vào link trùng URL
+                    link.classList.add('active');
+
+                    // Mở menu collapse nếu có
+                    const target = link.getAttribute('data-bs-target');
+                    if (target) {
+                        const collapseEl = document.querySelector(target);
+                        if (collapseEl) {
+                            collapseEl.classList.add('show');
+                        }
+                    }
+                }
+            });
+            child.forEach(link => {
+                const urls = link.getAttribute('href')
+                if (urls == currentPath) {
+                    child.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("timkienket")
+            const searchResults = document.getElementById("searchResults");
+
+            // ✅ Lấy tất cả link từ menu sidebar
+            const menuLinks = document.querySelectorAll('#layoutSidenav_nav a[href]');
+            const searchLinks = [];
+
+            menuLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                const text = link.textContent.trim();
+                if (href && text) {
+                    searchLinks.push({ name: text, url: href });
+                }
+            });
+
+            // ✅ Xử lý tìm kiếm khi gõ phím
+            searchInput.addEventListener("keyup", function () {
+                const keyword = this.value.toLowerCase().trim();
+                searchResults.innerHTML = "";
+
+                if (keyword === "") {
+                    searchResults.style.display = "none";
+                    return;
+                }
+
+                const matchedLinks = searchLinks.filter(item =>
+                    item.name.toLowerCase().includes(keyword)
+                );
+
+                if (matchedLinks.length > 0) {
+                    matchedLinks.forEach(item => {
+                        const li = document.createElement("li");
+                        li.className = "list-group-item list-group-item-action";
+                        li.style.cursor = "pointer";
+                        li.textContent = item.name;
+                        li.onclick = () => window.location.href = item.url;
+                        searchResults.appendChild(li);
+                    });
+                    searchResults.style.display = "block";
+                } else {
+                    searchResults.style.display = "none";
+                }
+            });
+
+            // ✅ Click ngoài sẽ ẩn kết quả
+            document.addEventListener("click", function (e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = "none";
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const widget = document.getElementById('new-orders-widget');
+            const closeBtn = document.getElementById('close-widget');
+
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            // Lấy kích thước cửa sổ để giới hạn vị trí
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            // --- Hàm xử lý lưu và khôi phục vị trí ---
+            const savePosition = (x, y) => {
+                const position = { x, y };
+                localStorage.setItem('widgetPosition', JSON.stringify(position));
+            };
+
+            const loadPosition = () => {
+                const savedPosition = localStorage.getItem('widgetPosition');
+                if (savedPosition) {
+                    const position = JSON.parse(savedPosition);
+                    // Chỉ áp dụng vị trí đã lưu nếu là desktop (min-width: 768px)
+                    if (windowWidth >= 768) {
+                        widget.style.top = `${position.y}px`;
+                        widget.style.left = `${position.x}px`;
+                        widget.style.bottom = 'auto';
+                        widget.style.right = 'auto';
+                        widget.style.transform = 'none';
+                    }
+                }
+            };
+
+            // Tải vị trí đã lưu khi trang được tải
+            loadPosition();
+
+            // Hàm chung để xử lý kéo
+            const handleDrag = (clientX, clientY) => {
+                let x = clientX - offsetX;
+                let y = clientY - offsetY;
+
+                const widgetWidth = widget.offsetWidth;
+                if (x < 0) x = 0;
+                if (x + widgetWidth > windowWidth) x = windowWidth - widgetWidth;
+
+                const widgetHeight = widget.offsetHeight;
+                if (y < 0) y = 0;
+                if (y + widgetHeight > windowHeight) y = windowHeight - widgetHeight;
+
+                widget.style.left = `${x}px`;
+                widget.style.top = `${y}px`;
+
+                widget.style.bottom = 'auto';
+                widget.style.right = 'auto';
+                widget.style.transform = 'none';
+            };
+
+            // --- Sự kiện trên MÁY TÍNH (Chuột) ---
+            widget.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                widget.classList.add('dragging');
+                offsetX = e.clientX - widget.getBoundingClientRect().left;
+                offsetY = e.clientY - widget.getBoundingClientRect().top;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                handleDrag(e.clientX, e.clientY);
+            });
+
+            document.addEventListener('mouseup', (e) => {
+                isDragging = false;
+                widget.classList.remove('dragging');
+                // Lưu vị trí cuối cùng sau khi kéo
+                savePosition(widget.getBoundingClientRect().left, widget.getBoundingClientRect().top);
+            });
+
+            // --- Sự kiện trên ĐIỆN THOẠI (Cảm ứng) ---
+            widget.addEventListener('touchstart', (e) => {
+                if (e.target.closest('#close-widget')) {
+                    return;
+                }
+
+                isDragging = true;
+                widget.classList.add('dragging');
+                const touch = e.touches[0];
+                offsetX = touch.clientX - widget.getBoundingClientRect().left;
+                offsetY = touch.clientY - widget.getBoundingClientRect().top;
+                e.preventDefault();
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const touch = e.touches[0];
+                handleDrag(touch.clientX, touch.clientY);
+            });
+
+            document.addEventListener('touchend', (e) => {
+                isDragging = false;
+                widget.classList.remove('dragging');
+                // Lưu vị trí cuối cùng sau khi kéo
+                savePosition(widget.getBoundingClientRect().left, widget.getBoundingClientRect().top);
+            });
+
+            // --- Xử lý sự kiện đóng widget ---
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                widget.style.display = 'none';
+            });
+        });
+
+
+    </script>
+
+
+    <script>
+        let stompClient = null;
+
+        function connect() {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                // Subscribe to a topic
+                stompClient.subscribe('/topic/notifications', function (notification) {
+                    alert(notification.body)
+                });
+                stompClient.subscribe('/topic/order', function (notification) {
+                    $('.new-order-count').text(notification.body)
+                    var audio = new Audio('/admin/mp3/notify-order.mp3');
+                    audio.play().catch(function(err){
+                        console.log("Trình duyệt chặn autoplay, cần click 1 lần để bật âm thanh:", err);
+                    });
+                    swal({
+                        title: "Thông báo",
+                        text: "Có 1 đơn hàng mới",
+                        type: "info",
+                        showCancelButton: true,
+                        confirmButtonText: "OK",
+                        cancelButtonText: "Chuyển đến"
+                    }, function(isConfirm) {
+                        if (!isConfirm) {
+                            // Nếu click "Chuyển đến"
+                            window.location.href = "/emp-prj/qtht-001/invoice/list"; // link tới trang đơn hàng
+                        }
+                    });
+                    // hiêển thị thông báo popup ở đây
+                });
+                stompClient.subscribe('/topic/contact', function (notification) {
+                    $('.counter-contact').text(notification.body)
+                    var audio = new Audio('/admin/mp3/lienhe.mp3');
+                    audio.play().catch(function(err){
+                        console.log("Trình duyệt chặn autoplay, cần click 1 lần để bật âm thanh:", err);
+                    });
+                    swal({
+                        title: "Thông báo",
+                        text: "Có 1 liên hệ mới",
+                        type: "info",
+                        showCancelButton: true,
+                        confirmButtonText: "OK",
+                        cancelButtonText: "Chuyển đến"
+                    }, function(isConfirm) {
+                        if (!isConfirm) {
+                            // Nếu click "Chuyển đến"
+                            window.location.href = "/emp-prj/qtht-001/contact/list"; // link tới trang đơn hàng
+                        }
+                    });
+                });
+                stompClient.subscribe('/topic/online', function (notification) {
+                    document.getElementById("dangtruycap").innerText = notification.body
+
+                });
+            }, function (error) {
+                console.error('Connection failed:', error);
+                setTimeout(connect, 5000); // Tự động kết nối lại sau 5 giây
+            });
+        }
+
+        connect();
+    </script>
+</div>
+
+</body>
+</html>

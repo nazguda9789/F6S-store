@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Thống kê</title>
+  <link rel="stylesheet" type="text/css" href="/admin/css/thongke.css">
+  <head th:replace="common/libadmin :: libheaderadmin"></head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="/admin/css/thongke.css">
+  <script src="/admin/js/index.js"></script>
+  <script>
+    window.onload = function() {
+      revenueYear(new Date().getFullYear());
+    }
+  </script>
+</head>
+
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+  <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+  <div id="layoutSidenav_content">
+    <main class="main">
+      <div class="container-fluid">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--blue">💰</div>
+            <div class="stat-info">
+              <div class="stat-label">Doanh thu hôm nay</div>
+              <div class="stat-value" id="stat-today">—</div>
+              <div class="stat-growth" id="stat-orders-today"></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--green">📅</div>
+            <div class="stat-info">
+              <div class="stat-label">Doanh thu tháng này</div>
+              <div class="stat-value" id="stat-month">—</div>
+              <div class="stat-growth" id="stat-growth-rev"></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--purple">🛒</div>
+            <div class="stat-info">
+              <div class="stat-label">Đơn hàng hoàn thành</div>
+              <div class="stat-value" id="stat-completed">—</div>
+              <div class="stat-growth" id="stat-growth-order"></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--orange">🕐</div>
+            <div class="stat-info">
+              <div class="stat-label">Đơn chờ xử lý</div>
+              <div class="stat-value" id="stat-pending">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--red">👥</div>
+            <div class="stat-info">
+              <div class="stat-label">Tổng khách hàng</div>
+              <div class="stat-value" id="stat-customers">—</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon--blue">📦</div>
+            <div class="stat-info">
+              <div class="stat-label">Tổng sản phẩm</div>
+              <div class="stat-value" id="stat-products">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================== ROW 1: Line chart 30 ngày + Pie trạng thái =================== -->
+        <div class="chart-row">
+          <div class="chart-card">
+            <div class="chart-card__header">
+              <div>
+                <h4 class="chart-card__title">Doanh thu 30 ngày gần nhất</h4>
+                <div class="chart-card__sub">Theo ngày (đơn hoàn thành)</div>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="chart-daily"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card__header">
+              <h4 class="chart-card__title">Trạng thái đơn hàng</h4>
+            </div>
+            <div class="chart-wrap chart-wrap--sm">
+              <canvas id="chart-status"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================== ROW 2: Bar chart năm + Pie danh mục =================== -->
+        <div class="chart-row">
+          <div class="chart-card">
+            <div class="chart-card__header">
+              <div>
+                <h4 class="chart-card__title">Doanh thu theo tháng</h4>
+                <div class="chart-card__sub">So sánh doanh thu trong năm</div>
+              </div>
+              <select class="year-select" id="year-select" onchange="loadYearRevenue(this.value)">
+                <option th:each="y : ${#numbers.sequence(2024, 2027)}"
+                        th:value="${y}"
+                        th:text="${y}"
+                        th:selected="${y == #dates.year(#dates.createNow())}"></option>
+              </select>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="chart-year"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card__header">
+              <h4 class="chart-card__title">Doanh thu theo danh mục</h4>
+              <div class="chart-card__sub" id="cat-month-label">Tháng này</div>
+            </div>
+            <div class="chart-wrap chart-wrap--sm">
+              <canvas id="chart-category"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================== TOP PRODUCTS =================== -->
+        <div class="chart-card" style="margin-bottom: 28px;">
+          <div class="chart-card__header">
+            <h4 class="chart-card__title">🏆 Top 10 sản phẩm bán chạy tháng này</h4>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="top-table">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Đã bán</th>
+                <th>Doanh thu</th>
+              </tr>
+              </thead>
+              <tbody id="top-products-body">
+              <tr><td colspan="5" style="text-align:center;color:#888;padding:20px">Đang tải...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  const BASE_URL = /*[[@{/}]]*/ '/';
+  const ADMIN_URL = /*[[${@environment.getProperty('app.admin-url', '/admin')}]]*/ '/admin';
+  const API = ADMIN_URL + '/api/statistic';
+
+  const fmt = n => new Intl.NumberFormat('vi-VN').format(Math.round(n || 0)) + '₫';
+  const fmtNum = n => new Intl.NumberFormat('vi-VN').format(n || 0);
+
+  let chartDaily, chartStatus, chartYear, chartCategory;
+
+  // ===== Load dashboard data =====
+  async function loadDashboard() {
+    const year = document.getElementById('year-select').value;
+    try {
+      const res = await fetch(`${API}/dashboard?year=${year}`);
+      const d = await res.json();
+      renderStats(d);
+      renderTopProducts(d.topSellingProducts || []);
+      renderStatusChart(d.orderStatusSummary || []);
+      renderCategoryChart(d.revenueByCategory || []);
+      renderDailyChart(d.dailyRevenueLast30Days || []);
+      renderYearChart(d.revenueByMonth || []);
+
+      // Growth badges
+      renderGrowth('stat-growth-rev', d.revenueGrowthRate, 'Tháng trước');
+      renderGrowth('stat-growth-order', d.orderGrowthRate, 'Đơn tháng trước');
+    } catch(e) {
+      console.error('Dashboard load error:', e);
+    }
+  }
+
+  function renderStats(d) {
+    setText('stat-today', fmt(d.revenueToday));
+    setText('stat-month', fmt(d.revenueThisMonth));
+    setText('stat-completed', fmtNum(d.completedOrders));
+    setText('stat-pending', fmtNum(d.pendingOrders));
+    setText('stat-customers', fmtNum(d.totalCustomers));
+    setText('stat-products', fmtNum(d.totalProducts));
+    setText('stat-orders-today', `${fmtNum(d.completedOrders)} đơn HT hôm nay`);
+  }
+
+  function renderGrowth(id, rate, label) {
+    const el = document.getElementById(id);
+    if (!el || rate == null) return;
+    const sign = rate >= 0 ? '+' : '';
+    el.textContent = `${sign}${rate}% so với ${label}`;
+    el.className = 'stat-growth ' + (rate >= 0 ? 'stat-growth--up' : 'stat-growth--down');
+  }
+
+  function renderTopProducts(list) {
+    const body = document.getElementById('top-products-body');
+    if (!list.length) { body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa">Chưa có dữ liệu</td></tr>'; return; }
+    body.innerHTML = list.map((p, i) => `
+        <tr>
+            <td><span class="top-table__rank top-table__rank--${i+1}">${i+1}</span></td>
+            <td><img class="top-table__img" src="${p.productImage || ''}" alt="${p.productName}" onerror="this.src='/images/no-image.png'"></td>
+            <td style="max-width:220px">${p.productName}</td>
+            <td><strong>${fmtNum(p.totalQuantity)}</strong> sp</td>
+            <td style="color:#e53e3e;font-weight:700">${fmt(p.totalQuantity * p.price)}</td>
+        </tr>
+    `).join('');
+  }
+
+  // ===== Charts =====
+  function renderDailyChart(data) {
+    const ctx = document.getElementById('chart-daily');
+    if (chartDaily) chartDaily.destroy();
+    chartDaily = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.map(d => d.date),
+        datasets: [{
+          label: 'Doanh thu',
+          data: data.map(d => d.revenue),
+          borderColor: '#3182ce',
+          backgroundColor: 'rgba(49,130,206,.08)',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.4,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { callback: v => (v/1000000).toFixed(1) + 'M' }, grid: { color: '#f0f0f0' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function renderStatusChart(data) {
+    const ctx = document.getElementById('chart-status');
+    const labelMap = {
+      'HOAN_THANH': 'Hoàn thành', 'HUY': 'Đã hủy',
+      'DANG_CHO_VAN_CHUYEN': 'Chờ vận chuyển',
+      'DANG_VAN_CHUYEN': 'Đang vận chuyển',
+      'DA_NHAN_HANG': 'Đã nhận hàng', 'CHO_XAC_NHAN': 'Chờ xác nhận'
+    };
+    const colors = ['#22c55e','#ef4444','#f59e0b','#3b82f6','#8b5cf6','#ec4899'];
+    if (chartStatus) chartStatus.destroy();
+    chartStatus = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: data.map(d => labelMap[d.status] || d.status),
+        datasets: [{ data: data.map(d => d.orderCount), backgroundColor: colors, borderWidth: 2 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12 } } },
+        cutout: '60%'
+      }
+    });
+  }
+
+  function renderCategoryChart(data) {
+    const ctx = document.getElementById('chart-category');
+    const colors = ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16'];
+    if (chartCategory) chartCategory.destroy();
+    chartCategory = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: data.map(d => d.categoryName),
+        datasets: [{ data: data.map(d => d.totalRevenue), backgroundColor: colors, borderWidth: 2 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12 } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed.toLocaleString('vi-VN')}₫ (${data[ctx.dataIndex].percentage}%)` } }
+        }
+      }
+    });
+  }
+
+  function renderYearChart(data) {
+    const ctx = document.getElementById('chart-year');
+    const labels = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'];
+    if (chartYear) chartYear.destroy();
+    chartYear = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Doanh thu',
+          data,
+          backgroundColor: data.map((v, i) => {
+            const max = Math.max(...data);
+            return v === max ? 'rgba(49,130,206,0.9)' : 'rgba(49,130,206,0.4)';
+          }),
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { callback: v => (v/1000000).toFixed(0) + 'M' }, grid: { color: '#f0f0f0' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  async function loadYearRevenue(year) {
+    try {
+      const res = await fetch(`${API}/revenue-year?year=${year}`);
+      const data = await res.json();
+      renderYearChart(data);
+    } catch(e) {}
+  }
+
+  function setText(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  // Khởi động
+  document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
+</body>
+</html>

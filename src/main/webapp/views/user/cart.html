@@ -1,0 +1,170 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="common/user/libuser :: libheader">
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+<div class="container shipping-section">
+    <nav aria-label="breadcrumb" class="breadcrumb-container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item breadcrumb-product-name active" aria-current="page"> Giỏ hàng</li>
+        </ol>
+    </nav>
+    <div class="content contentcart">
+        <div class="row cartbds">
+            <div th:if="${cartResponse.cartDetails.size() > 0}" class="col-lg-8 col-md-12 col-sm-12 col-12 collistcart">
+                <div class="listcart">
+                    <span class="cartname">GIỎ HÀNG</span>
+                    <span class="slcarts">(<span id="slcart" th:text="${cartResponse.cartDetails.size()}"></span>) Sản phẩm</span>
+
+                    <div class="cartres">
+                        <table class="table tablecart">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Sản phẩm</th>
+                                    <th>Đơn giá</th>
+                                    <th style="text-align: center;">Số lượng</th>
+                                    <th style="width: 100px;">Tổng tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listcartDes">
+                                <tr th:each="c : ${cartResponse.cartDetails}" th:class="'product-item-cart-'+${c.dataId}">
+                                    <td><label class="checkbox-custom">
+                                        <input type="checkbox" checked th:value="${c.dataId}">
+                                        <span class="checkmark-checkbox"></span>
+                                    </label></td>
+                                    <td>
+                                        <a th:href="@{product/{slug}(slug=${c.slug})}">
+                                            <img class="imgprocart" th:src="${c.image}">
+                                        </a>
+                                        <div class="divnamecart">
+                                            <a th:href="@{product/{slug}(slug=${c.slug})}" class="nameprocart" th:text="${c.productName}"></a>
+                                            <p class="sizecart"><span th:text="${c.colorName}"></span> / <span th:text="${c.sizeName}"></span></p>
+                                        </div>
+                                    </td>
+                                    <td><p class="boldcart">[[${#numbers.formatDecimal(c.price, 0, 'POINT', 0, 'POINT')}]] đ</p></td>
+                                    <td>
+                                        <div class="clusinp">
+                                            <button th:data-detail="${c.dataId}" data-quantity="-1" class="cartbtn change-quantity-cart"> - </button>
+                                            <input th:value="${c.quantity}" th:class="'inputslcart input-quantity-cart-'+${c.dataId}">
+                                            <button th:data-detail="${c.dataId}" data-quantity="1" class="cartbtn change-quantity-cart"> + </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="tdpricecart">
+                                            <p th:class="'boldcart total-price-item-'+${c.dataId}" th:data-price="${c.price}">[[${#numbers.formatDecimal(c.price * c.quantity, 0, 'POINT', 0, 'POINT')}]] đ</p>
+                                            <p th:data-del="${c.dataId}" class="delcart delete-cart-item"><i class="fa fa-times"></i></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+                        <table id="tablemobilecart" class="table tablecartmobile">
+                            <tbody>
+                                <tr th:each="c : ${cartResponse.cartDetails}" th:class="'product-item-cart-'+${c.dataId}">
+                                    <td>
+                                        <a th:href="@{product/{slug}(slug=${c.slug})}">
+                                            <img class="imgprocmobile" th:src="${c.image}">
+                                        </a>
+                                    </td>
+                                    <td class="tdinforcart">
+                                        <a th:href="@{product/{slug}(slug=${c.slug})}" class="nameprocmobile" th:text="${c.productName}"></a>
+                                        <p class="sizecmobile"><span th:text="${c.colorName}"></span> / <span th:text="${c.sizeName}"></span></p>
+                                        <div class="clusinpmobile">
+                                            <button th:data-detail="${c.dataId}" data-quantity="-1" class="cartbtn change-quantity-cart"> - </button>
+                                            <input th:value="${c.quantity}" th:class="'inputslcart input-quantity-cart-'+${c.dataId}">
+                                            <button th:data-detail="${c.dataId}" data-quantity="1" class="cartbtn change-quantity-cart"> + </button>
+                                        </div>
+                                    </td>
+                                    <td class="tdinforcart">
+                                        <button class="btn btn-outline-danger btn-sm delete-cart-item" th:data-del="${c.dataId}"><i class="fa fa-times"></i></button>
+                                        <label class="checkbox-custom">
+                                            <input th:value="${c.dataId}" type="checkbox" checked>
+                                            <span class="checkmark-checkbox"></span>
+                                        </label>
+                                        <p th:class="'boldcart pricecmobile total-price-item-'+${c.dataId}" th:data-price="${c.price}">[[${#numbers.formatDecimal(c.price * c.quantity, 0, 'POINT', 0, 'POINT')}]]</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${cartResponse.cartDetails.size() > 0}" class="col-lg-4 col-md-12 col-sm-12 col-12 collistcart">
+                <div class="ttcart">
+                    <div class="tongdon">
+                        <span class="tds">Tổng giá trị giỏ hàng: </span><span class="tonggiatien" id="tonggiatien">[[${#numbers.formatDecimal(cartResponse.totalAmount, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                        <button class="btnthanhtoan">Thanh toán</button>
+                    </div>
+                    <p>Miễn phí vận chuyển với mọi đơn hàng giá trị từ <span class="buypl">500.000 VND</span></p>
+                </div>
+            </div>
+            <div th:if="${cartResponse.cartDetails.size() == 0}">
+                <div class="empty-cart">
+                    <img src="/image/emptycart.png" alt="Giỏ hàng trống">
+                    <h2>Giỏ hàng của bạn đang trống</h2>
+                    <p>Hãy thêm sản phẩm vào giỏ để tiếp tục mua sắm.</p>
+                    <a href="/">Quay về cửa hàng</a>
+                </div>
+            </div>
+            <div class="cartgoiy">
+                <p class="tieudegy">Gợi ý sản phẩm</p>
+                <div class="row g-3 g-md-4">
+                    <article th:each="p: ${sanPhamBanChay}" class="col-6 col-sm-6 col-md-4 col-lg-20p">
+                        <div class="product-card h-100" itemscope itemtype="https://schema.org/Product">
+                            <figure class="product-media m-0">
+                                <a th:href="@{product/{slug}(slug=${p.slug})}" itemprop="url" th:aria-label="${p.name}">
+                                    <img class="img-product-list"
+                                         th:src="${p.image}"
+                                         loading="lazy" decoding="async"
+                                         th:alt="${p.name}"
+                                         itemprop="image" />
+                                </a>
+                            </figure>
+                            <div class="product-body">
+                                <div class="product-meta">
+                                    <span itemprop="sku">F6S</span>
+                                </div>
+                                <h3 class="product-title h6" itemprop="name">
+                                    <a th:href="@{product/{slug}(slug=${p.slug})}" th:text="${p.name}" class="product-name-list"></a>
+                                </h3>
+                                <div class="product-price">
+                                    <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                                        <span itemprop="price" th:content="${p.price}">[[${#numbers.formatDecimal(p.price, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                                        <meta itemprop="priceCurrency" content="VND" />
+                                        <link itemprop="availability" href="https://schema.org/InStock" />
+                                        <span class="oldprice-product-list" th:if="${p.olePrice != null}" itemprop="price" th:content="${p.olePrice}">[[${#numbers.formatDecimal(p.olePrice, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:insert="common/user/footeruser :: footerMain"></div>
+<script src="/js/cart.js"></script>
+<script th:inline="javascript">
+    var error = /*[[${error}]]*/ 'default';
+    if(error != null){
+        swal({
+            title: "Thông báo",
+            text: error,
+            type: "error"
+        },
+        function() {
+        });
+    }
+</script>
+
+</body>
+</html>

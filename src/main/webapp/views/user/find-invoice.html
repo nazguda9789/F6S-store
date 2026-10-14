@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tra cứu đơn hàng | F6S</title>
+    <meta name="description" content="" />
+    <link rel="canonical" href="/tra-cuu-don-hang" />
+
+    <meta property="og:type" content="Tra cứu đơn hàng" />
+    <meta property="og:title" content="Tra cứu đơn hàng" />
+    <meta property="og:url" content="/tra-cuu-don-hang" />
+    <meta property="og:type" content="article" />
+
+    <th:block th:include="common/user/libuser :: libheader"></th:block>
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+<div class="container my-4 shipping-section">
+    <nav aria-label="breadcrumb" class="breadcrumb-container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item breadcrumb-product-name active" aria-current="page"> Đơn hàng</li>
+        </ol>
+    </nav>
+    <div class="container-check-iv">
+        <div class="check-invoice-container">
+            <div class="check-invoice-title">Tra cứu đơn hàng</div>
+            <form>
+                <div class="mb-3">
+                    <input th:value="${param.code}" name="code" type="text" id="orderCode" class="form-control form-control-lg" placeholder="Nhập mã đơn hàng...">
+                </div>
+                <button class="btn check-invoice-btn w-100 btn-lg">Tra cứu</button>
+            </form>
+
+            <div th:if="${invoice != null}" id="resultCard" class="card check-invoice-result-card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Thông tin đơn hàng</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>Mã đơn:</strong> <span id="resultCode" th:text="${invoice.code}"></span></div>
+                        <div class="col-md-6"><strong>Ngày đặt:</strong> <span id="resultDate" th:text="${#temporals.format(invoice.createdDate, 'HH:mm dd/MM/yy')}"></span></div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6"><strong>Tạm tính:</strong> <span>[[${#numbers.formatDecimal(invoice.totalAmount, 0, 'POINT', 0, 'POINT')}]] đ</span></div>
+                        <div class="col-md-6"><strong>Phí vận chuyển:</strong> <span>[[${#numbers.formatDecimal(invoice.shipCost, 0, 'POINT', 0, 'POINT')}]] đ</span></div>
+                        <div class="col-md-6"><strong>Giảm giá:</strong> <span>[[${#numbers.formatDecimal(invoice.discount, 0, 'POINT', 0, 'POINT')}]] đ</span></div>
+                        <div class="col-md-6"><strong>Thanh toán:</strong> <h4 class="text-green">[[${#numbers.formatDecimal(invoice.totalAmount + invoice.shipCost - invoice.discount, 0, 'POINT', 0, 'POINT')}]] đ</h4></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Sản phẩm:</strong>
+                        <ul class="check-invoice-product-list mt-2" id="resultProducts">
+                            <li th:each="c : ${listDetail}" th:text="${c.productName} +' - ' + ${c.colorName} + ' (' +${c.sizeName}+')' "></li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Trạng thái:</strong>
+                        <span id="resultStatus" class="badge bg-success check-invoice-status-badge" th:text="${invoice.invoiceStatus.label}"></span>
+                    </div>
+
+                    <a th:if="${invoice.trackingCode != null}" th:href="'https://donhang.ghn.vn/?order_code='+${invoice.trackingCode}" target="_blank" class="btn btn-outline-dark btn-sm mt-2">
+                        Xem chi tiết vận chuyển
+                    </a>
+                    <a th:if="${invoice.trackingCode == null}" target="_blank" class="check-invoice-no-tracking">
+                        Đơn của bạn chưa được tạo vận đơn
+                    </a>
+                </div>
+            </div>
+
+            <div th:if="${error != null}" id="notFound" class="check-invoice-notfound">
+                ❌ Không tìm thấy thông tin đơn hàng. Vui lòng kiểm tra lại mã đơn!
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div th:replace="common/user/footeruser :: footerMain"></div>
+
+</body>
+
+</html>

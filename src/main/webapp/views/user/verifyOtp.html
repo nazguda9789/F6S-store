@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:include="common/user/libuser :: libheader"></th:block>
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser"></div>
+<div class="section-bottom-menu"></div>
+
+<div class="login-section">
+  <div class="block-img-login">
+    <img src="image/logo.jpg" alt="" class="img-logo-login">
+  </div>
+  <div class="content-modal-login">
+    <div class="divider"><span>Nhập Mã Xác Thực</span></div>
+    <div class="otp-container">
+      <input type="text" class="otp-input" id="otp-1" />
+      <input type="text" class="otp-input" id="otp-2" />
+      <input type="text" class="otp-input" id="otp-3" />
+      <input type="text" class="otp-input" id="otp-4" />
+      <input type="text" class="otp-input" id="otp-5" />
+      <input type="text" class="otp-input" id="otp-6" />
+    </div>
+    <form action="/verify-otp" method="post">
+      <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        <span th:text="${error}">Lỗi xảy ra</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <input name="email" th:value="${param.email}" type="hidden">
+      <input id="otp-main" name="otp" type="hidden">
+      <div style="position: relative;height: 10px">
+        <a th:href="@{/new-otp-verify(email=${param.email})}" style="position: absolute;right: 0">Gửi mã kích hoạt mới?</a>
+      </div>
+      <button class="w-100 btn btn-primary btn-login-main form-control">Xác Thực Tài Khoản</button>
+    </form>
+
+    <div class="center-block">
+      <a class="text-center" href="login">← Quay lại đăng nhập</a>
+    </div>
+  </div>
+</div>
+<script>
+  const inputs = document.querySelectorAll('.otp-input');
+  const otpMain = document.getElementById('otp-main');
+
+  inputs.forEach((input, index) => {
+
+    // Nhập dữ liệu
+    input.addEventListener('input', (e) => {
+      let value = e.target.value;
+
+      // Loại bỏ ký tự không phải số
+      value = value.replace(/[^0-9]/g, '');
+
+      if (value.length > 1) {
+        // Nếu paste nhiều ký tự, phân bổ sang các ô tiếp theo
+        const chars = value.split('');
+        for (let i = 0; i < chars.length && index + i < inputs.length; i++) {
+          inputs[index + i].value = chars[i];
+        }
+        // Focus ô tiếp theo
+        const nextIndex = index + value.length < inputs.length ? index + value.length : inputs.length - 1;
+        inputs[nextIndex].focus();
+      } else {
+        e.target.value = value;
+        if (value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      }
+
+      updateOtpMain();
+    });
+
+    // Xử lý Backspace
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && input.value === '' && index > 0) {
+        inputs[index - 1].focus();
+      }
+      setTimeout(updateOtpMain, 0);
+    });
+
+    // Ngăn các ký tự không số từ bàn phím
+    input.addEventListener('keypress', (e) => {
+      if (!/[0-9]/.test(e.key)) {
+        e.preventDefault();
+      }
+    });
+  });
+
+  function updateOtpMain() {
+    let otp = '';
+    inputs.forEach(input => otp += input.value);
+    otpMain.value = otp;
+  }
+
+
+</script>
+
+<script th:inline="javascript">
+  var success = /*[[${success}]]*/ 'default';
+  if(success != null){
+    swal({
+              title: "Thông báo",
+              text: success,
+              type: "success"
+            },
+            function() {
+            });
+  }
+</script>
+<div id="footer"></div>
+</body>
+</html>

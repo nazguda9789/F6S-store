@@ -1,0 +1,108 @@
+<!DOCTYPE html >
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+</head>
+<body>
+<div id="menu-main" th:fragment="headerUser">
+    <section class="container">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid container-fuild-menu">
+                <span class="navbar-toggler navbar-toggler-icon" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"></span>
+                <a class="navbar-brand-mobile navbar-toggler" href="#"><img src="/image/logo3.jpg" alt=""></a>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link item-custom-menu active-menu" href="/">Trang chủ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link item-custom-menu" href="/blogs">Bài viết</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link item-custom-menu" href="/contact">Liên hệ</a>
+                        </li>
+                        <li class="nav-item item-category-header">
+                            <a href="javascript:void(0)" class="nav-link item-custom-menu toggle-submenu">
+                                <span>Giới thiệu</span> <span class="arrow-down"></span>
+                            </a>
+                            <ul class="submenu-category">
+                                <li><a href="/gioi-thieu">Về chúng tôi</a></li>
+                                <li><a href="/gioi-thieu#chinhsach-bao-mat">Chính sách bảo mật</a></li>
+                                <li><a href="/gioi-thieu#chinhsach-doitra">Chính sách đổi trả</a></li>
+                                <li><a href="/gioi-thieu#chinhsach-bao-hanh">Chính sách bảo hành</a></li>
+                            </ul>
+                        </li>
+                        <li th:each="c : ${categories}" class="nav-item item-category-header">
+                            <a th:if="${c.children.size() > 0 }" href="javascript:void(0)" class="nav-link item-custom-menu toggle-submenu">
+                                <span th:text="${c.name}"></span> <span class="arrow-down"></span>
+                            </a>
+                            <a th:if="${c.children.size() == 0 }" th:href="@{/category/{slug}(slug=${c.slug})}" class="nav-link item-custom-menu toggle-submenu">
+                                <span th:text="${c.name}"></span>
+                            </a>
+                            <ul class="submenu-category" th:if="${c.children.size() >0}">
+                                <li th:each="child : ${c.children}"><a th:href="@{/category/{slug}(slug=${child.slug})}" th:text="${child.name}"></a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link item-custom-menu" href="/tra-cuu-don-hang">Đơn hàng</a>
+                        </li>
+                    </ul>
+                </div>
+                <ul class="list-item-menu d-flex">
+                    <li sec:authorize="isAnonymous()" class="nav-item dropdown item-right-menu" >
+                        <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="/image/user.png" class="image-menu-icon">
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/login">Đăng nhập</a></li>
+                            <li><a class="dropdown-item" href="/register">Đăng ký</a></li>
+                        </ul>
+                    </li>
+                    <li sec:authorize="isAuthenticated()" class="nav-item dropdown item-right-menu user-auth-drop" >
+                        <a class="nav-link" href="#" id="navbarDropdownAuth" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img  src="/image/user.png" class="image-menu-icon icon-user-login">
+                            <span class="hl-icon-user-login">Xin chào: <span th:text="${fullNameheader}"></span></span>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownAuth">
+                            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                            <li><a class="dropdown-item" href="/tai-khoan">Tài khoản</a></li>
+                            <!--kiểm tra nếu là role admin thì hiện thêm url admin-->
+                            <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                                <a class="dropdown-item" href="/adm-prj/qtht-001/category/list">Quản trị</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item item-right-menu">
+                        <a data-bs-toggle="modal" data-bs-target="#searchProductModal" class="nav-link icon-search-header"><img src="/image/search.svg" class="image-menu-icon"></a>
+                    </li>
+                    <li class="nav-item item-right-menu item-cart-menu">
+                        <a class="nav-link" href="/cart"><img src="/image/cart.png" class="image-menu-icon"></a>
+                        <span class="count-cart-menu" th:text="${cartQuantity}" id="cart-quantity"></span>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </section>
+
+    <script>
+        let stompClient = null;
+
+        function connect() {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/online', function (message) {
+                });
+            }, function (error) {
+                console.error('Connection socket failed:', error);
+                setTimeout(connect, 5000);
+            });
+        }
+
+        connect();
+    </script>
+</div>
+</body>
+</html>
+

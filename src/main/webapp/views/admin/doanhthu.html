@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống kê</title>
+    <link rel="stylesheet" type="text/css" href="/admin/css/thongke.css">
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="/admin/css/thongke.css">
+    <script src="/admin/js/index.js"></script>
+    <script>
+        window.onload = function() {
+            revenueYear(new Date().getFullYear());
+        }
+    </script>
+</head>
+
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+        <div id="layoutSidenav_content">
+            <main class="main">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-9 animated bounce">
+                            <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
+                                <div class="ms-3">
+                                    <img alt="" src="/image/lich.png">
+                                    <h2 class=" text-uppercase fw-weight-bold mb-0">
+                                        <script language="javascript">
+                                            document.write(day_name);
+                                        </script>
+                                    </h2>
+                                    <p class="text-gray fst-italic mb-0">
+                                    <div id="digital-clock"></div>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-lefts shadow h-100 py-2">
+                                    <span class="lbcard">Doanh thu tháng này (VND)</span>
+                                    <span className='solieudoanhthu'>[[${#numbers.formatDecimal(doanhThuThangNay, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-lefts shadow h-100 py-2">
+                                    <span class="lbcard">Doanh thu hôm nay</span>
+                                    <span className='solieudoanhthu'>[[${#numbers.formatDecimal(doanhThuHomNay, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-lefts shadow h-100 py-2">
+                                    <span class="lbcard">Số lượng quản trị</span>
+                                    <span className='solieudoanhthu' th:text="${numAdmin}"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-lefts shadow h-100 py-2">
+                                    <span class="lbcard">Số lượng người dùng</span>
+                                    <span className='solieudoanhthu' th:text="${numUser}"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-lefts shadow h-100 py-2">
+                                    <span class="lbcard">Đơn hoàn thành hôm nay</span>
+                                    <span className='solieudoanhthu' th:text="${soDonHoanThanhHomNay}"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="card border-lefts shadow h-100 py-2">
+                                    <span class="lbcard">Số lượng mặt hàng hiện có</span>
+                                    <span className='solieudoanhthu' th:text="${totalProduct}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 header-sp row ">
+                                <div class="col-md-3">
+                                    <p class="loctheongay">Chọn năm cần xem</p>
+                                    <select id="nams" class="form-control">
+                                    </select>
+                                </div>
+                                <div class="col-md-2"><br>
+                                    <button onclick="loadByNam()" class="btn btn-primary form-control" style="margin-top: 10px;"><i class="fa fa-filter"></i> Lọc</button>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 divtale" style="padding-top: 30px">
+                                <div class="card chart-container divtale">
+                                    <canvas id="chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <h5 style="display: block; margin-top: 40px">Sản phẩm bán chạy tháng này</h5>
+                        <table class="table table-striped tablefix">
+                            <thead class="thead-tablefix">
+                            <tr>
+                                <th>id</th>
+                                <th>Ảnh</th>
+                                <th>Tên</th>
+                                <th>Giá</th>
+                                <th>Số lượng bán</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="c : ${sanPhamBanChay}">
+                                <td th:text="${c.productId}"></td>
+                                <td><img th:src="${c.productImage}" class="img-table"></td>
+                                <td th:text="${c.productName}"></td>
+                                <td>[[${#numbers.formatDecimal(c.price, 0, 'POINT', 0, 'POINT')}]] đ</td>
+                                <td th:text="${c.totalQuantity}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+<script>
+    $( document ).ready(function() {
+        var arr = ['#4e73df','#1cc88a','#36b9cc','#eb9534','#ed00c6','#edd500']
+        var act = document.getElementsByClassName("border-lefts");
+        var lbcard = document.getElementsByClassName("lbcard");
+        for(var i=0; i<act.length; i++){
+            act[i].style.borderLeft = '.25rem solid '+arr[i]
+        }
+        for(var i=0; i<lbcard.length; i++){
+            lbcard[i].style.color = arr[i]
+        }
+        var main = '';
+        for(i=new Date().getFullYear(); i > new Date().getFullYear() - 15; i--){
+            main += `<option value="${i}">Năm ${i}</option>`
+        }
+        $("#nams").html(main)
+    });
+    revenueYear(new Date().getFullYear());
+</script>
+</html>

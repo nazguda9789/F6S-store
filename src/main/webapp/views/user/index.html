@@ -1,0 +1,335 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="common/user/libuser :: libheader">
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+
+
+<div th:if="${bannerSlider.size() > 0}" id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button th:each="b, stat : ${bannerSlider}" type="button"
+                data-bs-target="#carouselExampleIndicators"
+                th:data-bs-slide-to="${stat.index}" th:class="${stat.index == 0 ?'active':''}"
+                th:aria-current="${stat.index == 0 ?'true':''}"></button>
+        </button>
+    </div>
+    <div class="carousel-inner">
+        <div th:each="b, stat : ${bannerSlider}"
+             th:class="'carousel-item ' + (${stat.first} ? 'active' : '')">
+            <img th:src="${b.imageUrl}" class="d-block w-100" th:alt="${b.title}">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<div class="container shipping-section">
+    <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-6 col-6">
+            <div class="shipping-box">
+                <div class="icon-circle">
+                    <img src="image/icon-index-1.png" alt="">
+                </div>
+                <div class="shipping-text">
+                    <strong>GIAO HÀNG TOÀN QUỐC</strong>
+                    <span>Miễn phí giao hàng đơn từ 500K</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-6">
+            <div class="shipping-box">
+                <div class="icon-circle">
+                    <img src="image/icon-index-2.png" alt="">
+                </div>
+                <div class="shipping-text">
+                    <strong>THANH TOÁN KHI NHẬN HÀNG</strong>
+                    <span>Thanh toán khi nhận hàng</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-6">
+            <div class="shipping-box">
+                <div class="icon-circle">
+                    <img src="image/icon-index-4.png" alt="">
+                </div>
+                <div class="shipping-text">
+                    <strong>HỖ TRỢ 24/7</strong>
+                    <span>Hỗ trợ khách hàng 24/7</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-6">
+            <div class="shipping-box">
+                <div class="icon-circle">
+                    <img src="image/icon-index-3.png" alt="">
+                </div>
+                <div class="shipping-text">
+                    <strong>BẢO ĐẢM CHẤT LƯỢNG</strong>
+                    <span>Cam kết chất lượng sản phẩm</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container shipping-section">
+    <div class="voucher-container" id="voucherList">
+        <div class="voucher-card" th:each="v : ${vouchers}">
+            <div class="voucher-left">
+                <div class="ticket" th:text="${v.discount >= 1000000 ? (v.discount / 1000000) + 'Tr' : (v.discount / 1000) + 'K'}"></div>
+            </div>
+            <div class="voucher-right">
+                <div>
+                    <h4>NHẬP MÃ: <span th:text="${v.code}"></span></h4>
+                    <p>Mã giảm
+                        <span th:text="${v.discount >= 1000000 ? (v.discount / 1000000) + 'Tr' : (v.discount / 1000) + 'K'}"></span>
+                        cho đơn hàng tối thiểu
+                        <span th:text="${v.minAmount >= 1000000 ? (v.minAmount / 1000000) + 'Tr' : (v.minAmount / 1000) + 'K'}"></span>
+                    </p>
+                </div>
+                <div class="voucher-actions">
+                    <button class="btn-copy" th:data-code="${v.code}" onclick="copyCode(this)">Sao chép</button>
+                    <button class="btn-condition">Điều kiện</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="container py-5" aria-label="Sản phẩm gợi ý dành cho bạn">
+    <header class="mb-4 text-center">
+        <h2 class="h3 mb-1">Sản Phẩm Bán Chạy Tại Shop</h2>
+        <p class="text-muted mb-0">Sản phẩm bán chạy, còn hàng, giá tốt hôm nay</p>
+    </header>
+    <div class="row g-3 g-md-4">
+        <article th:each="p: ${sanPhamBanChay}" class="col-6 col-sm-6 col-md-4 col-lg-20p">
+            <div class="product-card h-100" itemscope itemtype="https://schema.org/Product">
+                <figure class="product-media m-0">
+                    <a th:href="@{product/{slug}(slug=${p.slug})}" itemprop="url" th:aria-label="${p.name}">
+                        <img class="img-product-list"
+                             th:src="${p.image}"
+                             loading="lazy" decoding="async"
+                             th:alt="${p.name}"
+                             itemprop="image" />
+                    </a>
+                </figure>
+                <div class="product-body">
+                    <div class="product-meta">
+                        <span itemprop="sku">F6S</span>
+                    </div>
+                    <h3 class="product-title h6" itemprop="name">
+                        <a th:href="@{product/{slug}(slug=${p.slug})}" th:text="${p.name}" class="product-name-list"></a>
+                    </h3>
+                    <div class="product-price">
+                    <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                        <span itemprop="price" th:content="${p.price}">[[${#numbers.formatDecimal(p.finalPrice, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                        <meta itemprop="priceCurrency" content="VND" />
+                        <link itemprop="availability" href="https://schema.org/InStock" />
+<!--                        <span class="oldprice-product-list" th:if="${p.olePrice != null}" itemprop="price" th:content="${p.olePrice}">[[${#numbers.formatDecimal(p.olePrice, 0, 'POINT', 0, 'POINT')}]] đ</span>-->
+                        <span class="discount-product-list" th:if="${p.discountAmount != null && p.discountAmount > 0}">- [[${#numbers.formatDecimal(p.discountAmount, 0, 'POINT', 0, 'POINT')}]] đ
+                        <span th:if="${p.discountPercent != null && p.discountPercent > 0}" th:text="'- '+${p.discountPercent}+' %'" class="badge bg-danger"></span>
+                        </span>
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <div class="banner-normal"></div>
+</section>
+<div class="container py-5">
+    <header class="mb-4 text-center">
+        <h2 class="h3 mb-1">Sản phẩm có thể bạn quan tâm</h2>
+    </header>
+
+    <div class="row g-3 g-md-4">
+        <article th:each="p: ${listRecommend}" class="col-6 col-sm-6 col-md-4 col-lg-20p">
+            <div class="product-card h-100" itemscope itemtype="https://schema.org/Product">
+                <figure class="product-media m-0">
+                    <a th:href="@{product/{slug}(slug=${p.slug})}" itemprop="url" th:aria-label="${p.name}">
+                        <img class="img-product-list"
+                             th:src="${p.image}"
+                             loading="lazy" decoding="async"
+                             th:alt="${p.name}"
+                             itemprop="image" />
+                    </a>
+                </figure>
+                <div class="product-body">
+                    <div class="product-meta">
+                        <span itemprop="sku">F6S</span>
+                    </div>
+                    <h3 class="product-title h6" itemprop="name">
+                        <a th:href="@{product/{slug}(slug=${p.slug})}" th:text="${p.name}" class="product-name-list"></a>
+                    </h3>
+                    <div class="product-price">
+                    <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                        <span itemprop="price" th:content="${p.price}">[[${#numbers.formatDecimal(p.finalPrice, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                        <meta itemprop="priceCurrency" content="VND" />
+                        <link itemprop="availability" href="https://schema.org/InStock" />
+                        <!--                        <span class="oldprice-product-list" th:if="${p.olePrice != null}" itemprop="price" th:content="${p.olePrice}">[[${#numbers.formatDecimal(p.olePrice, 0, 'POINT', 0, 'POINT')}]] đ</span>-->
+                        <span class="discount-product-list" th:if="${p.discountAmount != null && p.discountAmount > 0}">- [[${#numbers.formatDecimal(p.discountAmount, 0, 'POINT', 0, 'POINT')}]] đ
+                        <span th:if="${p.discountPercent != null && p.discountPercent > 0}" th:text="'- '+${p.discountPercent}+' %'" class="badge bg-danger"></span>
+                        </span>
+                    </span>
+                    </div>
+                </div>
+<!--                <div>-->
+<!--                    điểm: <span th:text="${p.score}"></span>-->
+<!--                </div>-->
+            </div>
+        </article>
+    </div>
+</div>
+<div class="container">
+    <div class="category-container">
+        <button class="btn-category-index"
+                th:each="c, iterStat : ${categories}"
+                th:data-category="${c.id}"
+                th:data-slug="${c.slug}"
+                th:data-name="${c.name}"
+                onclick="getProductByCategory(this)"
+                th:classappend="${iterStat.index == 0} ? ' active-category-index' : ''"
+                th:text="${c.name}">
+        </button>
+    </div>
+    <div class="row g-3 g-md-4" id="listproductcategory">
+        <article th:each="p: ${sanPhamDanhMuc}" class="col-6 col-sm-6 col-md-4 col-lg-20p">
+            <div class="product-card h-100" itemscope itemtype="https://schema.org/Product">
+                <figure class="product-media m-0">
+                    <a th:href="@{product/{slug}(slug=${p.slug})}" itemprop="url" th:aria-label="${p.name}">
+                        <img class="img-product-list"
+                             th:src="${p.image}"
+                             loading="lazy" decoding="async"
+                             th:alt="${p.name}"
+                             itemprop="image" />
+                    </a>
+                </figure>
+                <div class="product-body">
+                    <div class="product-meta">
+                        <span itemprop="sku">F6S</span>
+                    </div>
+                    <h3 class="product-title h6" itemprop="name">
+                        <a th:href="@{product/{slug}(slug=${p.slug})}" th:text="${p.name}" class="product-name-list"></a>
+                    </h3>
+                    <div class="product-price">
+                    <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                        <span itemprop="price" th:content="${p.price}">[[${#numbers.formatDecimal(p.finalPrice, 0, 'POINT', 0, 'POINT')}]] đ</span>
+                        <meta itemprop="priceCurrency" content="VND" />
+                        <link itemprop="availability" href="https://schema.org/InStock" />
+                        <!--                        <span class="oldprice-product-list" th:if="${p.olePrice != null}" itemprop="price" th:content="${p.olePrice}">[[${#numbers.formatDecimal(p.olePrice, 0, 'POINT', 0, 'POINT')}]] đ</span>-->
+                        <span class="discount-product-list" th:if="${p.discountAmount != null && p.discountAmount > 0}">- [[${#numbers.formatDecimal(p.discountAmount, 0, 'POINT', 0, 'POINT')}]] đ
+                        <span th:if="${p.discountPercent != null && p.discountPercent > 0}" th:text="'- '+${p.discountPercent}+' %'" class="badge bg-danger"></span>
+                        </span>
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <div class="text-center my-4">
+        <a id="link-xem-them-sp" th:href="'/category/'+${danhMucSp.slug}" class="btn btn-link-secondary btn-outline-secondary">
+            👉Xem thêm sản phẩm <span th:if="${danhMucSp != null}" th:text="${danhMucSp.name}" id="tencate"></span>
+        </a>
+    </div>
+    <div class="banner-normal"></div>
+
+</div>
+
+<section class="container shipping-section">
+    <div class="title-blog-index">
+        Tin tức - Bài Viết
+    </div>
+    <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+            <a th:href="@{blog/{slug}(slug=${lastBlog.slug})}"><img th:src="${lastBlog.imageBanner}" class="img-blog-last-index" alt="Bài viết mới nhất" loading="lazy" decoding="async"></a>
+            <a th:href="@{blog/{slug}(slug=${lastBlog.slug})}" class="title-last-blog-index" th:text="${lastBlog.title}"></a>
+            <div class="d-flex">
+                    <span class="item-sm-last-blog-index">
+                        <i class="fa fa-calendar order1-item"></i>
+                        <span>20/10/2023</span>
+                    </span>
+                <span class="item-sm-last-blog-index">
+                        <i class="fa fa-eye"></i>
+                        <span th:text="${lastBlog.numView} + ' lượt xem'"></span>
+                    </span>
+                <span class="item-sm-last-blog-index">
+                        <i th:if="${lastBlog.user != null}" class="fa fa-user"></i>
+                        <span th:text="${lastBlog.user == null?'':lastBlog.user.fullName}"></span>
+                </span>
+            </div>
+            <span class="description-last-blog-index" th:text="${lastBlog.description}"></span>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+            <div class="list-blog-right-index">
+                <div th:each="b : ${listBlog}" class="single-blog-index">
+                    <div class="row">
+                        <div class="col-4">
+                            <a th:href="@{blog/{slug}(slug=${b.slug})}"><img loading="lazy" decoding="async" th:src="${b.imageBanner}" class="img-blog-index" th:alt="${b.title}"></a>
+                        </div>
+                        <div class="col-8">
+                            <div class="content-blog-index">
+                                <a th:href="@{blog/{slug}(slug=${b.slug})}" class="title-list-blog-index" th:text="${b.title}"></a>
+                                <div class="d-flex">
+                                        <span class="item-sm-last-blog-index">
+                                            <i class="fa fa-calendar order1-item"></i>
+                                            <span th:text="${#temporals.format(b.createdDate, 'HH:mm dd/MM/yy')}"></span>
+                                        </span>
+                                    <span class="item-sm-last-blog-index">
+                                            <i class="fa fa-eye"></i>
+                                            <span th:text="${b.numView} + ' lượt xem'"></span>
+                                        </span>
+                                </div>
+                                <span class="description-last-blog-index" th:text="${b.description}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center my-4">
+        <a href="/blogs" class="btn btn-link-secondary btn-outline-secondary">
+            👉Xem tất cả bài viết
+        </a>
+    </div>
+</section>
+
+<div th:insert="common/user/footeruser :: footerMain"></div>
+<div th:insert="common/user/chat :: chat"></div>
+<script src="/js/product.js"></script>
+<!-- Modal -->
+</body>
+<script>
+    function copyCode(button) {
+        const code = button.getAttribute("data-code");
+        navigator.clipboard.writeText(code).then(() => {
+            toastr.success("Đã sao chép mã: " + code)
+        });
+    }
+</script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var bannerList = /*[[${bannerNormal}]]*/ [];
+    var listBannerDiv = document.querySelectorAll(".banner-normal");
+
+    for (var i = 0; i < bannerList.length && i < listBannerDiv.length; i++) {
+        var banner = bannerList[i];
+        var div = listBannerDiv[i];
+        div.innerHTML = `<a href="${banner.linkUrl}">
+                         <img src="${banner.imageUrl}" alt="${banner.title}" class="img-banner-normal" loading="lazy" decoding="async">
+                     </a>`;
+    }
+    /*]]>*/
+</script>
+</html>

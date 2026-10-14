@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Admin Dashboard" />
+    <meta name="author" content="Your Name" />
+    <title>Danh sách bài viết</title>
+    <head th:include="common/libadmin :: libheaderadmin"></head>
+    <!-- noUiSlider CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+    <script src="/admin/js/blog.js"></script>
+    <script>
+        window.onload = function (){
+            filterBlog(0);
+        }
+    </script>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/employee/navbarEmployee :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/employee/navbarEmployee :: sidenavAdmin"></div>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid">
+                <h1 class="mt-4">Quản lý Bài Viết</h1>
+
+                <div class="card mb-4">
+                    <div class="card-header-product">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+                                <input name="date" type="text" id="datepicker" class="form-controls" placeholder="Chọn khoảng ngày cần lọc">
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-6 col-6">
+                                <button onclick="filterBlog(0)" class="btn btn-primary"><i class="fas fa-search"></i> Lọc</button>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-6">
+                                <a href="save" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm bài viết</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3 align-items-center">
+                            <div class="col-sm-auto d-flex align-items-center">
+                                <label for="showEntries" class="me-2 mb-0">Showing</label>
+                                <select class="form-select form-select-sm" id="showEntries">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-auto d-flex align-items-center">
+                                <label for="showEntries" class="me-2 mb-0">Sort</label>
+                                <select class="form-select form-select-sm" id="sortby">
+                                    <option value="id,desc">Mới nhất</option>
+                                    <option value="id,asc">Cũ nhất</option>
+                                    <option value="numView,desc">Lượt xem cao nhất</option>
+                                    <option value="numView,asc">Lượt xem thấp nhất</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-auto d-flex align-items-center">
+                                <div class="stat-container">
+                                    <div class="stat-box">Tổng: <strong th:text="${totalBlog}">0</strong> </div>
+                                    <div class="stat-box">Tìm thấy: <strong id="timthay">0</strong></div>
+                                    <div class="stat-box">Đang hiển thị: <strong id="hienthi">0</strong></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 ms-auto">
+                                <div class="input-group">
+                                    <input id="search" class="form-control form-control-sm" placeholder="Nhập từ khóa">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="example" class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>id</th>
+                                    <th>Ảnh</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Ngày cập nhật</th>
+                                    <th>Người tạo</th>
+                                    <th>Lượt xem</th>
+                                    <th class="sticky-col">Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody id="listBlog">
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination" id="pageable">
+                                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalDetail" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tieudetintuc"></h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+            <div class="modal-body row">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Mã tin</th>
+                        <td id="matin"></td>
+                    </tr>
+                    <tr>
+                        <th>Ảnh</th>
+                        <td><img id="anhtin" class="img-thumbnail"></td>
+                    </tr>
+                    <tr>
+                        <th>Ngày tạo</th>
+                        <td id="ngaytao"></td>
+                    </tr>
+                    <tr>
+                        <th>Ngày sửa</th>
+                        <td id="ngaysua"></td>
+                    </tr>
+                    <tr>
+                        <th>Người tạo</th>
+                        <td id="nguoitao"></td>
+                    </tr>
+                    <tr>
+                        <th>SEO title</th>
+                        <td id="seotitle"></td>
+                    </tr>
+                    <tr>
+                        <th>SEO description</th>
+                        <td id="seodescription"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" id="noidungtin"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script>
+    const dateParam = new URL(document.URL).searchParams.get("date");
+
+    const fp = flatpickr("#datepicker", {
+        locale: "vn",
+        mode: "range", // 👉 Cho phép chọn khoảng ngày
+        dateFormat: "d-m-Y",
+        altInput: true,
+        altFormat: "l d-m-Y",
+        disableMobile: true,
+        monthSelectorType: "dropdown",
+        yearSelectorType: "dropdown",
+    });
+
+    if (dateParam) {
+        // nếu muốn gán sẵn khoảng ngày, dateParam phải có dạng "01-09-2025 to 07-09-2025"
+        fp.setDate(dateParam.split(" to "), false, "d-m-Y");
+    }
+</script>
+<script>
+    var uls = new URL(document.URL)
+    var region = uls.searchParams.get("region");
+    var date = uls.searchParams.get("date");
+    var price = uls.searchParams.get("price");
+    if(region != null){
+        document.getElementById("region").value = region
+    }
+    if(price != null && price != ''){
+        document.getElementById("price").value = price
+    }
+</script>
+</html>

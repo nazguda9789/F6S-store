@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Admin Dashboard" />
+  <meta name="author" content="Your Name" />
+  <title>Danh sách giảm giá sản phẩm</title>
+  <head th:include="common/libadmin :: libheaderadmin"></head>
+  <!-- noUiSlider CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+  <script src="/admin/js/discountproduct.js"></script>
+  <script>
+    window.onload = function (){
+      filterDiscount(0);
+    }
+  </script>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+  <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+  <div id="layoutSidenav_content">
+    <main>
+      <div class="container-fluid">
+        <h1 class="mt-4">Quản lý giảm giá sản phẩm</h1>
+
+        <div class="card mb-4">
+          <div class="card-header-product">
+            <div class="row">
+              <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+                <input type="text" id="dateRange" class="form-control" placeholder="Chọn khoảng ngày...">
+              </div>
+              <div class="col-lg-2 col-md-4 col-sm-12 col-12">
+                <select class="form-control" id="loaigiamgia">
+                  <option value="">-- Chọn loại giảm giá --</option>
+                  <option value="FIXED">Giảm cố định</option>
+                  <option value="PERCENT">Giảm %</option>
+                </select>
+              </div>
+              <div class="col-lg-1 col-md-2 col-sm-6 col-6">
+                <button onclick="filterDiscount(0)" class="btn btn-primary"><i class="fas fa-search"></i> Lọc</button>
+              </div>
+              <div class="col-lg-3 col-md-3 col-sm-6 col-6">
+                <a href="save" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm giảm giá</a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3 align-items-center">
+              <div class="col-sm-auto d-flex align-items-center">
+                <label for="showEntries" class="me-2 mb-0">Showing</label>
+                <select class="form-select form-select-sm" id="showEntries" onchange="filterDiscount(0)">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+              <div class="col-sm-auto d-flex align-items-center">
+                <label for="showEntries" class="me-2 mb-0">Sort</label>
+                <select class="form-select form-select-sm" id="sortby"  onchange="filterDiscount(0)">
+                  <option value="id,desc">Mới nhất</option>
+                  <option value="id,asc">Cũ nhất</option>
+                </select>
+              </div>
+              <div class="col-sm-auto d-flex align-items-center">
+                <div class="stat-container">
+                  <div class="stat-box">Tổng: <strong th:text="${totalElements}" id="tong">0</strong> </div>
+                  <div class="stat-box">Tìm thấy: <strong id="timthay">0</strong></div>
+                  <div class="stat-box">Đang hiển thị: <strong id="hienthi">0</strong></div>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table id="example" class="table table-bordered">
+                <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Sản phẩm</th>
+                  <th>Ngày tạo</th>
+                  <th>Người tạo</th>
+                  <th>Loại giảm giá</th>
+                  <th>Giá trị giảm</th>
+                  <th>Giảm tối đa</th>
+                  <th>Thời gian hiệu lực</th>
+                  <th class="sticky-col">Hành động</th>
+                </tr>
+                </thead>
+                <tbody id="listDiscountProduct">
+                </tbody>
+              </table>
+            </div>
+            <nav aria-label="Page navigation example">
+              <ul class="pagination" id="pageable">
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal fade" id="updateDiscountModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Cập nhật khuyến mại</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <input type="hidden" id="updateDiscountId">
+
+        <div class="mb-3">
+          <label>Loại giảm</label>
+          <select id="updateType" class="form-control" onchange="toggleMaxDiscount()">
+            <option value="PERCENT">Phần trăm</option>
+            <option value="FIXED">Số tiền</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label>Giá trị giảm</label>
+          <input type="number" id="updateValue" class="form-control">
+        </div>
+
+        <div class="mb-3" id="maxDiscountGroup">
+          <label>Giảm tối đa</label>
+          <input type="number" id="updateMaxValue" class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label>Ngày bắt đầu</label>
+          <input type="datetime-local" id="updateStartDate" class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label>Ngày kết thúc</label>
+          <input type="datetime-local" id="updateEndDate" class="form-control">
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button class="btn btn-primary" onclick="updateDiscount()">Lưu</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+<script>
+</script>
+<script>
+  $(document).ready(function () {
+    $('#dateRange').daterangepicker({
+      autoUpdateInput: false,
+      timePicker: true,
+      timePicker24Hour: true,
+      timePickerSeconds: false,
+      locale: {
+        format: 'DD/MM/YYYY HH:mm',
+        applyLabel: "Áp dụng",
+        cancelLabel: "Xóa",
+        daysOfWeek: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+        monthNames: [
+          "Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6",
+          "Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"
+        ]
+      }
+    });
+
+    // Sau khi chọn
+    $('#dateRange').on('apply.daterangepicker', function (ev, picker) {
+      $(this).val(
+              picker.startDate.format('DD/MM/YYYY HH:mm') +
+              ' - ' +
+              picker.endDate.format('DD/MM/YYYY HH:mm')
+      );
+    });
+
+    // Xóa
+    $('#dateRange').on('cancel.daterangepicker', function () {
+      $(this).val('');
+    });
+  });
+
+  document.getElementById("updateValue").addEventListener("input", function(){
+
+    const type = document.getElementById("updateType").value;
+
+    if(type === "FIXED"){
+      document.getElementById("updateMaxValue").value = this.value;
+    }
+
+  });
+</script>
+
+
+</html>

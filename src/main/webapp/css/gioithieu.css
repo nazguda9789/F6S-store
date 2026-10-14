@@ -1,0 +1,123 @@
+/* Import Animate.css */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+
+/* Cấu trúc chung */
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+}
+
+h1, h2, h5 {
+    font-family: 'Playfair Display', serif;
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-section .video-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.hero-section video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(60%);
+}
+
+.hero-content h1 {
+    font-size: 4rem;
+}
+
+.hero-content p {
+    font-size: 1.5rem;
+}
+
+.btn-primary {
+    background-color: #8B4513; /* Màu nâu đất sang trọng */
+    border-color: #8B4513;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #A0522D; /* Màu sáng hơn khi rê chuột */
+    border-color: #A0522D;
+    transform: scale(1.05); /* Hiệu ứng phóng to nhẹ */
+}
+
+/* Animations khi cuộn chuột */
+.animated-element {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s ease-out;
+}
+
+.animated-element.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.left-to-right {
+    transform: translateX(-50px);
+}
+
+.left-to-right.visible {
+    transform: translateX(0);
+}
+
+.right-to-left {
+    transform: translateX(50px);
+}
+
+.right-to-left.visible {
+    transform: translateX(0);
+}
+
+.bottom-to-top {
+    transform: translateY(50px);
+}
+
+.bottom-to-top.visible {
+    transform: translateY(0);
+}
+
+.animated-element.delay-1s { transition-delay: 0.2s; }
+.animated-element.delay-2s { transition-delay: 0.4s; }
+.animated-element.delay-3s { transition-delay: 0.6s; }
+.animated-element.delay-4s { transition-delay: 0.8s; }
+.animated-element.delay-5s { transition-delay: 1.0s; }
+.animated-element.delay-6s { transition-delay: 1.2s; }
+
+/* Collections Section */
+.card img {
+    transition: transform 0.5s ease;
+}
+
+.card:hover img {
+    transform: scale(1.05);
+}
+
+/* Chính sách và thông tin */
+.policy-section .accordion-button:not(.collapsed) {
+    color: #8B4513;
+    background-color: #f7f3f0;
+    font-weight: bold;
+}
+
+.policy-section .accordion-item {
+    border-color: #ccc;
+}

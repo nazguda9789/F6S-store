@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="common/user/libuser :: libheader"></th:block>
+</head>
+<body>
+    <div th:replace="common/user/headerUser :: headerUser"></div>
+    <div class="section-bottom-menu"></div>
+
+    <div class="login-section">
+        <div class="block-img-login">
+            <img src="../../image/logo.png" alt="" class="img-logo-login">
+        </div>
+        <div class="content-modal-login">
+            <button class="btn-login-google w-100"><img src="image/google-icon.png" alt=""> Tiếp tục với google</button>
+
+            <div class="divider"><span>Hoặc Nhập Thông Tin</span></div>
+            <form th:object="${userRegis}" action="/register" method="post">
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    <span th:text="${error}">Lỗi xảy ra</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <input th:field="*{fullName}" type="text" name="fullName" class="form-control input-login" placeholder="Nhập họ tên">
+                <input th:field="*{email}" type="text" name="" class="form-control input-login" placeholder="Nhập email của bạn" autocomplete="off">
+                <input th:field="*{phone}" type="text" class="form-control input-login" placeholder="Nhập số điện thoại">
+                <input th:field="*{password}" type="password" class="form-control input-login" placeholder="Mật khẩu">
+                <span class="note-regis">Lưu ý: (Mật khẩu tối thiểu 6 ký tự)</span>
+                <input th:field="*{rePassword}" type="password" class="form-control input-login" placeholder="Nhập lại mật khẩu">
+                <button class="w-100 btn btn-primary btn-login-main form-control">Đăng Ký</button>
+            </form>
+
+            <div class="center-block">
+                <a class="text-center" href="login">← Quay lại đăng nhập</a>
+            </div>
+        </div>
+    </div>
+    <div id="footer"></div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="common/user/libuser :: libheader"></head>
+
+<body>
+<head th:replace="common/user/headerUser :: headerUser"></head>
+
+<div class="section-bottom-menu"></div>
+
+<div class="container shipping-section text-center" style="padding: 80px 20px;">
+  <div style="max-width: 600px; margin: 0 auto;">
+    <h1 style="font-size: 100px; font-weight: 700; color: #ff4d4d; margin-bottom: 10px;">
+      400
+    </h1>
+    <h2 style="font-size: 28px; font-weight: 600; margin-bottom: 20px; color: #333;">
+      Oops! Có vẻ giá trị truyền vào đang có lỗi
+    </h2>
+    <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
+      Có thể đường dẫn có vấn đề hoặc giá trị nhập vào bị lỗi.<br>
+      Vui lòng quay về trang chủ hoặc tiếp tục khám phá các sản phẩm khác.
+    </p>
+    <a th:href="@{/}"
+       style="display: inline-block; padding: 12px 30px; background: #ff4d4d; color: #fff;
+                  text-decoration: none; border-radius: 30px; font-weight: 600; transition: 0.3s;">
+      Quay về Trang Chủ
+    </a>
+  </div>
+</div>
+
+<div th:replace="common/user/footeruser :: footerMain"></div>
+
+</body>
+</html>

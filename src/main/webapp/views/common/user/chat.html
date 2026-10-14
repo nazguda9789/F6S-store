@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+</head>
+<body>
+<div th:fragment="chat">
+  <div class="chat-button" id="chatButton">
+    <i class="fas fa-comment-dots"></i>
+  </div>
+
+  <!-- Options Menu -->
+  <div class="chat-options" id="chatOptions">
+    <div class="chat-option" id="chatBotOption">
+      <i class="fas fa-robot"></i>
+      <span>Chat với Bot</span>
+    </div>
+    <div class="chat-option" id="chatStaffOption" th:if="${#authorization.expression('isAuthenticated()')}">
+      <i class="fas fa-user-tie"></i>
+      <span>Chat với Nhân viên</span>
+    </div>
+  </div>
+
+  <!-- Chat Bot Box -->
+  <div class="chat-box" id="chatBotBox">
+    <div class="chat-header">
+      <h6><i class="fas fa-robot"></i> AI Assistant</h6>
+      <i class="fas fa-times close-chat" data-chat="bot"></i>
+    </div>
+    <div class="chat-messages" id="botMessages">
+      <div class="message bot">
+        <div class="message-content">
+          Xin chào! Tôi là trợ lý ảo của shop giày. Tôi có thể giúp gì cho bạn?
+        </div>
+        <div class="message-time">Vừa xong</div>
+      </div>
+    </div>
+    <div class="suggestions">
+      <small style="color: #666;">💡 Gợi ý câu hỏi:</small>
+      <div class="suggestion-buttons">
+        <button class="suggestion-btn">Giày thể thao nam nào đang bán chạy?</button>
+        <button class="suggestion-btn">Cách chọn size giày?</button>
+        <button class="suggestion-btn">Chính sách đổi trả?</button>
+        <button class="suggestion-btn">Giày chạy bộ tốt nhất?</button>
+        <button class="suggestion-btn">Khuyến mãi hiện tại?</button>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="botInput" placeholder="Nhập tin nhắn...">
+      <button class="send-btn" id="botSendBtn">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat Staff Box -->
+  <div class="chat-box" id="chatStaffBox">
+    <div class="chat-header">
+      <h6><i class="fas fa-user-tie"></i> Hỗ trợ nhân viên</h6>
+      <i class="fas fa-times close-chat" data-chat="staff"></i>
+    </div>
+    <div class="chat-messages" id="staffMessages">
+      <div class="message staff">
+        <div class="message-content">
+          Xin chào! Bạn cần hỗ trợ gì hôm nay?
+        </div>
+        <div class="message-time">Vừa xong</div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="staffInput" placeholder="Nhập tin nhắn...">
+      <button class="send-btn" id="staffSendBtn">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+  <div sec:authorize="isAuthenticated()">
+    <input type="hidden" id="userIdChat" th:value="${userLogged.id}">
+  </div>
+  <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
+  <script src="/js/chat.js"></script>
+  <script src="/js/chat-bot.js"></script>
+  <script src="/js/chat-realtime.js"></script>
+</div>
+</body>
+</html>

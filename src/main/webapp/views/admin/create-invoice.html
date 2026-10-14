@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Admin Dashboard" />
+    <meta name="author" content="Your Name" />
+    <title>Tạo đơn hàng</title>
+    <head th:include="common/libadmin :: libheaderadmin"></head>
+    <link rel="stylesheet" type="text/css" href="/admin/css/invoice.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid my-4">
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <select class="btn custom-select me-2" id="select-invoice" onchange="loadDetailOrder()">
+                            <option value="-1" th:if="${orderDrafts.size() == 0}">--- Chưa có đơn hàng chờ nào ---</option>
+                            <th:block th:if="${orderDrafts.size() > 0}">
+                                <option value="-1" selected disabled th:text="'Có '+${orderDrafts.size()} + ' đơn hàng chờ'"></option>
+                                <option th:each="c : ${orderDrafts}" th:value="${c.id}" th:text="${c.id}+' - '+${c.fullName} + ' - ' + ${@formatUtils.formatPhone(c.phone)} + ' - ' + ${#temporals.format(c.createdDate, 'HH:mm dd/MM/yy')}"></option>
+                            </th:block>
+                        </select>
+                        <button class="btn btn-secondary me-2 btn-luutam" onclick="createDonTam()"><i class="fa fa-check-circle"></i> Lưu đơn chờ</button>
+                        <button onclick="window.location.reload()" class="btn btn-secondary me-2 btn-hidden"><i class="fa fa-plus"></i> Tạo đơn chờ mới</button>
+                        <button onclick="createDonTam()" class="btn btn-warning me-2 btn-hidden"><i class="fa fa-edit"></i> Cập nhật đơn chờ</button>
+                        <button onclick="deleteOrder()" class="btn btn-danger me-2 btn-hidden"><i class="fa fa-trash-alt"></i> Xóa đơn chờ</button>
+                        <button data-bs-toggle="modal" data-bs-target="#saveModal" class="btn btn-success me-2 btn-hidden"><i class="fas fa-check-circle me-1"></i>Lưu đơn</button>
+                    </div>
+                </div>
+                <ul class="nav nav-tabs mb-3" id="orderTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="thongtin-banhang-tab" data-bs-toggle="tab" data-bs-target="#thongtin-banhang" type="button" role="tab" aria-controls="thongtin-banhang" aria-selected="true">Thông tin chung</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="thongtin-giao-hang-tab" data-bs-toggle="tab" data-bs-target="#thongtin-giao-hang" type="button" role="tab" aria-controls="thongtin-giao-hang" aria-selected="false">Thông tin giao hàng</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content mb-4" id="orderTabsContent">
+                    <div class="tab-pane fade show active" id="thongtin-banhang" role="tabpanel" aria-labelledby="thongtin-banhang-tab">
+                        <div class="card shadow-sm mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <h5>Thông tin khách hàng</h5><hr>
+                                        <input type="hidden" id="id-order">
+                                        <div class="custom-input">
+                                            <div class="input-wrapper">
+                                                <span class="icon"><i class="fa fa-user-alt"></i></span>
+                                                <input type="text" name="fullName" id="fullName" placeholder="Nhập họ tên khách hàng" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="custom-input">
+                                            <div class="input-wrapper">
+                                                <span class="icon"><i class="fa fa-phone-alt"></i></span>
+                                                <input type="text" name="phone" id="phone" placeholder="Nhập Số điện thoại" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="custom-input">
+                                            <div class="input-wrapper">
+                                                <span class="icon"><i class="fa fa-phone-alt"></i></span>
+                                                <input type="text" name="email" id="email" placeholder="Nhập Email" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <h5>Thông tin địa chỉ</h5><hr>
+                                        <div class="custom-input">
+                                            <div class="input-wrapper">
+                                                <select name="province" id="province" class="form-control select-province">
+                                                    <option th:each="p: ${provinces}" th:value="${p.code}" th:data-province-name="${p.name}" th:text="${p.name}"></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="custom-input">
+                                            <div class="input-wrapper">
+                                                <select name="ward" id="ward" class="select2 form-control select-ward">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <div class="form-floating mb-3">
+                                                <input required name="addressDetail" type="text" class="form-control" id="addressDetail" placeholder="Địa chỉ chi tiêt: Số nhà, tên đường,...">
+                                                <label for="addressDetail">Địa chỉ chi tiêt: Số nhà, tên đường,...</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <h5>Chi phí</h5><hr>
+                                        <div class="custom-input">
+                                            <div class="input-wrapper">
+                                                <span class="icon"><i class="fa fa-money-bill"></i> Phí ship: </span>
+                                                <input type="text" name="shipcost" id="shipcost" placeholder="Phí ship" class="form-control input-form" value="30000">
+                                            </div>
+                                        </div>
+                                        <div class="custom-input">
+                                            <div class="input-wrapper">
+                                                <span class="icon"><i class="fa fa-money-bill"></i> Giảm giá: </span>
+                                                <input type="text" name="discount" id="discount" placeholder="Giảm giá" class="form-control input-form">
+                                            </div>
+                                        </div>
+                                        <div class="custom-input">
+                                            <div class="input-wrapper">
+                                                <span class="icon"><i class="fa fa-money-bill"></i> Tổng Sp: </span>
+                                                <input type="text" name="totalAmount" id="totalAmount" placeholder="Tổng tiền" class="form-control input-form">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <h5>Thông tin khác</h5><hr>
+                                        <div class="form-group" style="padding-top: 15px">
+                                            <div class="form-floating mb-3">
+                                                <input required name="note" type="text" class="form-control" id="note" placeholder="Ghi chú đơn hàng">
+                                                <label>Ghi chú đơn hàng</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="padding-top: 15px">
+                                            <div class="form-floating mb-3">
+                                                <select class="form-control" id="discount-code">
+                                                    <option value="" data-discount="0" th:text="'--- Có '+${vouchers.size()}+' voucher khả dụng ---'"></option>
+                                                    <option th:each="v : ${vouchers}" th:data-discount="${v.discount}" th:value="${v.code}" th:text="'Giảm: '+${#numbers.formatDecimal(v.discount, 0, 'COMMA', 0, 'POINT')}+' - '+${v.code}"></option>
+                                                </select>
+                                                <label>Chọn mã giảm giá</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="thongtin-giao-hang" role="tabpanel" aria-labelledby="thongtin-giao-hang">
+                        <div class="card shadow-sm mb-3">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label text-success fw-bold">Đổi tác giao hàng:</label>
+                                        <select class="form-select" id="shippingPartner">
+                                            <option selected>Chọn đối tác giao hàng</option>
+                                            <option value="ghtk">Giao Hàng Tiết Kiệm</option>
+                                            <option value="ghn">Giao Hàng Nhanh</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="shippingFee" class="form-label">Phí giao hàng:</label>
+                                        <input type="number" class="form-control" id="shippingFee" value="0">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="deliveryCash" class="form-label">Giao hàng thu tiền:</label>
+                                        <input type="number" class="form-control" id="deliveryCash" value="0">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="shipWeight" class="form-label">Khối lượng ship (g):</label>
+                                        <input type="number" class="form-control" id="shipWeight" value="0">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="shippingNote" class="form-label">Ghi chú giao hàng:</label>
+                                        <textarea class="form-control" id="shippingNote" rows="1"></textarea>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="invoiceValue" class="form-label">Giá trị hóa đơn:</label>
+                                        <input type="number" class="form-control" id="invoiceValue" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-7">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">Thông tin sản phẩm</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="input-group mb-3">
+                                    <input onkeyup="searchSanPham(event)" type="text" class="form-control" id="productSearch" placeholder="Tìm kiếm sản phẩm...">
+                                    <button onclick="loadProductInvoice(0)" class="btn btn-outline-secondary" type="button" id="searchBtn"><i class="fas fa-search"></i></button>
+                                </div>
+
+                                <div id="productSearchResults" class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                    <table class="table table-hover table-sm table-product-create-invoice">
+                                        <thead>
+                                        <tr>
+                                            <th style="width: 60px;">Ảnh</th>
+                                            <th style="width: 20%;">Sản phẩm</th>
+                                            <th style="width: 80px;">Đơn vị</th>
+                                            <th>Màu sắc</th>
+                                            <th>Kích thước</th>
+                                            <th>Tồn kho</th>
+                                            <th>Giá bán</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="productTableBody">
+                                        </tbody>
+                                    </table>
+                                    <div id="noProductFound" class="text-center text-muted py-3" style="display: none;">
+                                        Không tìm thấy sản phẩm nào.
+                                    </div>
+                                </div>
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination" id="pageable">
+                                        <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-light d-flex">
+                                <h5 class="card-title mb-0">Chi tiết đơn hàng</h5>
+                                <span>Tổng số lượng:</span>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <div class="table-responsive flex-grow-1 overflow-auto" style="max-height: 500px;">
+                                    <table class="table table-hover table-sm table-list-product-order-tm">
+                                        <thead>
+                                        <tr>
+                                            <th style="width: 50px;">Mã SP</th>
+                                            <th>Tên SP</th>
+                                            <th style="width: 80px;">Màu/Size</th>
+                                            <th style="width: 80px;">SL</th>
+                                            <th style="width: 100px;">Đơn giá</th>
+                                            <th style="width: 100px;">Tổng</th>
+                                            <th style="width: 40px;"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="orderItemsTableBody">
+                                        </tbody>
+                                    </table>
+                                    <div id="noOrderItem" class="text-center text-muted py-3" style="display: block;">
+                                        Chưa có sản phẩm nào trong đơn hàng.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered  modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Trạng thái đơn hàng <span id="ma-code-donhang"></span></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="status-update-card">
+                    <h4 class="mb-3">⚙️ Chọn trạng thái</h4>
+                    <div class="btn-group" role="group" aria-label="Chọn trạng thái">
+                        <input type="radio" class="btn-check" name="invoiceStatus" id="status1" checked value="DANG_CHO_VAN_CHUYEN" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="status1">
+                            <i class="fas fa-hourglass-half"></i> Đang chờ vận chuyển
+                        </label>
+
+                        <input type="radio" class="btn-check" name="invoiceStatus" id="status2" value="HOAN_THANH" autocomplete="off">
+                        <label class="btn btn-outline-success" for="status2">
+                            <i class="fas fa-check-circle"></i> Hoàn thành
+                        </label>
+                    </div>
+
+                    <h4 class="mb-3" style="display: block;margin-top:30px">⚙️ Loại đơn hàng</h4>
+                    <div class="btn-group" role="group" aria-label="Loại đơn hàng">
+                        <input type="radio" class="btn-check" name="orderType" id="orderTypeFacebook" value="FACEBOOK" checked autocomplete="off">
+                        <label class="btn btn-outline-primary" for="orderTypeFacebook">Facebook</label>
+
+                        <input type="radio" class="btn-check" name="orderType" id="orderTypeTaiQuay" value="TAI_QUAY" autocomplete="off">
+                        <label class="btn btn-outline-danger" for="orderTypeTaiQuay">Tại quầy</label>
+                    </div><br><br>
+                    <label class="checkbox-custom"> Xóa đơn hàng khỏi đơn hàng tạm
+                        <input id="check-delete" type="checkbox">
+                        <span class="checkmark-checkbox"></span>
+                    </label><br>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="changeOrderToInvoice()">Xác nhận lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/admin/js/create-invoice.js"></script>
+</body>
+
+<script>
+    $(document).on('select2:open', () => {
+        document.querySelector('.select2-container--open .select2-search__field').focus();
+    });
+    $( document ).ready(function() {
+        $('.select-province').select2({
+            placeholder: "Chọn tỉnh, thành phố"
+        });
+    });
+</script>
+<script th:inline="javascript">
+    let provinceData = [[${provinces}]];
+    $(document).ready(function () {
+        $('#province').on('change', function () {
+            let provinceCode = $(this).val();
+            let wards = [];
+            for (let p of provinceData) {
+                if (p.code === provinceCode) {
+                    wards = p.wards;
+                    break;
+                }
+            }
+            var main = '';
+            for(var i=0; i< wards.length; i++){
+                main += `<option value="${wards[i].code}" data-shipcost="${wards[i].shipCost}" data-ward-name="${wards[i].name}">${wards[i].name}</option>`
+            }
+            document.getElementById("ward").innerHTML = main
+            $('.select-ward').select2({
+                placeholder: "Chọn xã, phường",
+            });
+        });
+
+        let firstProvince = provinceData.length > 0 ? provinceData[0].code : null;
+        if (firstProvince) {
+            $('#province').val(firstProvince).trigger('change');
+            $('.select-ward').select2({
+                placeholder: "Chọn xã, phường",
+            });
+        }
+    });
+    $('#discount-code').on('change', function() {
+        let discount = $(this).find(':selected').data('discount');
+        $("#discount").val(discount)
+    });
+</script>
+</html>

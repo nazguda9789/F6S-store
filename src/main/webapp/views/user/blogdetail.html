@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- ✅ SEO: Title + Meta Description -->
+    <title th:text="${blog.seoTitle} + ' | ' +'F6S'"></title>
+    <meta name="description" th:content="${blog.metaDescription}" />
+    <link rel="canonical" th:href="@{'/blog/' + ${blog.slug}}" />
+
+    <!-- ✅ Open Graph cho MXH -->
+    <meta property="og:type" content="product" />
+    <meta property="og:title" th:content="${blog.seoTitle}" />
+    <meta property="og:description" th:content="${blog.metaDescription}" />
+    <meta property="og:image" th:content="${blog.imageBanner}" />
+    <meta property="og:url" th:content="@{/blog/{slug}(slug=${blog.slug})}" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" th:content="${#temporals.format(blog.createdDate, 'yyyy-MM-dd')}"/>
+
+    <th:block th:include="common/user/libuser :: libheader"></th:block>
+    <script type="application/ld+json" th:utext="${jsonLd}"></script>
+
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+<div class="container my-4 shipping-section">
+    <nav aria-label="breadcrumb" class="breadcrumb-container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item breadcrumb-product-name active" aria-current="page" th:text="${blog.title}"></li>
+        </ol>
+    </nav>
+    <div class="container-image-blog-detail"><img th:src="${blog.imageBanner}"  th:alt="${blog.title}" loading="lazy"></div>
+    <h1 th:text="${blog.title}" class="title-blog-detail"></h1>
+    <div class="d-flex head-blog-detail">
+        <span class="item-sm-last-blog-index">
+            <i class="fa fa-calendar order1-item"></i>
+            <span th:text="${#temporals.format(blog.createdDate, 'HH:mm dd/MM/yy')}">20/10/2023</span>
+        </span>
+        <span class="item-sm-last-blog-index">
+            <i class="fa fa-eye"></i>
+            <span th:text="${blog.numView} + ' lượt xem'"></span>
+        </span>
+        <span class="item-sm-last-blog-index">
+            <i th:if="${blog.user != null}" class="fa fa-user"></i>
+            <span th:text="${blog.user == null?'':blog.user.fullName}"></span>
+        </span>
+    </div>
+
+    <div class="description-blog-detail">
+        <strong th:text="${blog.description}"></strong>
+    </div>
+    <div class="content-blog-detail" th:utext="${blog.content}">
+    </div>
+</div>
+
+<div th:replace="common/user/footeruser :: footerMain"></div>
+</body>
+
+</html>

@@ -1,0 +1,642 @@
+:root {
+    --bs-blue: #0d6efd;
+    --bs-gray-200: #e9ecef;
+    --bs-gray-400: #ced4da;
+    --bs-gray-600: #6c757d;
+    --main-blue: #0275d8; /* Custom blue for buttons/tabs */
+    --active-blue: #025aa5; /* Darker blue for active state */
+    --light-blue-bg: #eaf3ff;
+    --orange-btn: #fd7e14;
+    --red-text: #dc3545;
+    --text-color: #495057;
+    --bg-color: #f8f9fa;
+}
+
+/* --- Header Section --- */
+.header-bar {
+    background-color: #fff;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--bs-gray-200);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+.search-input {
+    border: 1px solid var(--bs-gray-400);
+    border-radius: 5px;
+    padding-left: 35px !important;
+    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%236c757d" class="bi bi-search" viewBox="0 0 16 16"%3E%3Cpath d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"%3E%3C/path%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+
+.header-actions .btn-status {
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-actions .btn-blue {
+    background-color: var(--main-blue);
+}
+
+.header-actions .btn-dark {
+    background-color: #343a40;
+}
+
+/* --- Tabs Section --- */
+.nav-status {
+    padding: 10px 20px;
+    display: flex;           /* bật flexbox */
+    flex-wrap: wrap;         /* cho phép xuống dòng khi tràn */
+    gap: 10px;               /* khoảng cách giữa các button, tuỳ chỉnh */
+}
+
+.btn-status-list {
+    flex: 1 1 auto;          /* giãn đều nhau, nhưng vẫn có thể co nhỏ */
+    min-width: 100px;        /* giới hạn nhỏ nhất, tuỳ chỉnh theo thiết kế */
+    text-align: center;      /* căn giữa chữ */
+    padding: 8px 12px;       /* tuỳ chỉnh padding */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    background: #f0f0f0;
+    height: 40px !important;
+    border-radius: 16px !important;
+    border: none !important;
+    font-size: 15px;
+    color: #00467f;
+    font-weight: 600;
+}
+
+
+.tab-number {
+    color: #ff4614;
+    margin-left: 5px;
+    font-weight: 500;
+}
+
+.active-status-list{
+    background: #00467f;
+    color: #fff;
+    box-shadow: 0 0 4px #052653 !important;
+    font-weight: 600;
+}
+.active-status-list .tab-number {
+    color: #ffc900;
+}
+
+.nav-link.active .tab-number {
+    background-color: var(--active-blue);
+}
+
+/* --- Filter Section --- */
+.filter-section {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+.date-input-container {
+    position: relative;
+}
+
+.date-input {
+    padding-right: 30px;
+}
+
+.date-input-icon {
+    position: absolute;
+    right: 30px !important;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--bs-gray-600);
+}
+
+/* --- Table/List Section --- */
+.order-table {
+    background-color: #fff;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.order-table th, .order-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--bs-gray-200);
+    vertical-align: top;
+}
+
+.order-table th {
+    font-weight: bold;
+    color: var(--bs-gray-600);
+    background-color: #f8f9fa;
+}
+
+.order-table td {
+    font-size: 0.95rem;
+}
+
+.order-details .main-id {
+    color: var(--main-blue);
+    font-weight: bold;
+}
+
+.order-details .status {
+    color: var(--red-text);
+}
+
+.receiver-details .status {
+    color: var(--bs-gray-600);
+    font-size: 0.85rem;
+}
+
+.cod-amount {
+    font-weight: bold;
+    color: var(--red-text);
+}
+
+.payment-info {
+    font-size: 0.85rem;
+    color: var(--bs-gray-600);
+}
+
+.rebuild-btn {
+    background-color: var(--orange-btn);
+    color: white;
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+.date-input-container {
+    position: relative;
+    width: 200px;
+}
+.date-input {
+    padding-right: 35px;
+}
+.date-input-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
+}
+.total-cost-invoice{
+    font-size: 1rem !important;
+}
+.vandon-btn{
+    margin-top: 10px;
+}
+.empty-table-message {
+    text-align: center;
+    padding: 50px 0; /* Thêm khoảng trống trên và dưới */
+    color: #6c757d; /* Màu chữ xám */
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.empty-table-message p {
+    margin-bottom: 20px;
+}
+
+.btn-create-order {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #28a745; /* Màu xanh lá cây */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.btn-create-order:hover {
+    background-color: #218838;
+}
+
+/* Tùy chỉnh thêm để bảng trông đẹp hơn */
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+.order-table th,
+.order-table td {
+    padding: 12px;
+    border: 1px solid #dee2e6;
+    text-align: left;
+}
+
+.order-table thead tr th {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+/* Ẩn input checkbox trong cột STT để hiển thị gọn hơn */
+.order-table th:first-child,
+.order-table td:first-child {
+    text-align: center;
+}
+@media screen and (max-width: 768px) {
+    .headcontent-invoice{
+        display: block !important;
+        padding-right: 0px;
+        margin-top: 0px;
+        padding-top: 0px;
+    }
+    .container-head-time {
+        max-width: 100%;
+        display: flex;       /* giữ flex */
+        gap: 15px;
+        margin-top: 0px;
+        padding-top: 0px;
+    }
+    .container-head-time .date-input-container {
+        flex: 1;             /* các phần tử con rộng đều nhau */
+    }
+    .btn-status-list{
+        font-size: 12px;
+    }
+    .stat-container .stat-box{
+        font-size: 11px;
+    }
+    .row-pageable-head{
+        max-width: 100%;
+        display: flex;
+        gap: 5px !important;
+    }
+    .row-pageable-head > * {
+        flex: 1;             /* các phần tử con rộng đều nhau */
+    }
+}
+
+
+.inv-detail-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
+}
+.inv-detail-card .card-body {
+    padding:10px;
+}
+.inv-detail-card-header {
+    background-color: #e9ecef;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1.25rem 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #495057;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+.inv-detail-label {
+    font-weight: 500;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+.inv-detail-value {
+    font-weight: 600;
+    color: #343a40;
+    font-size: 1rem;
+}
+.inv-detail-product-info-item {
+    border-left: 3px solid #007bff;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+.inv-detail-service-option {
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #f1f3f5;
+}
+.inv-detail-service-option.active {
+    border-color: #007bff;
+    background-color: #e6f7ff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+}
+.inv-detail-notes-value {
+    background-color: #f1f3f5;
+    padding: 15px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+}
+@media print {
+    .d-flex.justify-content-between.align-items-center.mb-4,
+    .btn,
+    .fa-image {
+        display: none !important;
+    }
+    body {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background-color: #fff !important;
+    }
+    .container {
+        padding: 10px !important;
+    }
+    .row {
+        margin: 0 !important;
+    }
+    .col-md-6 {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+        padding: 0 10px !important;
+    }
+}
+
+.status-history-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    background: #fff;
+    padding: 20px;
+}
+.status-badge {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+.status-badge.confirmed { background: #198754; color: #fff; }
+.status-badge.shipping { background: #0d6efd; color: #fff; }
+.status-badge.cancelled { background: #dc3545; color: #fff; }
+.status-badge.completed { background: #6f42c1; color: #fff; }
+
+.status-update-card {
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    padding: 20px;
+}
+.status-update-btn {
+    min-width: 150px;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 10px 15px;
+}
+.status-update-btn i { margin-right: 6px; }
+.status-update-btn-disable {
+    pointer-events: none;   /* không click được */
+    opacity: 0.5;           /* mờ đi */
+    cursor: not-allowed;    /* icon chuột báo cấm */
+    background: #b8b8b8 !important;
+    color: #fff !important;
+}
+.status-update-btn:hover{
+    background: #e6e6e6;
+}
+
+
+.header-placeholder {
+    background-color: #343a40 !important;
+    border-bottom: 1px solid #495057;
+}
+
+.card {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 1rem 1.25rem;
+}
+
+.card-title {
+    font-weight: 600;
+    color: #333;
+}
+
+.form-control, .form-select {
+    border-radius: 6px;
+}
+
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link {
+    color: #495057;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0d6efd;
+    border-color: #dee2e6 #dee2e6 #fff;
+    font-weight: 500;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    padding: 0.5rem;
+}
+
+.product-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+.product-item{
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.order-item-img {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+/* Các lớp cho cấu trúc bảng mới với rowspan */
+.product-main-row td {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.variant-row {
+    background-color: #e9ecef;
+}
+
+.variant-row:hover {
+    background-color: #dee2e6;
+    cursor: pointer;
+}
+
+.variant-row td {
+    padding-left: 30px; /* Lề trái để phân cấp */
+}
+
+
+.stock-info.in-stock {
+    color: green;
+}
+.stock-info.low-stock {
+    color: orange;
+}
+.stock-info.out-of-stock {
+    color: red;
+}
+
+/* Các lớp cho bảng chi tiết đơn hàng */
+.btn-remove-item {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+.quantity-input {
+    width: 60px;
+    padding: 0.25rem 0.5rem;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.form-group-inline {
+    display: flex;
+    gap: 15px;
+}
+
+.form-group-inline .form-group {
+    flex: 1;
+}
+.custom-input {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font-family: Arial, sans-serif;
+    padding-top: 15px;
+}
+
+.custom-input label {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 4px; /* label và input gần nhau, ít chiếm chiều dọc */
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper .icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 16px;
+}
+.input-wrapper .icon-custom {
+    position: relative;
+    color: #666;
+    font-size: 16px;
+    width: 150px;
+}
+.input-wrapper .input-form{
+    padding: 8px 12px 8px 150px;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 8px 12px 8px 35px; /* chừa chỗ cho icon */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-wrapper input:focus {
+    border-color: #0d6efd; /* màu xanh bootstrap */
+    box-shadow: 0 0 4px rgba(13, 110, 253, 0.3);
+    outline: none;
+}
+
+/* Style chung cho input & select */
+.input-wrapper input,
+.input-wrapper select {
+    width: 100%;
+    padding: 8px 12px 8px 35px; /* chừa chỗ cho icon */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none; /* ẩn mũi tên mặc định */
+    background: #fff;
+}
+
+/* Thêm mũi tên custom cho select */
+.input-wrapper select {
+    background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 16 16' fill='gray' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    cursor: pointer;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 4px rgba(13, 110, 253, 0.3);
+    outline: none;
+}
+
+.table-product-create-invoice tr{
+    border-top: 1px solid #b8b8b8;
+}
+.table-product-create-invoice tr td{
+    background: #fff !important;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.custom-select {
+    border: 1px solid #dc3545; /* viền đỏ giống outline-danger */
+    color: #dc3545;            /* chữ đỏ */
+    background-color: #fff;    /* nền trắng */
+    border-radius: 0.375rem;   /* bo góc */
+    padding: 0.375rem 0.75rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.custom-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    border-color: #dc3545;
+}
+
+.custom-select option {
+    color: #000;   /* chữ đen trong dropdown */
+    background-color: #fff; /* nền trắng khi mở menu */
+}
+.table-list-product-order-tm{
+    font-size: 0.8rem;
+}
+.btn-hidden{
+    display: none;
+}

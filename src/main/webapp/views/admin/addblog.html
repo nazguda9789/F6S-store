@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Admin Dashboard" />
+  <meta name="author" content="Your Name" />
+  <title>Admin Dashboard</title>
+  <head th:replace="common/libadmin :: libheaderadmin"></head>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+  <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+  <div id="layoutSidenav_content">
+    <main>
+      <div class="container-fluid">
+        <h1 class="mt-4">Quản lý Bài Viết</h1>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <span th:text="${param.id == null?'Thêm bài viết':'Cập nhật bài viết'}"></span>
+            <a href="list" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-list"></i> Danh sách bài viết</a>
+          </div>
+          <div class="card-body">
+            <form th:object="${blog}" method="post" class="row">
+              <div class="col-lg-3 col-md-3 col-sm-12 col-12">
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                  <span th:text="${error}">Lỗi xảy ra</span>
+
+                </div>
+                <input th:field="*{id}" type="hidden" class="form-control">
+                <label class="lb-form">Tiêu đề bài viết</label>
+                <input onkeyup="createSlug(this.value)" th:field="*{title}" type="text" class="form-control">
+                <label class="lb-form">Slug</label>
+                <input th:field="*{slug}" id="slug" type="text" class="form-control">
+                <label class="lb-form">Mô tả ngắn</label>
+                <textarea onkeyup="document.getElementById('metaDescription').value = this.value" th:field="*{description}" rows="3" class="form-control"></textarea>
+                <br><br>
+                <button id="btnadd" class="btn btn-success form-control action-btn" th:text="${param.id == null?'Thêm bài viết':'Cập nhật bài viết'}"></button>
+              </div>
+              <div class="col-lg-3 col-md-3 col-sm-12 col-12">
+                <label class="lb-form">SEO title</label>
+                <input th:field="*{seoTitle}" id="seoTitle" type="text" class="form-control">
+                <label class="lb-form">Meta description</label>
+                <textarea th:field="*{metaDescription}" id="metaDescription" rows="3" class="form-control"></textarea>
+                <label class="lb-form">Ảnh bài viết</label>
+                <input onchange="chonAnh()" id="fileimage" type="file" class="form-control">
+                <input type="hidden" th:field="*{imageBanner}" id="imageBanner">
+                <img id="imgpreview" th:src="${blog.imageBanner}" style="width: 120px; margin-top: 15px;margin-bottom: 15px;display: block;">
+              </div>
+              <div class="col-lg-6 col-md-3 col-sm-12 col-12">
+                <textarea th:field="*{content}" id="editor" name="content"></textarea>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+<script src="https://cdn.tiny.cloud/1/f6s0gxhkpepxkws8jawvfwtj0l9lv0xjgq1swbv4lgcy3au3/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  function createSlug(productName) {
+    document.getElementById("seoTitle").value = productName
+    // 1. Convert to lowercase
+    let slug = productName.toLowerCase();
+
+    // 2. Remove Vietnamese diacritics (dấu)
+    slug = slug.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    // 3. Replace spaces and other special characters with hyphens
+    slug = slug.replace(/[^a-z0-9\s-]/g, ""); // Keep only letters, numbers, spaces, and hyphens
+
+    // 4. Replace multiple hyphens with a single hyphen
+    slug = slug.replace(/[\s_-]+/g, "-");
+
+    // 5. Trim leading/trailing hyphens
+    slug = slug.trim("-");
+    document.getElementById("slug").value = slug
+  }
+</script>
+<script>
+  tinymce.init({
+    selector: 'textarea#editor', // Chọn textarea có id là 'editor'
+    // Tăng cường các plugin để hỗ trợ nhiều chức năng hơn
+    plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak ' +
+            'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking ' +
+            'table emoticons template paste codesample help',
+    // Định nghĩa các nút trên thanh công cụ. Chia thành nhiều dòng để dễ quản lý.
+    toolbar: 'undo redo | blocks | ' + // Hoàn tác, làm lại, và định dạng khối (Heading 1, 2, Paragraph,...)
+            'bold italic underline strikethrough | forecolor backcolor | ' + // Định dạng chữ: đậm, nghiêng, gạch chân, gạch ngang, màu chữ, màu nền
+            'alignleft aligncenter alignright alignjustify | outdent indent | ' + // Căn lề, lùi dòng
+            'numlist bullist | link image media table | ' + // Danh sách số, danh sách dấu chấm, chèn liên kết, ảnh, video, bảng
+            'charmap emoticons | fullscreen code preview | help', // Ký tự đặc biệt, biểu tượng cảm xúc, chế độ toàn màn hình, xem trước, mã nguồn, trợ giúp
+    height: 600, // Tăng chiều cao của trình soạn thảo
+    menubar: 'file edit view insert format tools table help', // Hiện thêm menu bar ở trên cùng
+    images_upload_handler: async function (blobInfo, success, failure) {
+      const formData = new FormData();
+      formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+      const res = await fetch('/adm-prj/qtht-001/api/upload/upload-file', {
+        method: 'POST',
+        body: formData
+      });
+      if (res.status < 300) {
+        var linkImage = await res.text();
+        success(linkImage);
+      }
+    }
+  });
+</script>
+
+<script>
+  async function chonAnh(){
+    document.getElementById("btnadd").disabled = true
+    const filePath = document.getElementById('fileimage')
+    const formData = new FormData()
+    formData.append("file", filePath.files[0])
+
+    const res = await fetch('/adm-prj/qtht-001/api/upload/upload-file', {
+      method: 'POST',
+      body: formData
+    });
+    if (res.status < 300) {
+      var linkImage = await res.text();
+      document.getElementById("imageBanner").value = linkImage
+      document.getElementById("imgpreview").src = linkImage
+      document.getElementById("btnadd").disabled = false
+    }
+    else{
+      document.getElementById("btnadd").disabled = false
+    }
+  }
+</script>
+</html>

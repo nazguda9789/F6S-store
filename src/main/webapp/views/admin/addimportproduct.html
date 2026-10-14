@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tài Khoản</title>
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+        <div id="layoutSidenav_content">
+            <main class="main">
+                <div class="title-add-admin">
+                    <p>Thêm/ cập nhật đơn nhập</p>
+                </div>
+                <form class="form-add row" style="padding-bottom: 30px;" method="post" action="addimportproduct"
+                      th:object="${importProduct}">
+                    <div class="col-sm-5">
+                        <label class="lb-form">sản phẩm</label>
+                        <select id="listproduct" name="productId" class="form-control" data-live-search="true">
+                            <option th:each="c : ${listProduct}" th:text="${c.name}" th:value="${c.id}" th:selected="${importProduct.product != null ? c.id == importProduct.product.id:false}"></option>
+                        </select>
+                        <label class="lb-form">Số lượng</label>
+                        <input th:field="*{quantity}" type="number" class="form-control">
+                        <label class="lb-form">giá nhập</label>
+                        <input th:field="*{importPrice}" type="number" class="form-control"><br><br>
+                        <button class="btn btn-success form-control action-btn">Thêm/ Cập nhật đơn nhập</button>
+                    </div>
+                    <div class="col-sm-7">
+                        <label class="lb-form">Mô tả</label>
+                        <textarea id="editor" th:field="*{description}" placeholder="thông tin nhập hàng"></textarea>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+
+</body>
+<script src="https://cdn.tiny.cloud/1/f6s0gxhkpepxkws8jawvfwtj0l9lv0xjgq1swbv4lgcy3au3/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    tinymce.init({
+        selector: 'textarea#editor',
+    });
+    const ser = $("#listproduct");
+    ser.select2({
+        placeholder: "Chọn sản phẩm",
+    });
+</script>
+
+</html>

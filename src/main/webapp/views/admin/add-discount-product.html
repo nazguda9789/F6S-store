@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Admin Dashboard" />
+  <meta name="author" content="Your Name" />
+  <title>Admin Dashboard</title>
+  <head th:replace="common/libadmin :: libheaderadmin"></head>
+  <script src="/admin/js/discountproduct.js"></script>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+  <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+  <div id="layoutSidenav_content">
+    <main>
+      <div class="container-fluid">
+        <h1 class="mt-4">Quản lý khuyến mại</h1>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <span th:text="${param.id == null?'Thêm khuyến mại sản phẩm':'Cập nhật khuyến mại sản phẩm'}"></span>
+            <a href="list" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-list"></i> Danh sách khuyến mại sản phẩm</a>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-xl-5 col-lg-6 col-md-12 col-sm-12">
+                <label class="lb-form">Chọn danh mục</label>
+                <select class="form-control" id="danhmucselect" multiple onchange="loadProduct()">
+                    <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                </select>
+                <label class="lb-form">Chọn sản phẩm</label>
+                <select class="form-control" id="sanphamselect" multiple>
+                </select>
+              </div>
+              <div class="col-xl-5 col-lg-6 col-md-12 col-sm-12">
+                <label class="lb-form">Loại giảm giá</label>
+                <select class="form-control" id="loaigiamgia" onchange="changeType()">
+                    <option value="FIXED">Giảm cố định</option>
+                    <option value="PERCENT">Theo %</option>
+                </select>
+
+                <div class="form-floating mt-4">
+                  <input class="form-control input-custom" id="giatrigiam" placeholder="giá giảm" required>
+                  <label class="label-form">Giá trị giảm</label>
+                </div>
+
+                <div class="form-floating mt-4" id="divgiamtoida" style="display: none">
+                  <input class="form-control input-custom" id="giamtoida" placeholder="giá giảm">
+                  <label class="label-form">Giảm tối đa</label>
+                </div>
+                <div class="form-floating mt-4">
+                  <input type="text" id="dateRange" class="form-control" placeholder="Chọn khoảng ngày...">
+                  <label class="label-form">Chọn ngày bắt đầu - kết thúc</label>
+                </div>
+
+                <button class="btn btn-primary form-control mt-5" onclick="saveDiscount()">Thêm giảm giá sản phẩm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="discountResult" class="discount-result hidden">
+          <div class="discount-card">
+            <div class="result-header">
+              <div class="icon success">✓</div>
+              <h3>Kết quả thêm giảm giá</h3>
+            </div>
+
+            <div class="result-stat">
+              <div class="stat success">
+                <span id="successCount">0</span>
+                <p>Thành công</p>
+              </div>
+
+              <div class="stat fail">
+                <span id="failCount">0</span>
+                <p>Thất bại</p>
+              </div>
+            </div>
+
+            <div id="failListBox" class="fail-list hidden">
+              <h4>Sản phẩm bị trùng thời gian giảm giá</h4>
+              <ul id="failProducts"></ul>
+            </div>
+
+            <button onclick="closeResult()" class="btn-close">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script>
+  function changeType(){
+    if(document.getElementById("loaigiamgia").value == 'FIXED'){
+      document.getElementById("divgiamtoida").style.display = 'none'
+    }
+    else{
+      document.getElementById("divgiamtoida").style.display = 'block'
+    }
+  }
+</script>
+<script>
+$( document ).ready(function() {
+  $('#danhmucselect').select2({
+    theme: "bootstrap-5",
+    width: '100%',
+  });
+});
+
+
+$(document).ready(function () {
+  $('#dateRange').daterangepicker({
+    autoUpdateInput: false,
+    timePicker: true,
+    timePicker24Hour: true,
+    timePickerSeconds: false,
+    minDate: moment(), // chặn ngày trước hiện tại
+    locale: {
+      format: 'DD/MM/YYYY HH:mm',
+      applyLabel: "Áp dụng",
+      cancelLabel: "Xóa",
+      daysOfWeek: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+      monthNames: [
+        "Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6",
+        "Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"
+      ]
+    }
+  });
+
+  // Sau khi chọn
+  $('#dateRange').on('apply.daterangepicker', function (ev, picker) {
+    $(this).val(
+            picker.startDate.format('DD/MM/YYYY HH:mm') +
+            ' - ' +
+            picker.endDate.format('DD/MM/YYYY HH:mm')
+    );
+  });
+
+  // Xóa
+  $('#dateRange').on('cancel.daterangepicker', function () {
+    $(this).val('');
+  });
+});
+
+
+</script>
+
+</body>
+</html>

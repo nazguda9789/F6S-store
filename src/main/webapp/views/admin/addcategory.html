@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Admin Dashboard" />
+    <meta name="author" content="Your Name" />
+    <title>Admin Dashboard</title>
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid">
+                <h1 class="mt-4">Quản lý Danh Mục</h1>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <span th:text="${param.id == null?'Thêm danh mục':'Cập nhật danh mục'}"></span>
+                        <a href="list" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-list"></i> Danh sách danh mục</a>
+                    </div>
+                    <div class="card-body">
+                        <form th:object="${category}" method="post" class="col-sm-5">
+                            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                                <span th:text="${error}">Lỗi xảy ra</span>
+
+                            </div>
+                            <input th:field="*{id}" type="hidden" class="form-control">
+                            <label class="lb-form">Tên danh mục</label>
+                            <input onkeyup="createSlug(this.value)" th:field="*{name}" type="text" class="form-control">
+                            <label class="lb-form">Slug</label>
+                            <input th:field="*{slug}" id="slug" type="text" class="form-control">
+                            <label class="lb-form">Vị trí hiển thị</label>
+                            <input th:field="*{position}" id="slug" type="number" class="form-control">
+                            <label class="lb-form">Meta description</label>
+                            <input th:field="*{metaDescription}" class="form-control">
+                            <br><label class="checkbox-custom">Danh mục cha
+                                <input th:field="*{isParent}" onchange="changeParent(this)" class="active-detail" type="checkbox" th:checked="${category.isParent}">
+                                <span class="checkmark-checkbox"></span>
+                            </label>
+                            <div id="listdanhmuccha" th:if="${!category.isParent}">
+                                <label class="lb-form">Chọn danh mục cha</label>
+                                <select class="form-control" th:field="*{parentId}">
+                                    <option value="" disabled selected>-- Chọn --</option>
+                                    <option th:each="c:${listParentCategory}" th:value="${c.id}" th:text="${c.name}"></option>
+                                </select>
+                            </div>
+                            <br><br>
+                            <button class="btn btn-success form-control action-btn" th:text="${param.id == null?'Thêm danh mục':'Cập nhật danh mục'}"></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+<script>
+    function createSlug(productName) {
+        // 1. Convert to lowercase
+        let slug = productName.toLowerCase();
+
+        // 2. Remove Vietnamese diacritics (dấu)
+        slug = slug.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        // 3. Replace spaces and other special characters with hyphens
+        slug = slug.replace(/[^a-z0-9\s-]/g, ""); // Keep only letters, numbers, spaces, and hyphens
+
+        // 4. Replace multiple hyphens with a single hyphen
+        slug = slug.replace(/[\s_-]+/g, "-");
+
+        // 5. Trim leading/trailing hyphens
+        slug = slug.trim("-");
+        document.getElementById("slug").value = slug
+    }
+</script>
+
+<script>
+    function changeParent(e){
+        var isChecked = e.checked;
+        if(isChecked){
+            document.getElementById("listdanhmuccha").style.display = 'none';
+        }
+        else{
+            document.getElementById("listdanhmuccha").style.display = 'block';
+        }
+    }
+</script>
+</html>

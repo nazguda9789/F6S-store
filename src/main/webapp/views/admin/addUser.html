@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Admin Dashboard" />
+  <meta name="author" content="Your Name" />
+  <title>Admin Dashboard</title>
+  <head th:replace="common/libadmin :: libheaderadmin"></head>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+  <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+  <div id="layoutSidenav_content">
+    <main>
+      <div class="container-fluid">
+        <h1 class="mt-4">Quản lý Tài Khoản</h1>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <span th:text="${param.id == null?'Thêm tài khoản':'Cập nhật tài khoản'}"></span>
+            <a href="list" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-list"></i> Danh sách tài khoản</a>
+          </div>
+          <div class="card-body">
+            <div class="container mt-5 col-md-6">
+              <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                  <h4 th:text="${user.id == null ? 'Thêm người dùng mới' : 'Cập nhật người dùng'}"></h4>
+                </div>
+                <div class="card-body">
+
+                  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    <span th:text="${error}">Lỗi xảy ra</span>
+
+                  </div>
+
+                  <form action="create" th:object="${user}" method="post">
+
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="mb-3">
+                      <label class="form-label">Email</label>
+                      <input type="text" class="form-control" th:field="*{email}" placeholder="Nhập email"
+                             th:readonly="${user.id != null}">
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label" th:text="${user.id == null ? 'Mật khẩu' : 'Mật khẩu mới (bỏ trống nếu không đổi)'}"></label>
+                      <input type="password" class="form-control" th:field="*{password}" placeholder="••••••••">
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Họ tên</label>
+                      <input type="text" class="form-control" th:field="*{fullName}" placeholder="Nhập họ tên">
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Số điện thoại</label>
+                      <input type="text" class="form-control" th:field="*{phone}" placeholder="Nhập số điện thoại">
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Địa chỉ</label>
+                      <input type="text" class="form-control" th:field="*{address}" placeholder="Nhập địa chỉ">
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Vai trò</label>
+                      <select class="form-select" th:field="*{role}">
+                        <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+                      </select>
+                    </div>
+
+                    <div class="form-check mb-3">
+                      <input type="checkbox" class="form-check-input" th:field="*{accountNonLocked}">
+                      <label class="form-check-label">Kích hoạt tài khoản</label>
+                    </div>
+
+                    <div class="text-center">
+                      <button class="btn btn-primary" type="submit" th:text="${user.id == null ? 'Thêm mới' : 'Cập nhật'}"></button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+</body>
+
+</html>

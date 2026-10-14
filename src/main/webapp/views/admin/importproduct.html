@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tài Khoản</title>
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+        <div id="layoutSidenav_content">
+            <main class="main">
+                <div class="col-sm-12 header-sp">
+                    <form class="row">
+                        <div class="col-md-2 col-sm-4 col-4">
+                            <label class="lb-form">Từ ngày</label>
+                            <input required th:value="${param.fromDate}" name="fromDate" type="date" class="form-control">
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-4">
+                            <label class="lb-form">Đến ngày</label>
+                            <input required th:value="${param.toDate}" name="toDate" type="date" class="form-control">
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-4">
+                            <label class="lb-form" style="display: block;">&ThinSpace;</label>
+                            <button class="btn btn-primary form-control"><i class="fa fa-filter"></i> Lọc</button>
+                        </div>
+                        <div class="col-md-3 col-sm-4 col-4">
+                            <label class="lb-form" style="display: block;">&ThinSpace;</label>
+                            <a href="addimportproduct" class="btn btn-success"><i class="fa fa-plus"></i> Thêm đơn nhập</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-sm-12">
+                    <div class="wrapper">
+                        <table id="example" class="table table-striped tablefix">
+                            <thead class="thead-tablefix">
+                                <tr>
+                                    <th>id đơn nhập</th>
+                                    <th>sản phẩm</th>
+                                    <th>Số lượng nhập</th>
+                                    <th>giá nhập</th>
+                                    <th>Ngày nhập</th>
+                                    <th>Thông tin</th>
+                                    <th class="sticky-col">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listImport">
+                                <tr th:each="c : ${listImp}">
+                                    <td th:text="${c.id}"></td>
+                                    <td th:text="${c.product.name}"></td>
+                                    <td th:text="${c.quantity}"></td>
+                                    <td>[[${#numbers.formatDecimal(c.importPrice, 0, 'COMMA', 0, 'POINT')}]].đ</td>
+                                    <td th:text="${c.importDate}"></td>
+                                    <td th:utext="${c.description}"></td>
+                                    <td class="sticky-col">
+                                        <a th:href="@{deleteimportproduct(id=${c.id})}" onclick="return confirm('Xác nhận xóa?');"><i class="fa fa-trash-alt iconaction" ></i></a>
+                                        <a th:href="@{addimportproduct(id=${c.id})}"><i class="fa fa-edit iconaction" ></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+</body>
+<script>
+    $('#example').DataTable();
+</script>
+</html>

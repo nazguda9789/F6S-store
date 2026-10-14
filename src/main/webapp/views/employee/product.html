@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Admin Dashboard" />
+    <meta name="author" content="Your Name" />
+    <title>Danh sách sản phẩm</title>
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+    <!-- noUiSlider CSS -->
+    <script src="/admin/js/product.js"></script>
+    <script>
+        window.onload = function (){
+            filterProduct(0);
+        }
+    </script>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/employee/navbarEmployee :: headerAdmin"></div>
+<div id="layoutSidenav">
+    <div th:replace="common/employee/navbarEmployee :: sidenavAdmin"></div>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid">
+                <h1 class="mt-4">Quản lý Sản Phẩm</h1>
+
+                <div class="card mb-4">
+                    <div class="card-header-product">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <select name="category" id="listcategory" class="form-control">
+                                    <option value="-1">--- Tất cả danh mục ---</option>
+                                    <option th:each="c : ${listCategory}" th:text="${c.name}" th:value="${c.id}"> </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-2">
+                                <select id="priceRange" class="form-control">
+                                    <option value="0-1000000000">-- Chọn khoảng giá --</option>
+                                    <option value="0-100000">Dưới 100.000₫</option>
+                                    <option value="100000-200000">100.000₫ – 200.000₫</option>
+                                    <option value="200000-500000">200.000₫ – 500.000₫</option>
+                                    <option value="500000-1000000">500.000₫ – 1.000.000₫</option>
+                                    <option value="1000000-">Trên 1.000.000₫</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="status-toggle btn-group" role="group" aria-label="Bộ lọc trạng thái sản phẩm">
+                                    <input type="radio" class="btn-check" name="statusFilter" id="all" value="" autocomplete="off" checked>
+                                    <label class="btn btn-outline-secondary" for="all">Tất cả</label>
+
+                                    <input type="radio" class="btn-check" name="statusFilter" id="active" value="true" autocomplete="off">
+                                    <label class="btn btn-outline-success" for="active">Hoạt động</label>
+
+                                    <input type="radio" class="btn-check" name="statusFilter" id="inactive" value="false" autocomplete="off">
+                                    <label class="btn btn-outline-danger" for="inactive">Khóa</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <button onclick="filterProduct(0)" class="btn btn-primary"><i class="fas fa-search"></i> Lọc</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3 align-items-center">
+                            <div class="col-sm-auto d-flex align-items-center">
+                                <label for="showEntries" class="me-2 mb-0">Showing</label>
+                                <select class="form-select form-select-sm" id="showEntries">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-auto d-flex align-items-center">
+                                <label for="showEntries" class="me-2 mb-0">Sort</label>
+                                <select class="form-select form-select-sm" id="sortby">
+                                    <option value="id,desc">Mới nhất</option>
+                                    <option value="id,asc">Cũ nhất</option>
+                                    <option value="price,desc">giá cao đến thấp</option>
+                                    <option value="price,asc">giá thấp đến cao</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-auto d-flex align-items-center">
+                                <div class="stat-container">
+                                    <div class="stat-box">Tổng: <strong th:text="${totalProduct}">0</strong> </div>
+                                    <div class="stat-box">Tìm thấy: <strong id="timthay">0</strong></div>
+                                    <div class="stat-box">Đang hiển thị: <strong id="hienthi">0</strong></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 ms-auto">
+                                <div class="input-group">
+                                    <input id="search" class="form-control form-control-sm" placeholder="Nhập từ khóa">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="example" class="table table-striped tablefix">
+                                <thead class="thead-tablefix">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Id</th>
+                                    <th>Ảnh</th>
+                                    <th>Danh mục</th>
+                                    <th>Tên</th>
+                                    <th>Giá</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Số lượng còn</th>
+                                    <th>Số lượng bán</th>
+                                    <th>Trạng thái</th>
+                                    <th class="sticky-col">Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody id="listproduct">
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination" id="pageable">
+                                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div class="modal fade" id="modalDetail" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tensanpham"></h5> <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+            <div class="modal-body row">
+                <table border="1" cellpadding="5" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>Màu</th>
+                        <th>Sizes</th>
+                    </tr>
+                    </thead>
+                    <tbody id="productTable"></tbody>
+                </table>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Mã sản phẩm</th>
+                        <td id="masp"></td>
+                    </tr>
+                    <tr>
+                        <th>Ảnh</th>
+                        <td><img id="anhsp" class="img-thumbnail-sm"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div class="list-image-detail-admin" id="list-image-detail">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Ngày tạo</th>
+                        <td id="ngaytao"></td>
+                    </tr>
+                    <tr>
+                        <th>Ngày sửa</th>
+                        <td id="ngaysua"></td>
+                    </tr>
+                    <tr>
+                        <th>SEO description</th>
+                        <td id="seodescription"></td>
+                    </tr>
+                    <tr>
+                        <th>Số lượng bán</th>
+                        <td id="soluongban"></td>
+                    </tr>
+                    <tr>
+                        <th>Số lượng tồn</th>
+                        <td id="soluongton"></td>
+                    </tr>
+                </table>
+                <div id="noidungtin"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

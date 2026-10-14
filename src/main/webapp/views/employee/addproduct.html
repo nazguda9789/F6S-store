@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Admin Dashboard" />
+    <meta name="author" content="Your Name" />
+    <title>Admin Dashboard</title>
+    <head th:replace="common/libadmin :: libheaderadmin"></head>
+    <script>
+        window.onload = function() {
+            loadInit();
+        }
+    </script>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/employee/navbarEmployee :: headerAdmin"></div>
+<div id="layoutSidenav">
+<div th:replace="common/employee/navbarEmployee :: sidenavAdmin"></div>
+<div id="layoutSidenav_content">
+    <div class="card mb-4">
+        <div class="card-header">
+            <span th:text="${param.id == null?'Thêm sản phẩm':'Cập nhật sản phẩm'}"></span>
+            <a href="list" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-list"></i> Danh sách sản phẩm</a>
+            <button form="formadd" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-list"></i> Cập nhật sản phẩm</button>
+        </div>
+        <form th:object="${product}" id="formadd" action="javascript:saveProduct()" class="card-body row">
+            <div class="col-sm-2">
+                <label class="lb-form">Hình ảnh hiển thị</label>
+                <div class="divimgpreview">
+                    <img th:src="${product.image}" class="imgpreview" id="imgpreview">
+                </div>
+                <button type="button" onclick="document.getElementById('anhdaidien').click()"  class="btn btn-outline-primary form-control btnthemhinhanh"><i class="fa fa-image"></i> Chọn hình ảnh</button>
+                <input type="file" style="visibility: hidden;" id="anhdaidien">
+                <input type="hidden" th:value="${product.image}" id="productimage">
+            </div>
+            <div class="col-sm-3">
+                <div class="lb-form">Thông tin sản phẩm</div>
+                <label class="form-label">Tên sản phẩm</label>
+                <input th:value="${product.name}" class="form-control form-control-sm" id="name" onkeyup="createSlug(this.value)">
+                <label class="form-label">Slug</label>
+                <input th:value="${product.slug}" class="form-control form-control-sm" id="slug">
+                <label class="form-label">Danh mục</label>
+                <select class="form-control form-control-sm selectpicker" multiple id="categoryIds" data-live-search="true">
+                    <option th:each="c : ${listCategory}"
+                            th:value="${c.id}"
+                            th:text="${c.name}"
+                            th:selected="${product.categoryIds.contains(c.id)}">
+                    </option>
+                </select>
+            </div>
+            <div class="col-sm-3">
+                <div class="lb-form">Giá bán</div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="form-label">Giá hiện tại</label>
+                        <input th:value="${product.price}" onkeyup="setPriceInput(this)" class="form-control form-control-sm" id="giaban">
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label">Giá cũ</label>
+                        <input th:value="${product.olePrice}" onkeyup="setOldPriceInput(this)" class="form-control form-control-sm" id="giacu">
+                    </div>
+                </div>
+                <label class="form-label">Khối lượng (<strong>KG</strong>)</label>
+                <input th:value="${product.weight}"  class="form-control form-control-sm" id="weight">
+                <div class="lb-form">&ThinSpace;</div>
+                <label class="checkbox-custom">Đang hoạt động
+                    <input th:checked="${product.active}" id="activeproduct" type="checkbox">
+                    <span class="checkmark-checkbox"></span>
+                </label>
+            </div>
+            <div class="col-sm-3">
+                <div class="lb-form">SEO</div>
+                <label class="form-label">Meta title</label>
+                <input th:field="*{metaTitle}" class="form-control form-control-sm" id="metaTitle">
+                <label class="form-label">Meta description</label>
+                <textarea th:field="*{metaDescription}"  class="form-control form-control-sm" rows="4" id="metaDescription">Mua áo sơ mi nam cao cấp, thiết kế trẻ trung, vải mát, giao hàng toàn quốc. Khuyến mãi lên đến 50% tại ShopHieu</textarea>
+            </div>
+            <div class="col-sm-2">
+                <div onclick="choosefile.click()" class="divchooseimg">
+                    <img src="/image/addimg.png">
+                    <span id="slfile">Chọn thêm nhiều ảnh</span>
+                    <input type="file" id="choosefile" class="inputmulfile" multiple>
+                </div>
+            </div>
+            <div class="col-sm-10">
+                <div class="row" id="preview"></div>
+            </div>
+            <div class="row" th:if="${param.id != null}">
+                <div th:each="c:${images}"
+                     class="col-lg-2 col-md-3 col-sm-6 col-6"
+                     style="padding-top: 15px;">
+                    <img th:src="${c.linkImage}"
+                         class="image-upload"
+                         style="height: 125px; width: 100%; margin-top: 5px; cursor: grab;"
+                         draggable="true"
+                         th:data-url="${c.linkImage}"
+                         ondragstart="onDragStart(event, this)">
+                    <button th:onclick="'deleteImage(' + ${c.id} + ', this)'"
+                            type="button"
+                            class="btn btn-outline-danger form-control">Xóa</button>
+                </div>
+            </div>
+
+            <div class="color-image-product" th:if="${param.id != null}">
+                <h4>Chọn ảnh cho màu sắc</h4>
+                <div class="container">
+                    <div class="row g-3">
+                        <div th:id="'productimagediv'+${c.colorId}" class="col-6 col-md-4 col-lg-2"
+                             th:each="c: ${productColor}">
+                            <div class="card shadow-sm h-100 text-center"
+                                 ondragover="event.preventDefault()"
+                                 th:ondrop="'onDrop(event, ' + ${c.id} + ')'">
+
+                                <div th:style="'width: 40px; height: 40px; border-radius: 50%; background-color: ' + ${c.code}"
+                                     class="mx-auto mb-2 border"></div>
+
+                                <h6 class="mb-3" th:text="${c.colorName}"></h6>
+
+                                <div class="d-flex justify-content-center align-items-center mb-3"
+                                     style="height: 50px;">
+                                    <img th:id="'imgcolor' + ${c.id}"
+                                         th:src="${c.image}"
+                                         class="img-color-product">
+                                </div>
+
+                                <button onclick="changeImage(this)"
+                                        th:data-id="${c.id}"
+                                        class="btn btn-outline-primary btn-sm w-100"
+                                        type="button">
+                                    <i class="fa fa-upload"></i> Chọn ảnh
+                                </button>
+                                <input type="file" class="d-none" th:id="'inputchangefile'+${c.id}">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" style="margin-top: 30px; margin-bottom: 100px">
+                <ul class="nav nav-tabs mb-3" id="ex1" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="ex1-tab-1" data-bs-toggle="tab" href="#ex1-tabs-1"
+                                role="tab" aria-controls="ex1-tabs-1"aria-selected="true">Chi tiết sản phẩm</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="ex1-tab-2"data-bs-toggle="tab"
+                                href="#ex1-tabs-2"role="tab"aria-controls="ex1-tabs-2"aria-selected="false">Mô tả sản phẩm</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="ex1-content">
+                    <div class="tab-pane fade show active" id="ex1-tabs-1" role="tabpanel" aria-labelledby="ex1-tab-1" >
+                        <div class="lb-form">Chi tiết sản phẩm</div>
+                        <span style="color: darkred">Lưu ý: (SKU hoặc số lượng bỏ trống thì sẽ không được lưu, nhập 0 nếu bỏ trống số lượng)</span>
+                        <br><div th:class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-12">
+                                <label  class="form-label">Chọn màu sắc</label>
+                                <select class="form-control form-control-sm selectpicker" multiple id="colorList" data-live-search="true">
+                                    <option th:each="c : ${listColor}"
+                                            th:value="${c.id}"
+                                            th:text="${c.name}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12 col-12">
+                                <label  class="form-label">Chọn kích thước</label>
+                                <select class="form-control form-control-sm selectpicker" multiple id="sizeList" data-live-search="true">
+                                    <option th:each="c : ${listSize}"
+                                            th:value="${c.id}"
+                                            th:text="${c.name}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-12">
+                                <label class="form-label">Số lượng</label>
+                                <input placeholder="Nhập số lượng" value="0" min="0" id="soluongtohop" class="form-control-sm">
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-12">
+                                <label  class="form-label">&ThinSpace;</label>
+                                <button type="button" onclick="setToHop()" class="btn btn-primary btn-sm form-control">Sinh tổ hợp</button>
+                            </div>
+                        </div><br>
+                        <table class="table table-bordered table-responsive">
+                            <thead>
+                            <tr>
+                                <th>Size</th>
+                                <th>Màu sắc</th>
+                                <th>Số lượng</th>
+                                <th>SKU</th>
+                                <th>giá bán</th>
+                                <th>giá cũ</th>
+                                <th>Hoạt động</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody id="ctnctsp">
+                                <tr th:if="${details != null}" th:each="dt:${details}">
+                                    <td>
+                                        <input th:value="${dt.id}" th:id="'iddt'+${dt.id}" type="hidden" style="display: none">
+                                        <select th:id="'size'+${dt.id}" onchange="setSku(this)" class="form-control-sm select-size">
+                                            <option th:selected="${c.id == dt.sizeId}" th:data-sizeName="${c.name}" th:each="c:${listSize}" th:value="${c.id}" th:text="${c.name}"></option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select th:id="'color'+${dt.id}" onchange="setSku(this)" class="form-control-sm select-color">
+                                            <option th:selected="${c.id == dt.colorId}" th:data-colorName="${c.name}" th:each="c:${listColor}" th:value="${c.id}" th:text="${c.name}"></option>
+                                        </select>
+                                    </td>
+                                    <td><input th:id="'stock'+${dt.id}" th:value="${dt.stock}" class="form-control-sm stock-detail"></td>
+                                    <td><input th:id="'sku'+${dt.id}" th:value="${dt.sku}" class="form-control-sm sku-detail"><button type="button" onclick="setSku(this)" class="btn btn-outline-primary"><i class="fa fa-check"></i></button></td>
+                                    <td><input class="form-control-sm price-detail" th:id="'price-detail'+${dt.id}" th:value="${dt.price}"></td>
+                                    <td><input class="form-control-sm old-price-detail" th:id="'old-price-detail'+${dt.id}" th:value="${dt.oldPrice}"></td>
+                                    <td><label class="checkbox-custom">Active
+                                        <input th:id="'active'+${dt.id}" class="active-detail" type="checkbox" th:checked="${dt.active}">
+                                        <span class="checkmark-checkbox"></span>
+                                    </label></td>
+                                    <td>
+                                        <button th:onclick="'deleteDetail(' + ${dt.id} + ', this)'" type="button" class="btn btn-outline-danger"><i class="fas fa-trash-alt"></i></button>
+                                        <button th:onclick="'saveDetail(' + ${dt.id} + ')'" type="button" class="btn btn-outline-primary"><i class="fas fa-edit"></i> Lưu</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table id="blockaddctsp" style="display: none">
+                            <tr class="tr-chitietsanpham">
+                                <td>
+                                    <select onchange="setSku(this)" class="form-control-sm select-size">
+                                        <option th:data-sizeName="${c.name}" th:each="c:${listSize}" th:value="${c.id}" th:text="${c.name}"></option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select onchange="setSku(this)" class="form-control-sm select-color">
+                                        <option th:data-colorName="${c.name}" th:each="c:${listColor}" th:value="${c.id}" th:text="${c.name}"></option>
+                                    </select>
+                                </td>
+                                <td><input class="form-control-sm stock-detail" value="0"></td>
+                                <td><input class="form-control-sm sku-detail"><button type="button" onclick="setSku(this)" class="btn btn-outline-primary"><i class="fa fa-check"></i></button></td>
+                                <td><input class="form-control-sm price-detail"></td>
+                                <td><input class="form-control-sm old-price-detail"></td>
+                                <td><label class="checkbox-custom">Active
+                                    <input class="active-detail" type="checkbox" checked>
+                                    <span class="checkmark-checkbox"></span>
+                                </label></td>
+                                <td><button type="button" class="btn btn-outline-danger" onclick="deleteItem(this)"><i class="fas fa-trash-alt"></i></button></td>
+                            </tr>
+                        </table>
+                        <button type="button" onclick="addChiTietSanPham()" class="btn btn-outline-primary form-control">Thêm chi tiết</button>
+                    </div>
+                    <div class="tab-pane fade" id="ex1-tabs-2" role="tabpanel" aria-labelledby="ex1-tab-2">
+                        <div class="lb-form">Mô tả sản phẩm</div>
+                        <textarea th:field="*{description}" id="editor" name="content"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loading">
+                <div class="bar1 bar"></div>
+            </div><br><br>
+            <button class="btn btn-primary" th:text="${param.id == null?'Thêm sản phẩm':'Cập nhật sản phẩm'}">Thêm sản phẩm</button>
+        </form>
+    </div>
+</div>
+</div>
+<script src="/admin/js/product.js"></script>
+</body>
+<script src="https://cdn.tiny.cloud/1/f6s0gxhkpepxkws8jawvfwtj0l9lv0xjgq1swbv4lgcy3au3/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    let draggedImageUrl = null;
+
+    function onDragStart(event, el) {
+        draggedImageUrl = el.getAttribute("data-url");
+    }
+
+    function onDrop(event, colorId) {
+        if (!draggedImageUrl) return;
+        let imgEl = document.getElementById("imgcolor" + colorId);
+        imgEl.src = draggedImageUrl;
+
+        // Gọi changeImage để xử lý logic backend
+        changeImageByUrl(colorId, draggedImageUrl);
+
+        draggedImageUrl = null;
+    }
+
+    function changeImageByUrl(colorId, imageUrl) {
+        console.log("Đổi ảnh cho colorId=" + colorId + " thành " + imageUrl);
+        fetch(`/adm-prj/qtht-001/api/product/update-image-color-by-url/${colorId}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain"
+            },
+            body: imageUrl
+        })
+        .then(response => {
+            if (response.ok) {
+                toastr.success("Đã cập nhật ảnh");
+            } else {
+                toastr.error("Cập nhật ảnh thất bại!");
+            }
+        })
+        .catch(error => {
+            toastr.error("Lỗi khi gọi API:", error);
+        });
+    }
+</script>
+
+<script>
+
+    function setSku(selectElement) {
+        // Lấy tên sản phẩm từ input bên ngoài
+        const productName = document.getElementById("name").value;
+        console.log(productName)
+
+        // Tìm dòng <tr> chứa select đang thay đổi
+        const tr = selectElement.closest("tr");
+
+        // Lấy select size và color trong cùng <tr>
+        const sizeSelect = tr.querySelector(".select-size");
+        const colorSelect = tr.querySelector(".select-color");
+
+        // Lấy option được chọn
+        const sizeOption = sizeSelect.options[sizeSelect.selectedIndex];
+        const colorOption = colorSelect.options[colorSelect.selectedIndex];
+
+        // Lấy tên size và màu từ attribute data-
+        const sizeName = sizeOption.getAttribute("data-sizeName") || "";
+        const colorName = colorOption.getAttribute("data-colorName") || "";
+        console.log(sizeName)
+        console.log(colorName)
+
+        // Gọi hàm sinh SKU
+        const sku = generateSKU(productName, sizeName, colorName);
+
+        // Gán vào input SKU trong cùng dòng
+        const skuInput = tr.querySelector(".sku-detail");
+        if (skuInput) {
+            skuInput.value = sku;
+        }
+    }
+    function addChiTietSanPham() {
+        const templateRowHTML = document.getElementById("blockaddctsp").querySelector('tbody').innerHTML;
+        const tempTbody = document.createElement('tbody');
+        tempTbody.innerHTML = templateRowHTML;
+        const newRow = tempTbody.firstElementChild;
+        const targetTbody = document.getElementById("ctnctsp");
+        targetTbody.appendChild(newRow);
+        // lấy input có class price-detail trong newRow set giá trị cho nó
+        const priceInput = newRow.querySelector('.price-detail');
+        priceInput.value = document.getElementById("giaban").value
+        const oldPriceInput = newRow.querySelector('.old-price-detail');
+        oldPriceInput.value = document.getElementById("giacu").value
+    }
+
+    function deleteItem(buttonElement){
+        const tdElement = buttonElement.parentNode;
+        const trElement = tdElement.parentNode;
+        const parentOfTr = trElement.parentNode;
+        if (parentOfTr) {
+            parentOfTr.removeChild(trElement);
+        } else {
+            console.warn("Không tìm thấy phần tử cha của tr để xóa.");
+        }
+    }
+    function createSlug(productName) {
+        // 1. Convert to lowercase
+        let slug = productName.toLowerCase();
+
+        // 2. Remove Vietnamese diacritics (dấu)
+        slug = slug.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        // 2.1. Xử lý ký tự đặc biệt đ/Đ
+        slug = slug.replace(/đ/g, "d").replace(/Đ/g, "d");
+
+        // 3. Replace spaces and other special characters with hyphens
+        slug = slug.replace(/[^a-z0-9\s-]/g, ""); // Keep only letters, numbers, spaces, and hyphens
+
+        // 4. Replace multiple hyphens with a single hyphen
+        slug = slug.replace(/[\s_-]+/g, "-");
+
+        // 5. Trim leading/trailing hyphens
+        slug = slug.trim("-");
+        document.getElementById("slug").value = slug
+        document.getElementById("metaTitle").value = productName
+    }
+    anhdaidien.onchange = evt => {
+        const [file] = anhdaidien.files
+        if (file) {
+            imgpreview.src = URL.createObjectURL(file)
+        }
+    }
+</script>
+<script>
+    tinymce.init({
+        selector: 'textarea#editor', // Chọn textarea có id là 'editor'
+        // Tăng cường các plugin để hỗ trợ nhiều chức năng hơn
+        plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak ' +
+            'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking ' +
+            'table emoticons template paste codesample help',
+        // Định nghĩa các nút trên thanh công cụ. Chia thành nhiều dòng để dễ quản lý.
+        toolbar: 'undo redo | blocks | ' + // Hoàn tác, làm lại, và định dạng khối (Heading 1, 2, Paragraph,...)
+            'bold italic underline strikethrough | forecolor backcolor | ' + // Định dạng chữ: đậm, nghiêng, gạch chân, gạch ngang, màu chữ, màu nền
+            'alignleft aligncenter alignright alignjustify | outdent indent | ' + // Căn lề, lùi dòng
+            'numlist bullist | link image media table | ' + // Danh sách số, danh sách dấu chấm, chèn liên kết, ảnh, video, bảng
+            'charmap emoticons | fullscreen code preview | help', // Ký tự đặc biệt, biểu tượng cảm xúc, chế độ toàn màn hình, xem trước, mã nguồn, trợ giúp
+        height: 600, // Tăng chiều cao của trình soạn thảo
+        menubar: 'file edit view insert format tools table help', // Hiện thêm menu bar ở trên cùng
+        images_upload_handler: async function (blobInfo, success, failure) {
+            const formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+            const res = await fetch('/adm-prj/qtht-001/api/upload/upload-file', {
+                method: 'POST',
+                body: formData
+            });
+            if (res.status < 300) {
+                var linkImage = await res.text();
+                success(linkImage);
+            }
+        }
+    });
+</script>
+<script>
+    function generateSKU(productName, sizeName, colorName) {
+        // Lấy chữ cái đầu mỗi từ, nhưng giữ nguyên từ nếu nó là số
+        function getAbbreviationWithNumbers(str) {
+            return str
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // bỏ dấu
+                .split(/\s+/)
+                .filter(word => word.trim() !== "")
+                .map(word => /^\d+$/.test(word) ? word : word[0].toUpperCase())
+                .join('');
+        }
+
+        // Loại bỏ dấu, ký tự đặc biệt, giữ lại chữ và số, viết hoa
+        function normalize(str) {
+            return str
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-zA-Z0-9]/g, "")
+                .toUpperCase();
+        }
+
+        const productCode = getAbbreviationWithNumbers(productName); // ATLN2025
+        const size = normalize(sizeName);                            // 30
+        const color = normalize(colorName);                          // XANH
+
+        return `${productCode}-${size}-${color}`;
+    }
+
+    function setPriceInput(e){
+        $('.price-detail').val(e.value)
+    }
+    function setOldPriceInput(e){
+        $('.old-price-detail').val(e.value)
+    }
+</script>
+</html>

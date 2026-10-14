@@ -1,0 +1,174 @@
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+
+.contact-container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.contact-container h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.contact-container p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.contact-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.contact-form .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-form .form-group:nth-child(4) {
+    grid-column: 1 / 3;
+}
+
+.contact-form label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: #222;
+    outline: none;
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.error {
+    font-size: 13px;
+    color: #e74c3c;
+    margin-top: 4px;
+}
+
+.btn-submit {
+    grid-column: 1 / 3;
+    padding: 14px;
+    background: #222;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-submit:hover {
+    background: #444;
+}
+
+.alert.success {
+    background: #e6ffed;
+    color: #1b7c3d;
+    padding: 12px;
+    border: 1px solid #a5e7b3;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.shop-info {
+    margin-top: 40px;
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid #eee;
+}
+
+.shop-info h2 {
+    margin-bottom: 10px;
+    color: #222;
+}
+
+.shop-info p {
+    margin: 6px 0;
+    color: #555;
+}
+
+/* --------------------- Responsive --------------------- */
+
+/* Tablet (max-width: 768px) */
+@media (max-width: 768px) {
+    .contact-form {
+        grid-template-columns: 1fr; /* 1 cột */
+    }
+
+    .contact-form .form-group:nth-child(4),
+    .btn-submit {
+        grid-column: 1; /* full width */
+    }
+
+    .contact-container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .contact-container h1 {
+        font-size: 24px;
+    }
+}
+
+/* Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    .contact-container {
+        margin: 15px;
+        padding: 15px;
+    }
+
+    .contact-container h1 {
+        font-size: 20px;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .btn-submit {
+        font-size: 15px;
+        padding: 12px;
+    }
+
+    .shop-info h2 {
+        font-size: 18px;
+    }
+
+    .shop-info p {
+        font-size: 14px;
+    }
+}

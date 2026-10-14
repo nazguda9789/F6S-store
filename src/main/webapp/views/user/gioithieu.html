@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Giới thiệu | F6S</title>
+    <meta name="description" content="" />
+    <link rel="canonical" href="/gioi-thieu" />
+
+    <meta property="og:type" content="giới thiệu" />
+    <meta property="og:title" content="Giới thiệu " />
+    <meta property="og:url" content="/giơi-thieu" />
+    <meta property="og:type" content="article" />
+
+    <th:block th:include="common/user/libuser :: libheader"></th:block>
+    <link rel="stylesheet" href="css/gioithieu.css">
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+<div class="container my-4 shipping-section">
+    <nav aria-label="breadcrumb" class="breadcrumb-container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item breadcrumb-product-name active" aria-current="page"> Giới thiệu</li>
+        </ol>
+    </nav>
+    <section id="about" class="py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0 animated-element left-to-right">
+                    <img src="../../image/passion.webp" class="img-fluid rounded shadow" alt="Đam mê">
+                </div>
+                <div class="col-md-6 animated-element right-to-left">
+                    <h2 class="mb-3">Câu chuyện của sự đam mê</h2>
+                    <p>Mỗi đôi giày của F6S là kết tinh từ sự am hiểu về chuyển động và niềm đam mê mãnh liệt với sân cỏ.
+                        Chúng tôi tin rằng, một đôi giày tốt không chỉ giúp bạn thi đấu hiệu quả, mà còn là cách để bạn
+                        khẳng định cá tính và bản lĩnh riêng trong mỗi trận cầu.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="collections" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5 animated-element bottom-to-top">Các Bộ Sưu Tập Nổi Bật</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col animated-element bottom-to-top">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="../../image/ronaldo.jpg" class="card-img-top" alt="Ronaldo">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Mercurial Superfly CR7 SE 'Cristiano'</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col animated-element bottom-to-top delay-1s">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="../../image/messi.jpg" class="card-img-top" alt="Messi">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">F50 adizero Messi Ballon d'Or</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col animated-element bottom-to-top delay-2s">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="../../image/neymar.jpg" class="card-img-top" alt="Neymar">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Nike Mercurial Vapor XI "Written in the Stars"</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5 animated-element bottom-to-top">Cảm nhận từ khách hàng</h2>
+            <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="text-center">
+                            <p class="fst-italic">"Giày của F6S thực sự rất tôn dáng. Tôi đã tìm thấy phong cách của mình ở đây."</p>
+                            <cite>- Nguyễn Quốc Hưng</cite>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="text-center">
+                            <p class="fst-italic">"Chất lượng sản phẩm và dịch vụ chăm sóc khách hàng ở đây rất tuyệt vời. Chắc chắn sẽ quay lại!"</p>
+                            <cite>- Trần Minh Đức</cite>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="policy" class="policy-section py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5 animated-element bottom-to-top">Thông Tin và Chính Sách</h2>
+            <div class="accordion" id="policyAccordion">
+
+                <!-- Chính sách bảo mật -->
+                <div class="accordion-item animated-element bottom-to-top delay-1s" id="chinhsach-bao-mat">
+                    <h3 class="accordion-header" id="headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            Chính sách bảo mật thông tin khách hàng
+                        </button>
+                    </h3>
+                    <div id="collapseOne" class="accordion-collapse collapse"
+                         aria-labelledby="headingOne" data-bs-parent="#policyAccordion">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>F6S cam kết giữ bí mật tuyệt đối thông tin cá nhân của khách hàng (tên, số điện thoại, địa chỉ, email).</li>
+                                <li>Thông tin chỉ được sử dụng để xử lý đơn hàng, chăm sóc khách hàng và gửi ưu đãi khi có sự đồng ý.</li>
+                                <li>Tuyệt đối không chia sẻ cho bên thứ ba, trừ trường hợp theo yêu cầu của cơ quan nhà nước có thẩm quyền.</li>
+                                <li>Dữ liệu được bảo mật bằng hệ thống mã hóa SSL và các biện pháp an ninh hiện đại.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chính sách đổi trả -->
+                <div class="accordion-item animated-element bottom-to-top delay-2s" id="chinhsach-doitra">
+                    <h3 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Chính sách đổi trả sản phẩm
+                        </button>
+                    </h3>
+                    <div id="collapseTwo" class="accordion-collapse collapse"
+                         aria-labelledby="headingTwo" data-bs-parent="#policyAccordion">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>Đổi trả trong vòng <b>7 ngày</b> kể từ ngày nhận hàng.</li>
+                                <li>Điều kiện: sản phẩm còn nguyên tem mác, chưa qua sử dụng, không giặt, không hư hỏng, còn đầy đủ phụ kiện (nếu có).</li>
+                                <li>Không áp dụng đổi trả với sản phẩm giảm giá trên 50%.</li>
+                                <li>Chi phí vận chuyển khi đổi trả:
+                                    <ul>
+                                        <li>Lỗi từ F6S (sai sản phẩm, lỗi kỹ thuật): shop chịu phí.</li>
+                                        <li>Khách hàng đổi do không vừa, không ưng: khách chịu phí.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chính sách bảo hành -->
+                <div class="accordion-item animated-element bottom-to-top delay-3s" id="chinhsach-bao-hanh">
+                    <h3 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Chính sách bảo hành sản phẩm
+                        </button>
+                    </h3>
+                    <div id="collapseThree" class="accordion-collapse collapse"
+                         aria-labelledby="headingThree" data-bs-parent="#policyAccordion">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>F6S bảo hành sản phẩm <b>30 ngày</b> cho lỗi kỹ thuật từ nhà sản xuất (bung keo đế, đứt chỉ khâu mũi, hoặc lỗi chất liệu da/vải.).</li>
+                                <li>Không áp dụng bảo hành đối với: lỗi do thi đấu trên mặt sân không phù hợp (ví dụ: giày cỏ nhân tạo đá trên sân bê tông), giày bị rách do va chạm vật lý mạnh, hoặc hư hỏng do giặt máy và phơi nắng gắt trực tiếp.</li>
+                                <li>Khách hàng vui lòng liên hệ bộ phận CSKH để được hướng dẫn quy trình kiểm tra tình trạng giày và gửi về trung tâm bảo hành.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chính sách vận chuyển -->
+                <div class="accordion-item animated-element bottom-to-top delay-4s" id="chinhsach-van-chuyen">
+                    <h3 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            Chính sách giao nhận, vận chuyển
+                        </button>
+                    </h3>
+                    <div id="collapseFour" class="accordion-collapse collapse"
+                         aria-labelledby="headingFour" data-bs-parent="#policyAccordion">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>Thời gian giao hàng:
+                                    <ul>
+                                        <li>Nội thành Hà Nội, TP.HCM: 1-2 ngày.</li>
+                                        <li>Tỉnh thành khác: 3-5 ngày.</li>
+                                        <li>Khu vực xa/đặc biệt: 5-7 ngày.</li>
+                                    </ul>
+                                </li>
+                                <li>Phí vận chuyển: 30.000đ/đơn hàng.</li>
+                                <li>Miễn phí vận chuyển cho đơn từ <b>1.000.000đ</b>.</li>
+                                <li>Đơn hàng sẽ được giao qua các đơn vị uy tín như GHTK, VNPost, J&T, Shopee Express.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chính sách thanh toán -->
+                <div class="accordion-item animated-element bottom-to-top delay-5s" id="chinhsach-thanh-toan">
+                    <h3 class="accordion-header" id="headingFive">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            Phương thức thanh toán
+                        </button>
+                    </h3>
+                    <div id="collapseFive" class="accordion-collapse collapse"
+                         aria-labelledby="headingFive" data-bs-parent="#policyAccordion">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>Thanh toán khi nhận hàng (COD).</li>
+                                <li>Chuyển khoản ngân hàng (Vietcombank, Techcombank, MB Bank... – thông tin sẽ gửi khi đặt hàng).</li>
+                                <li>Ví điện tử: Momo, ZaloPay, VNPay.</li>
+                                <li>Tất cả giao dịch đều được xác nhận qua SMS/Email ngay sau khi thanh toán thành công.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chính sách khách hàng thân thiết -->
+                <div class="accordion-item animated-element bottom-to-top delay-6s" id="chinhsach-khachhang">
+                    <h3 class="accordion-header" id="headingSix">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                            Chính sách khách hàng thân thiết
+                        </button>
+                    </h3>
+                    <div id="collapseSix" class="accordion-collapse collapse"
+                         aria-labelledby="headingSix" data-bs-parent="#policyAccordion">
+                        <div class="accordion-body">
+                            <ul>
+                                <li>Mỗi đơn hàng sẽ được tích điểm theo giá trị (1.000đ = 1 điểm).</li>
+                                <li>Điểm có thể quy đổi thành voucher giảm giá cho các đơn tiếp theo.</li>
+                                <li>Khách hàng thân thiết được ưu tiên mua trước các bộ sưu tập mới và nhận quà sinh nhật đặc biệt.</li>
+                                <li>Các chương trình ưu đãi độc quyền sẽ được gửi qua Email/SMS.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<div th:replace="common/user/footeruser :: footerMain"></div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Lấy tất cả các phần tử có class 'animated-element'
+        const animatedElements = document.querySelectorAll('.animated-element');
+
+        // Tạo một IntersectionObserver để theo dõi các phần tử
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Nếu phần tử xuất hiện trong viewport, thêm class 'visible'
+                    entry.target.classList.add('visible');
+                    // Ngừng theo dõi để animation không lặp lại
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            // Cấu hình observer
+            threshold: 0.3 // Phần tử xuất hiện 30% thì animation sẽ chạy
+        });
+
+        // Bắt đầu theo dõi từng phần tử
+        animatedElements.forEach(element => {
+            observer.observe(element);
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const hash = window.location.hash;
+        if (hash) {
+            const target = document.querySelector(hash);
+            if (target) {
+                target.scrollIntoView({ behavior: "smooth", block: "start" });
+                const button = target.querySelector(".accordion-button");
+                if (button && button.classList.contains("collapsed")) {
+                    button.click();
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+
+</html>

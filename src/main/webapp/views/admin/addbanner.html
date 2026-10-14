@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="Admin Dashboard" />
+  <meta name="author" content="Your Name" />
+  <title th:text="${param.id == null?'Thêm bài banner':'Cập nhật banner'}"></title>
+  <head th:replace="common/libadmin :: libheaderadmin"></head>
+</head>
+<body class="sb-nav-fixed">
+<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div id="layoutSidenav">
+  <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+  <div id="layoutSidenav_content">
+    <main>
+      <div class="container-fluid">
+        <h1 class="mt-4">Quản lý Bài Viết</h1>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <span th:text="${param.id == null?'Thêm banner':'Cập nhật banner'}"></span>
+            <a href="list" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-list"></i> Danh sách banner</a>
+          </div>
+          <div class="card-body">
+            <form th:object="${banner}" method="post" class="row">
+              <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                  <span th:text="${error}">Lỗi xảy ra</span>
+
+                </div>
+                <input th:field="*{id}" type="hidden" class="form-control">
+                <label class="lb-form">Tiêu đề banner</label>
+                <input th:field="*{title}" type="text" class="form-control">
+                <label class="lb-form">Trang áp dụng</label>
+                <input th:field="*{pageName}" type="text" class="form-control">
+                <label class="lb-form">Link click ảnh</label>
+                <input th:field="*{linkUrl}" type="text" class="form-control">
+                <label class="lb-form">Vị trí hiển thị</label>
+                <input th:field="*{displayOrder}" type="text" class="form-control">
+                <label class="lb-form">Loại banner</label>
+                <select th:field="*{bannerType}" class="form-control">
+                  <option value="NORMAL">NORMAL</option>
+                  <option value="SLIDER">SLIDER</option>
+                </select>
+                <br><label class="checkbox-custom">Hiển thị
+                <input th:field="*{active}" class="active-detail" type="checkbox" checked th:checked="${banner.active}">
+                <span class="checkmark-checkbox"></span>
+              </label>
+                </div>
+              <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+                <label class="lb-form">Ảnh banner</label>
+                <input onchange="chonAnh()" id="fileimage" type="file" class="form-control">
+                <input type="hidden" th:field="*{imageUrl}" id="imageBanner">
+                <img id="imgpreview" th:src="${banner.imageUrl}" style="max-width: 70%; margin-top: 15px;margin-bottom: 15px;display: block;">
+                <button id="btnadd" class="btn btn-primary form-control action-btn" th:text="${param.id == null?'Thêm banner':'Cập nhật banner'}"></button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+<script>
+  async function chonAnh(){
+    document.getElementById("btnadd").disabled = true
+    const filePath = document.getElementById('fileimage')
+    const formData = new FormData()
+    formData.append("file", filePath.files[0])
+
+    const res = await fetch('/adm-prj/qtht-001/api/upload/upload-file', {
+      method: 'POST',
+      body: formData
+    });
+    if (res.status < 300) {
+      var linkImage = await res.text();
+      document.getElementById("imageBanner").value = linkImage
+      document.getElementById("imgpreview").src = linkImage
+      document.getElementById("btnadd").disabled = false
+    }
+    else{
+      document.getElementById("btnadd").disabled = false
+    }
+  }
+</script>
+</html>

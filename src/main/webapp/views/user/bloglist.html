@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Blog | F6S</title>
+    <meta name="description" content="" />
+    <link rel="canonical" href="/blogs" />
+
+    <meta property="og:type" content="blog" />
+    <meta property="og:title" content="Blog tin tức " />
+    <meta property="og:url" content="/blogs" />
+    <meta property="og:type" content="article" />
+
+    <th:block th:include="common/user/libuser :: libheader"></th:block>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name" : "F6S",
+            "url" : "/",
+            "logo": {
+                "@type": "ImageObject",
+                "url":"/"
+            }
+        }
+    </script>
+
+</head>
+<body>
+<div th:replace="common/user/headerUser :: headerUser">
+
+</div>
+<div class="section-bottom-menu"></div>
+<div class="container my-4 shipping-section">
+    <nav aria-label="breadcrumb" class="breadcrumb-container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item breadcrumb-product-name active" aria-current="page"> Blog</li>
+        </ol>
+    </nav>
+
+    <div class="text-center">
+        <h1 class="category-title">Blog</h1>
+    </div>
+    <div class="blog-list row">
+        <div th:each="b : ${blogList}" class="col-lg-4 col-md-4 col-sm-12 col-12">
+            <div class="single-blog-list">
+                <a th:href="@{blog/{slug}(slug=${b.slug})}">
+                    <img th:src="${b.imageBanner}" class="img-blog-list" th:title="${b.title}" loading="lazy" decoding="async">
+                </a>
+                <a th:text="${b.title}" th:href="@{blog/{slug}(slug=${b.slug})}" class="title-blog-list"></a>
+                <div class="d-flex">
+                    <span class="item-sm-last-blog-index">
+                        <i class="fa fa-calendar order1-item"></i>
+                        <span th:text="${#temporals.format(b.createdDate, 'HH:mm dd/MM/yy')}"></span>
+                    </span>
+                    <span class="item-sm-last-blog-index">
+                        <i class="fa fa-eye"></i>
+                        <span th:text="${b.numView} + ' lượt xem'"></span>
+                    </span>
+                </div>
+                <hr>
+                <span class="blog-description-list" th:text="${b.description}"></span>
+            </div>
+        </div>
+    </div>
+
+    <nav aria-label="Page navigation" class="navigationpage">
+        <ul class="pagination justify-content-center">
+            <!-- Nút Previous -->
+            <li class="page-item" th:classappend="${pageable.pageNumber == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{${currentUri}(page=${pageable.pageNumber - 1})}"
+                   aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            <!-- Trang đầu -->
+            <li class="page-item" th:if="${pageable.pageNumber > 2}">
+                <a class="page-link" th:href="@{${currentUri}(page=0)}">1</a>
+            </li>
+
+            <!-- Dấu ... trước -->
+            <li class="page-item disabled" th:if="${pageable.pageNumber > 3}">
+                <a class="page-link">...</a>
+            </li>
+
+            <!-- Các trang quanh trang hiện tại -->
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(pageable.pageNumber-2, pageable.pageNumber+2)}"
+                th:if="${i >= 0 and i < tongSoTrang}"
+                th:classappend="${i == pageable.pageNumber} ? 'active'">
+                <a class="page-link"
+                   th:href="@{${currentUri}(page=${i})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+
+            <!-- Dấu ... sau -->
+            <li class="page-item disabled" th:if="${pageable.pageNumber < tongSoTrang - 4}">
+                <a class="page-link">...</a>
+            </li>
+
+            <!-- Trang cuối -->
+            <li class="page-item" th:if="${pageable.pageNumber < tongSoTrang - 3}">
+                <a class="page-link"
+                   th:href="@{${currentUri}(page=${tongSoTrang - 1})}"
+                   th:text="${tongSoTrang}">100</a>
+            </li>
+
+            <!-- Nút Next -->
+            <li class="page-item" th:classappend="${pageable.pageNumber >= tongSoTrang - 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{${currentUri}(page=${pageable.pageNumber + 1})}"
+                   aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+
+<div th:replace="common/user/footeruser :: footerMain"></div>
+</body>
+
+</html>
