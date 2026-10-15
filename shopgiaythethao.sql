@@ -1,6 +1,6 @@
 -- =====================================================
 -- WEBSITE QUẢN LÝ BÁN GIÀY THỂ THAO F6S
--- Hệ quản trị CSDL: MySQL
+-- Hệ quản trị CSDL: MySQL / MariaDB
 -- =====================================================
 
 -- Xóa database cũ nếu tồn tại và tạo lại
@@ -15,7 +15,7 @@ CREATE TABLE tai_khoan (
     id             INT AUTO_INCREMENT PRIMARY KEY,
     ten_dang_nhap  VARCHAR(50)  NOT NULL UNIQUE,
     mat_khau       VARCHAR(255) NOT NULL,
-    vai_tro        VARCHAR(20)  NOT NULL CHECK (vai_tro IN ('ADMIN','NHAN_VIEN','KHACH_HANG')) DEFAULT 'KHACH_HANG',
+    vai_tro        VARCHAR(20)  NOT NULL DEFAULT 'KHACH_HANG' CHECK (vai_tro IN ('ADMIN','NHAN_VIEN','KHACH_HANG')),
     trang_thai     TINYINT      NOT NULL DEFAULT 1,        -- 1: hoạt động, 0: khóa
     ngay_tao       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -147,9 +147,9 @@ CREATE TABLE hoa_don (
     khach_hang_id       INT,
     nhan_vien_id        INT,
     phieu_giam_gia_id   INT,
-    loai_hoa_don        VARCHAR(20) NOT NULL CHECK (loai_hoa_don IN ('ONLINE','TAI_QUAY')) DEFAULT 'ONLINE',
-    trang_thai          VARCHAR(30) NOT NULL CHECK (trang_thai IN ('CHO_XAC_NHAN','DA_XAC_NHAN','DANG_GIAO','HOAN_THANH','DA_HUY')) DEFAULT 'CHO_XAC_NHAN',
-    phuong_thuc_thanh_toan VARCHAR(20) NOT NULL CHECK (phuong_thuc_thanh_toan IN ('TIEN_MAT','CHUYEN_KHOAN','COD')) DEFAULT 'COD',
+    loai_hoa_don        VARCHAR(20) NOT NULL DEFAULT 'ONLINE' CHECK (loai_hoa_don IN ('ONLINE','TAI_QUAY')),
+    trang_thai          VARCHAR(30) NOT NULL DEFAULT 'CHO_XAC_NHAN' CHECK (trang_thai IN ('CHO_XAC_NHAN','DA_XAC_NHAN','DANG_GIAO','HOAN_THANH','DA_HUY')),
+    phuong_thuc_thanh_toan VARCHAR(20) NOT NULL DEFAULT 'COD' CHECK (phuong_thuc_thanh_toan IN ('TIEN_MAT','CHUYEN_KHOAN','COD')),
     ten_nguoi_nhan      VARCHAR(100),
     sdt_nguoi_nhan      VARCHAR(15),
     dia_chi_giao        VARCHAR(255),
@@ -207,8 +207,6 @@ GROUP BY CAST(ngay_tao AS DATE);
 -- =====================================================
 -- DỮ LIỆU MẪU
 -- =====================================================
--- MySQL hỗ trợ tự động tăng ID, do đó ta có thể bỏ qua SET IDENTITY_INSERT
--- và chèn trực tiếp các giá trị ID.
 INSERT INTO tai_khoan (id, ten_dang_nhap, mat_khau, vai_tro) VALUES
 (1, 'admin',  '123456', 'ADMIN'),
 (2, 'nv01',   '123456', 'NHAN_VIEN'),
