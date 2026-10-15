@@ -45,7 +45,7 @@ public class HomeController {
 
         List<Category> parentCategory = (List<Category>) model.getAttribute("categories");
 
-        if(parentCategory.size() > 0){
+        if(parentCategory != null && !parentCategory.isEmpty()){
             Long id = parentCategory.get(0).getId();
             Page<ProductView> productByCategory = productService.getProductByCategory(id);
             model.addAttribute("sanPhamDanhMuc", productByCategory.getContent());

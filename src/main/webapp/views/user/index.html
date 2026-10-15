@@ -237,7 +237,7 @@
         </article>
     </div>
 
-    <div class="text-center my-4">
+    <div class="text-center my-4" th:if="${danhMucSp != null}">
         <a id="link-xem-them-sp" th:href="'/category/'+${danhMucSp.slug}" class="btn btn-link-secondary btn-outline-secondary">
             👉Xem thêm sản phẩm <span th:if="${danhMucSp != null}" th:text="${danhMucSp.name}" id="tencate"></span>
         </a>
@@ -251,7 +251,7 @@
         Tin tức - Bài Viết
     </div>
     <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+        <div class="col-lg-6 col-md-6 col-sm-12 col-12" th:if="${lastBlog != null}">
             <a th:href="@{blog/{slug}(slug=${lastBlog.slug})}"><img th:src="${lastBlog.imageBanner}" class="img-blog-last-index" alt="Bài viết mới nhất" loading="lazy" decoding="async"></a>
             <a th:href="@{blog/{slug}(slug=${lastBlog.slug})}" class="title-last-blog-index" th:text="${lastBlog.title}"></a>
             <div class="d-flex">
