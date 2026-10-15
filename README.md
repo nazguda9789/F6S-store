@@ -4,6 +4,8 @@ Database hiện dùng là `f6s_shop`. Cài mới bằng `f6s_shop.sql` (có DROP
 
 ## Chạy bằng IntelliJ IDEA và XAMPP trên Windows
 
+Đặt lại mật khẩu admin có sẵn: trong IntelliJ → Run → Edit Configurations → Environment variables, đặt `F6S_ADMIN_EMAIL` bằng email admin (ví dụ `admin@gmail.com`), `F6S_ADMIN_PASSWORD` bằng mật khẩu mới do bạn chọn và `F6S_ADMIN_RESET_PASSWORD=true`. Chạy ứng dụng để lưu mật khẩu BCrypt vào bảng `users`. Sau khi thành công, bỏ biến reset và mật khẩu khỏi cấu hình Run rồi chạy lại. Cách này khôi phục trạng thái hoạt động và mở khóa admin; không thay đổi tài khoản không phải admin. Không cần import lại SQL. Các bảng tiếng Việt không tự đồng bộ với `users`.
+
 1. Cài JDK 17, IntelliJ IDEA và XAMPP.
 2. Trong XAMPP, bật Apache và MySQL. Mở http://localhost/phpmyadmin.
 3. Cài mới: import `f6s_shop.sql`. Bản SQL có 50 sản phẩm nguồn, 13 bài viết, 1 admin và 2 nhân viên bên cạnh dữ liệu mẫu cũ; giữ hash mật khẩu gốc. Không nhập khách hàng, giao dịch hoặc khóa dịch vụ từ SQL nguồn. Các bảng `product`, `blog`, `users` phục vụ Java cùng tồn tại với các bảng tiếng Việt; hai nhóm bảng không tự đồng bộ khi sửa dữ liệu sau này.
