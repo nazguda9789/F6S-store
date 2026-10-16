@@ -1,20 +1,199 @@
-# Website quản lý bán giày thể thao F6S
+# F6S — Website quản lý bán giày thể thao
 
-Database hiện dùng là `f6s_shop`. Cài mới bằng `f6s_shop.sql` (có DROP DATABASE, cần sao lưu). Database đang dùng: chọn database và chỉ import `sql/bo_sung_du_lieu.sql` để bổ sung mà không xóa dữ liệu cũ. Xem danh sách đầy đủ tại [DANH_SACH_BO_SUNG.md](DANH_SACH_BO_SUNG.md).
+F6S là ứng dụng Java Spring Boot phục vụ khách mua giày online và nhân viên bán hàng tại quầy, kèm khu vực quản trị sản phẩm, đơn hàng và doanh thu. Giao diện dùng Thymeleaf, Bootstrap và JavaScript; dữ liệu lưu bằng MySQL/MariaDB.
 
-## Chạy bằng IntelliJ IDEA và XAMPP trên Windows
+> Các mục chức năng dưới đây được ghi nhận từ mã nguồn hiện tại, không có nghĩa tất cả đã được kiểm thử hoàn chỉnh. Xem phần trạng thái kiểm chứng ở cuối tài liệu.
 
-Đặt lại mật khẩu admin có sẵn: trong IntelliJ → Run → Edit Configurations → Environment variables, đặt `F6S_ADMIN_EMAIL` bằng email admin (ví dụ `admin@gmail.com`), `F6S_ADMIN_PASSWORD` bằng mật khẩu mới do bạn chọn và `F6S_ADMIN_RESET_PASSWORD=true`. Chạy ứng dụng để lưu mật khẩu BCrypt vào bảng `users`. Sau khi thành công, bỏ biến reset và mật khẩu khỏi cấu hình Run rồi chạy lại. Cách này khôi phục trạng thái hoạt động và mở khóa admin; không thay đổi tài khoản không phải admin. Không cần import lại SQL. Các bảng tiếng Việt không tự đồng bộ với `users`.
+## 1. Website hiện có những gì?
 
-1. Cài JDK 17, IntelliJ IDEA và XAMPP.
-2. Trong XAMPP, bật Apache và MySQL. Mở http://localhost/phpmyadmin.
-3. Cài mới: import `f6s_shop.sql`. Bản SQL có 50 sản phẩm nguồn, 13 bài viết, 1 admin và 2 nhân viên bên cạnh dữ liệu mẫu cũ; giữ hash mật khẩu gốc. Không nhập khách hàng, giao dịch hoặc khóa dịch vụ từ SQL nguồn. Các bảng `product`, `blog`, `users` phục vụ Java cùng tồn tại với các bảng tiếng Việt; hai nhóm bảng không tự đồng bộ khi sửa dữ liệu sau này.
-4. Trong IntelliJ, chọn File → Open và mở thư mục chứa `pom.xml`. Chọn Project SDK 17 và Reload All Maven Projects.
-5. MySQL mặc định là `localhost:3306`, username `root`, password trống. Nếu khác, đặt các biến `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` trong Run Configuration → Environment variables.
-6. Để tạo tài khoản quản trị riêng, đặt `F6S_ADMIN_EMAIL` và `F6S_ADMIN_PASSWORD` trong Environment variables trước khi chạy. Không lưu mật khẩu vào Git.
-7. Mở `src/main/java/com/web/ShopgiaythethaoApplication.java` và nhấn Run cạnh hàm main. Hoặc chạy trong Terminal Windows: `.\mvnw.cmd spring-boot:run`.
-8. Khi console báo Started, mở http://localhost:8080. Nhấn Stop trong IntelliJ để dừng ứng dụng.
+| Khu vực | Chức năng có trong mã nguồn |
+|---|---|
+| Khách hàng | Trang chủ, danh mục, tìm/lọc sản phẩm, chi tiết giày theo size/màu, giỏ hàng, đặt hàng và thanh toán, tài khoản cá nhân, tra cứu/theo dõi đơn, bài viết, giới thiệu và liên hệ |
+| Bán hàng tại quầy | Màn tạo hóa đơn cho admin/nhân viên, chọn sản phẩm và khách hàng, xử lý hóa đơn/thanh toán |
+| Nhân viên | Quản lý sản phẩm, hóa đơn/chi tiết đơn, khách hàng, bài viết, liên hệ và chat |
+| Admin | Dashboard; quản lý sản phẩm, danh mục, size, màu, banner, khách hàng và tài khoản; hóa đơn; voucher và đợt giảm giá; bài viết; cấu hình Cloudinary |
+| Thống kê | Có màn doanh thu, số đơn hoàn tất, doanh thu ngày/tháng và sản phẩm bán chạy; cần kiểm thử số liệu với dữ liệu giao dịch thực tế |
+| Xác thực/phân quyền | Đăng nhập bằng email/mật khẩu, đăng xuất, BCrypt, phân quyền admin/nhân viên/khách hàng, khóa đăng nhập sai; có tích hợp Google/Facebook |
+| Dịch vụ ngoài | Email OTP/quên mật khẩu, Cloudinary, VNPay sandbox, GHN, Telegram, chatbot Gemini/Groq; chỉ dùng được khi cấu hình dịch vụ phù hợp |
 
-Maven cần Internet để tải thư viện. Các chức năng email, OAuth, vận chuyển, SMS và thanh toán cần cấu hình dịch vụ của bạn. Khóa dịch vụ được đọc từ biến môi trường; xem placeholder trong `application*.properties`. Email dùng `MAIL_USERNAME`/`MAIL_PASSWORD`; VNPay dùng `VNPAY_TMN_CODE`/`VNPAY_HASH_SECRET`.
+Mã nguồn chưa được xác nhận đáp ứng toàn bộ yêu cầu báo cáo theo phương thức thanh toán, kênh online/tại quầy hoặc cảnh báo sắp hết hàng. Nhóm cần kiểm tra và hoàn thiện các nghiệp vụ đó, cùng việc đồng bộ tồn kho giữa hai kênh bán.
 
-Trạng thái kiểm chứng: bản SQL đầy đủ đã import thành công vào MySQL 8; chạy lại bản bổ sung không tăng số dòng. Đã kiểm tra liên kết sản phẩm–danh mục và sản phẩm–size–màu không bị thiếu. Chưa xác minh chạy Spring Boot hoặc import trên MariaDB/XAMPP.
+## 2. Cần tải và cài những gì?
+
+Hướng dẫn chính bên dưới dành cho Windows.
+
+| Phần mềm | Mục đích | Link tải |
+|---|---|---|
+| JDK 17 | Biên dịch/chạy Java; chọn bản 64-bit phù hợp máy | [Amazon Corretto 17](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html) |
+| IntelliJ IDEA | Mở và chạy project; bản miễn phí hỗ trợ Java/Maven | [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) |
+| XAMPP | Cung cấp MariaDB/MySQL và phpMyAdmin | [XAMPP](https://www.apachefriends.org/download.html) |
+| Mã nguồn F6S | Bao gồm Maven Wrapper và SQL | [Download ZIP](https://github.com/nazguda9789/F6S-store/archive/refs/heads/main.zip) |
+| Git — tùy chọn | Clone/pull bản mới, không cần nếu dùng ZIP | [Git](https://git-scm.com/downloads) |
+
+Repository private yêu cầu đăng nhập GitHub bằng tài khoản có quyền truy cập.
+
+Không cần cài Node.js/npm cho cấu trúc project hiện tại. Maven đã có sẵn thông qua `mvnw.cmd`; lần chạy đầu cần Internet để tải thư viện. Apache trong XAMPP phục vụ phpMyAdmin, còn Spring Boot phục vụ website ở cổng 8080.
+
+Ảnh mẫu dùng URL Cloudinary bên ngoài nên cũng cần Internet. Tài khoản/khóa dịch vụ ngoài được mô tả ở mục 7.
+
+## 3. Tải project và mở bằng IntelliJ
+
+1. Tải ZIP từ link trên và giải nén vào đường dẫn không dấu, ví dụ `C:\Projects\F6S-store`.
+2. Kiểm tra thư mục mở có trực tiếp `pom.xml`, `mvnw.cmd` và thư mục `src`. Tránh mở nhầm thư mục cha sau khi giải nén.
+3. IntelliJ → **File → Open**, chọn thư mục chứa `pom.xml`, cho phép mở dưới dạng Maven project.
+4. **File → Project Structure → Project → SDK**: chọn JDK 17. Có thể dùng **Download JDK** nếu chưa cài.
+5. Trong cửa sổ Maven, chọn **Reload All Maven Projects** và đợi tải thư viện; tắt Offline mode nếu đang bật.
+
+## 4. Chuẩn bị database bằng XAMPP
+
+1. Mở XAMPP Control Panel, Start **MySQL** và **Apache**.
+2. Truy cập `http://localhost/phpmyadmin`.
+3. Chọn đúng phương án import:
+
+| Tình huống | File cần import |
+|---|---|
+| Cài mới, chấp nhận tạo lại database | `f6s_shop.sql` |
+| Đã có database, cần thêm dữ liệu nguồn | Chọn database `f6s_shop`, import `sql/bo_sung_du_lieu.sql` |
+
+**File đầy đủ có `DROP DATABASE IF EXISTS f6s_shop`, sẽ xóa database cùng tên. Sao lưu trước khi import nếu đã có dữ liệu.** Không import cả hai file chỉ để cài mới; file đầy đủ đã bao gồm dữ liệu bổ sung.
+
+Dữ liệu nguồn gồm 50 sản phẩm, 13 bài viết, 1 admin và 2 nhân viên, kèm danh mục, size, màu và ảnh. Giữ 2 sản phẩm mẫu trong bảng tiếng Việt. Xem danh sách chi tiết tại [DANH_SACH_BO_SUNG.md](DANH_SACH_BO_SUNG.md).
+
+Ứng dụng Java dùng các bảng `users`, `product`, `product_detail`, `blog`, `invoice`… SQL còn giữ các bảng tiếng Việt như `tai_khoan`, `san_pham`, `bai_viet` để bảo toàn dữ liệu hiện có. **Hai nhóm bảng không tự đồng bộ sau import**; thay mật khẩu hoặc sản phẩm chỉ trong bảng tiếng Việt sẽ không thay đổi dữ liệu mà Java đọc.
+
+## 5. Cấu hình database và tài khoản admin
+
+Profile mặc định là `dev`, đọc `src/main/resources/application-dev.properties`. Kết nối mặc định:
+
+- Database: `f6s_shop`
+- Host/cổng: `localhost:3306`
+- User: `root`
+- Mật khẩu: trống theo mặc định XAMPP
+
+Nếu máy dùng cổng hoặc mật khẩu khác, đặt biến trong IntelliJ → **Run → Edit Configurations → Environment variables** (có thể cần chọn **Modify options → Environment variables**):
+
+| Biến | Giá trị |
+|---|---|
+| `SPRING_DATASOURCE_URL` | `jdbc:mysql://localhost:3306/f6s_shop` — sửa cổng nếu cần |
+| `SPRING_DATASOURCE_USERNAME` | Username MySQL của bạn |
+| `SPRING_DATASOURCE_PASSWORD` | Mật khẩu MySQL của bạn |
+
+Tạo cấu hình Run bằng cách mở `src/main/java/com/web/ShopgiaythethaoApplication.java`, chọn Run cạnh hàm `main`, sau đó Stop để chỉnh Environment variables.
+
+SQL chứa các email đăng nhập sau, nhưng chỉ giữ hash mật khẩu gốc:
+
+| Vai trò | Email |
+|---|---|
+| Admin | `admin@gmail.com` |
+| Nhân viên | `nhanvien@gmail.com` |
+| Nhân viên | `employee@gmail.com` |
+
+### Đặt mật khẩu mới cho admin
+
+Thêm vào Environment variables của cấu hình Run:
+
+| Biến | Giá trị |
+|---|---|
+| `F6S_ADMIN_EMAIL` | `admin@gmail.com` |
+| `F6S_ADMIN_PASSWORD` | Mật khẩu mới bạn tự chọn |
+| `F6S_ADMIN_RESET_PASSWORD` | `true` |
+
+Chạy ứng dụng để lưu mật khẩu BCrypt và mở khóa admin trong bảng `users`. Sau khi đăng nhập thành công, bỏ biến reset và mật khẩu khỏi cấu hình Run, rồi chạy lại. Không cần import lại SQL.
+
+Để tạo admin mới, dùng email chưa tồn tại và đặt `F6S_ADMIN_EMAIL`/`F6S_ADMIN_PASSWORD`; không cần cờ reset. Cơ chế này không nâng quyền hoặc đặt lại mật khẩu cho tài khoản nhân viên/khách hàng có sẵn.
+
+Biến đặt trong Run Configuration chỉ áp dụng khi chạy bằng cấu hình đó; lệnh Terminal không tự nhận chúng. Project không tự nạp file `.env`.
+
+## 6. Chạy và kiểm tra website
+
+Trong IntelliJ, nhấn Run ở `ShopgiaythethaoApplication.main`. Hoặc mở PowerShell tại thư mục chứa `pom.xml`:
+
+```powershell
+.\mvnw.cmd clean compile
+.\mvnw.cmd spring-boot:run
+```
+
+Nếu cần đặt biến khi chạy Terminal, khai báo trong chính phiên PowerShell trước khi chạy, ví dụ:
+
+```powershell
+$env:F6S_ADMIN_EMAIL = "admin@gmail.com"
+$env:F6S_ADMIN_PASSWORD = "<mat-khau-moi-cua-ban>"
+$env:F6S_ADMIN_RESET_PASSWORD = "true"
+.\mvnw.cmd spring-boot:run
+```
+
+Sau khi đặt lại mật khẩu, dừng ứng dụng bằng Ctrl+C và xóa biến khỏi phiên:
+
+```powershell
+Remove-Item Env:F6S_ADMIN_PASSWORD
+Remove-Item Env:F6S_ADMIN_RESET_PASSWORD
+```
+
+Khi console có `Started ShopgiaythethaoApplication`, kiểm tra:
+
+| Trang | URL |
+|---|---|
+| Trang chủ | http://localhost:8080/ |
+| Đăng nhập | http://localhost:8080/login |
+| Dashboard admin | http://localhost:8080/adm-prj/qtht-001/dashbroad/view |
+| Hóa đơn admin | http://localhost:8080/adm-prj/qtht-001/invoice/list |
+| Tạo hóa đơn tại quầy — admin | http://localhost:8080/adm-prj/qtht-001/invoice/create |
+| Hóa đơn nhân viên | http://localhost:8080/emp-prj/qtht-001/invoice/list |
+| Thống kê doanh thu | http://localhost:8080/adm-prj/qtht-001/thong-ke/doanh-thu |
+
+Các trang nội bộ yêu cầu vai trò tương ứng. Kiểm tra trang chủ có sản phẩm, mở chi tiết size/màu, đăng nhập admin, mở quản lý hóa đơn. Thông báo Started chưa chứng minh các nghiệp vụ thanh toán, email hoặc vận chuyển đã hoạt động.
+
+Dừng bằng nút Stop trong IntelliJ hoặc Ctrl+C trong Terminal.
+
+## 7. Cấu hình để dùng các tích hợp
+
+Cài phần mềm và import SQL giúp chuẩn bị chạy local. Để dùng các chức năng tích hợp, cần tài khoản dịch vụ của chính bạn; không chỉ tải thêm phần mềm.
+
+| Tích hợp | Cần chuẩn bị và cấu hình |
+|---|---|
+| Email OTP, quên mật khẩu, email hóa đơn | Gmail và App Password hợp lệ; đặt `MAIL_USERNAME`, `MAIL_PASSWORD`. Code hiện dùng SMTP Gmail, cổng 587, STARTTLS. Kiểm tra gửi email thật trước khi thử đăng ký/quên mật khẩu |
+| Upload ảnh Cloudinary | Tạo tài khoản Cloudinary, đăng nhập admin → quản lý Cloudinary, thêm cloud name/API key/API secret và chọn cấu hình chính. Dữ liệu lưu bảng `cloud_key`; biến `CLOUDINARY_URL` không được service hiện tại sử dụng |
+| Google/Facebook login | Tạo ứng dụng OAuth của bạn, thay client ID trong profile dev và đặt `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET` hoặc `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_SECRET`. Cấu hình redirect URI tương ứng `http://localhost:8080/login/oauth2/code/google` hoặc `/facebook` trên trang nhà cung cấp |
+| VNPay | Tài khoản sandbox, `VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET`; kiểm tra URL trả về khớp cấu hình và luồng thanh toán. Code mặc định gọi VNPay sandbox, không phải môi trường thu tiền thật |
+| GHN | Tài khoản/shop GHN đúng môi trường dev; đặt `GHN_API_KEY`, `GHN_TOKEN` theo client đang dùng và kiểm tra các trường `ghn.shopId`, `ghn.shop-id`, `ghn.base-url` trong cấu hình. Các shop ID có sẵn không được coi là cấu hình của bạn |
+| Telegram | Nếu cần bot, cấu hình `TELEGRAM_BOT_TOKEN` và `telegram.bot.username`. Khi thiếu token hoặc username, phần đăng ký bot thủ công được bỏ qua |
+| Chatbot AI | Đặt `GEMINI_API_KEY`/`GROQ_API_KEY` cho nhà cung cấp được sử dụng; phụ thuộc Internet, model và hạn mức API |
+| SMS | Có mã tích hợp SpeedSMS; cần kiểm tra luồng thực tế, `speedsms.api.key`/`speedsms.api.url` và client `SpeedSMSAPI` dùng `SPEEDSMS_TOKEN`. Chưa có một cấu hình thống nhất được xác minh cho mọi luồng SMS |
+
+Không đưa mật khẩu hoặc khóa thật vào README/Git. Các tích hợp hiện chưa được kiểm thử đầy đủ; cần kiểm tra từng luồng với tài khoản dịch vụ hợp lệ. Việc thiếu khóa có thể khiến chức năng tương ứng lỗi khi sử dụng dù web đã khởi động.
+
+## 8. Xử lý lỗi thường gặp
+
+| Lỗi | Cách kiểm tra/xử lý |
+|---|---|
+| `InvalidPathException`, đường dẫn bị đổi thành dấu ? | Giải nén/mở project ở đường dẫn không dấu, ví dụ `C:\Projects\F6S-store` |
+| `ClassNotFoundException: com.web.ShopgiaythethaoApplication` | Mở đúng thư mục có pom.xml, chọn JDK 17, reload Maven, chạy clean compile; xử lý lỗi biên dịch đầu tiên nếu có |
+| `Communications link failure` | Bật MySQL XAMPP, kiểm tra host/cổng trong datasource |
+| `Unknown database` | Kiểm tra đã import đúng `f6s_shop` |
+| `Access denied for user` | Sửa username/password MySQL trong Environment variables |
+| `tokenUri cannot be empty` | Dùng bản code mới; kiểm tra không có biến môi trường token URI được đặt rỗng ghi đè địa chỉ mặc định |
+| `Bot token and username can't be empty` | Dùng bản mới có kiểm tra thiếu cấu hình; chỉ khai báo Telegram khi dùng bot |
+| `Error resolving template [user/index]` | Reload Maven rồi clean compile; pom.xml phải copy views vào templates và profile dev dùng `classpath:/templates/` |
+| `danhMucSp.slug` trên null | Cập nhật bản mới có kiểm tra dữ liệu rỗng; import dữ liệu bổ sung nếu database chưa có danh mục |
+| `Port 8080 was already in use` | Dừng tiến trình cũ hoặc đặt `SERVER_PORT=8081`; cập nhật URL truy cập và callback tích hợp tương ứng |
+| Không thấy ảnh/tải ảnh lỗi | Kiểm tra Internet và URL ảnh; upload cần cấu hình Cloudinary chính |
+| Maven không tải thư viện | Kiểm tra Internet/proxy, tắt Offline mode, reload Maven; không bỏ qua lỗi build |
+
+## 9. Cấu trúc project và trạng thái kiểm chứng
+
+```text
+pom.xml                         Maven, Java 17, Spring Boot 3.4.3
+mvnw / mvnw.cmd                 Maven Wrapper
+src/main/java/com/web/          Controller, service, entity, repository, security
+src/main/resources/             Cấu hình dev/prod
+src/main/webapp/views/          Template Thymeleaf
+src/main/webapp/css, js, lib/   Tài nguyên giao diện
+src/test/                       Kiểm thử
+f6s_shop.sql                    Database đầy đủ, có lệnh tạo lại
+sql/bo_sung_du_lieu.sql         Bổ sung dữ liệu vào database đang dùng
+DANH_SACH_BO_SUNG.md            Danh sách sản phẩm, bài viết, tài khoản đã nhập
+```
+
+Đã kiểm tra bản SQL đầy đủ import được trên MySQL 8, bản bổ sung chạy lại không tăng số dòng và các liên kết sản phẩm–danh mục/size/màu không bị thiếu. Đã bổ sung kiểm thử cho cơ chế đặt lại mật khẩu admin.
+
+Trong môi trường chuẩn bị, Maven chưa tải được dependency vì lỗi DNS nên chưa chạy được kiểm thử Java hoặc xác minh ứng dụng từ đầu đến cuối. Chưa kiểm chứng import trên MariaDB/XAMPP hoặc các tích hợp ngoài. Vì vậy cần chạy kiểm tra local theo mục 6 và kiểm thử từng dịch vụ theo mục 7 trước khi đánh giá website hoạt động hoàn chỉnh.
