@@ -105,16 +105,18 @@
                     <div th:if="${localShipping}" class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label for="local-province" class="form-label">Tỉnh / thành phố</label>
-                            <input id="local-province" name="provinceName" class="form-control" placeholder="Ví dụ: Hà Nội" autocomplete="address-level1" maxlength="100" required>
+                            <select id="local-province" name="provinceName" class="form-control" required aria-describedby="local-address-help"><option value=""></option></select>
                         </div>
                         <div class="col-md-6">
                             <label for="local-ward" class="form-label">Phường / xã</label>
-                            <input id="local-ward" name="wardName" class="form-control" placeholder="Nhập phường / xã nhận hàng" autocomplete="address-level2" maxlength="100" required>
+                            <select id="local-ward" class="form-control" required><option value=""></option></select>
+                            <input type="hidden" id="local-ward-name" name="wardName">
                         </div>
                         <div class="col-12">
                             <label for="local-district" class="form-label">Quận / huyện (nếu có)</label>
                             <input id="local-district" name="districtName" class="form-control" placeholder="Nhập quận / huyện nếu địa chỉ có" maxlength="100">
                         </div>
+                        <div class="col-12"><small id="local-address-help" class="text-muted">Chọn thành phố → phường/xã; quận/huyện được điền theo danh mục. Danh mục 3 cấp trước 07/2025 chỉ để tra cứu địa chỉ cũ. Với địa chỉ mới, gõ tên rồi chọn dòng “Dùng địa chỉ”, có thể để trống quận/huyện.</small></div>
                     </div>
                     <div class="form-group-inline">
                         <div class="form-group">
@@ -213,6 +215,7 @@
 </div>
 <div th:insert="common/user/footeruser :: footerMain"></div>
 <script src="/js/cart.js"></script>
+<script src="/js/local-address.js"></script>
 </body>
 <script>
     $(document).on('select2:open', () => {

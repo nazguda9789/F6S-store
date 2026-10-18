@@ -1,5 +1,14 @@
 # Cập nhật giao diện và xử lý lỗi F6S — 18/10/2026
 
+## Bổ sung: tìm địa chỉ theo thành phố → phường/xã → quận/huyện
+
+- Trong chế độ giao hàng nội bộ, thay hai ô nhập tỉnh và phường bằng danh sách có tìm kiếm không dấu; chọn phường tự điền quận/huyện, đổi tỉnh xóa địa chỉ cấp dưới cũ.
+- Phường trùng tên hiển thị kèm quận/huyện để phân biệt. Backend vẫn nhận tên địa chỉ, không nhận nhầm mã tra cứu.
+- Danh mục 3 cấp trước 07/2025 phục vụ ngay trong ứng dụng, không cần token GHN/API bên ngoài. Giao diện ghi rõ đây là địa chỉ cũ; có thể gõ địa chỉ mới rồi chọn “Dùng địa chỉ”, quận/huyện không bắt buộc và được sửa trực tiếp.
+- Khi không tải được danh mục vẫn nhập địa chỉ mới được. Nếu thư viện chọn không chạy, dùng ô nhập tay. Không thay đổi quy tắc phí ship, COD hoặc VNPay; chế độ GHN giữ quy trình và mã riêng.
+- Nguồn và giấy phép dữ liệu: `src/main/webapp/data/README.md`.
+- Kiểm chứng: 9 kiểm thử JavaScript đạt; trình duyệt kiểm tra chọn địa chỉ, tìm không dấu, tự điền quận/huyện, xóa dữ liệu cũ khi đổi tỉnh, nhập địa chỉ mới và tạo đơn COD thành công trên database kiểm thử. Khi giả lập danh mục trả 503 vẫn nhập địa chỉ được, không có lỗi JavaScript không được bắt.
+
 ## Bổ sung: nhập địa chỉ không phụ thuộc GHN và sửa header admin
 
 - Mặc định `SHIPPING_PROVIDER=local`: có ô nhập tỉnh/thành phố, phường/xã và quận/huyện tùy chọn; đặt COD không cần GHN. Cửa hàng tự sắp xếp giao hàng, không tự tạo vận đơn GHN.
