@@ -3,8 +3,8 @@
 <head>
     <th:block th:include="common/user/libuser :: libheader"></th:block>
     <link rel="stylesheet" href="css/checkout.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="/lib/css/select2.min.css" rel="stylesheet" />
+    <script src="/lib/js/select2.min.js"></script>
     <script src="/js/checkout.js"></script>
 </head>
 <body>
@@ -74,7 +74,7 @@
                         <span th:data-shipcost="${shippingCost}" class="ship-cost-change" id="ship-cost-change" th:if="${cartResponse.totalAmount < 500000}">[[${#numbers.formatDecimal(shippingCost, 0, 'POINT', 0, 'POINT')}]] đ</span>
                         <span data-shipcost="0" th:if="${cartResponse.totalAmount >= 500000}" class="ship-cost-change">Miễn phí</span>
                         <input type="hidden" form="form-create-order" th:value="${shippingCost}" name="phiShip" id="phiship" th:if="${cartResponse.totalAmount < 500000}">
-                        <input type="hidden" form="form-create-order" value="0" name="phiShip" th:if="${cartResponse.totalAmount >= 500000}">
+                        <input type="hidden" form="form-create-order" value="0" name="phiShip" id="phiship" th:if="${cartResponse.totalAmount >= 500000}">
                     </div>
                     <div class="price-row">
                         <span>Khuyến mại</span>
@@ -100,6 +100,7 @@
                         <label for="fullName">Họ tên của bạn</label>
                     </div>
                 </div>
+                    <div id="shipping-status" th:hidden="${shippingAvailable != false}" class="alert alert-warning" role="alert" th:text="${shippingWarning}"></div>
                     <div class="form-group-inline">
                         <div class="form-group">
                             <div class="form-floating mb-3">
@@ -180,7 +181,7 @@
                 </div>
             </div>
 
-            <button form="form-create-order" type="submit" class="place-order-btn place-order-btn-desktop">Xác Nhận Đặt Hàng</button>
+            <button form="form-create-order" type="submit" th:disabled="${shippingAvailable == false}" class="place-order-btn place-order-btn-desktop">Xác nhận đặt hàng</button>
         </div>
     </main>
 
@@ -190,7 +191,7 @@
             <strong class="total-amount total-amount-co total-amount-mobile" th:if="${cartResponse.totalAmount < 500000}" th:data-total="${cartResponse.totalAmount + shippingCost}">[[${#numbers.formatDecimal(cartResponse.totalAmount + shippingCost, 0, 'POINT', 0, 'POINT')}]] đ</strong>
             <strong class="total-amount total-amount-co total-amount-mobile" th:if="${cartResponse.totalAmount >= 500000}" th:data-total="${cartResponse.totalAmount}">[[${#numbers.formatDecimal(cartResponse.totalAmount, 0, 'POINT', 0, 'POINT')}]] đ</strong>
         </div>
-        <button form="form-create-order" type="submit" class="place-order-btn place-order-btn-moblie">Hoàn tất đơn hàng</button>
+        <button form="form-create-order" type="submit" th:disabled="${shippingAvailable == false}" class="place-order-btn place-order-btn-moblie">Hoàn tất đơn hàng</button>
     </div>
 
 </div>
@@ -317,17 +318,21 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById("form-create-order");
-        const btn = document.querySelector(".place-order-btn");
-
-        btn.addEventListener("click", function (e) {
+        form.addEventListener("submit", function (e) {
             // tìm radio đang được chọn
-            let payType = document.querySelector("input[name='paytype']:checked").value;
+            const selected = document.querySelector("input[name='paytype']:checked");
+            if (!selected || document.getElementById("shipping-status").hidden === false) {
+                e.preventDefault();
+                return;
+            }
+            let payType = selected.value;
 
             if (payType === "cod") {
                 form.action = "/checkout";
             } else if (payType === "vnpay") {
                 form.action = "/checkout-vnpay";
             } else if (payType === "momo") {
+                e.preventDefault();
                 swal({ title: "Thông báo", text: "Xin lỗi, loại thanh toán này chưa được hỗ trợ", type: "error" }, function() { });
             }
 

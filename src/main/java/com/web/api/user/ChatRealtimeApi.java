@@ -41,11 +41,14 @@ public class ChatRealtimeApi {
 
     @GetMapping("/user/my-chat")
     public ResponseEntity<?> myChat(){
-        List<Chatting> result = chatRepository.findByUser(userUtils.getUserWithAuthority().getId());
+        User user = userUtils.getUserWithAuthority();
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        List<Chatting> result = chatRepository.findByUser(user.getId());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/admin/getAllUserChat")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<?> getAllUserChat(@RequestParam(value = "search", required = false) String search){
         if(search == null){
             search = "";
@@ -56,13 +59,16 @@ public class ChatRealtimeApi {
     }
 
     @GetMapping("/admin/getListChat")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public List<Chatting> getListChat(@RequestParam("idUser") Long idUser){
         return chatRepository.findByUser(idUser);
     }
 
     @PostMapping("/user/post")
     public ResponseEntity<?> chatByUser(@RequestBody Chatting chatting){
-        chatting.setUser(userUtils.getUserWithAuthority());
+        User user = userUtils.getUserWithAuthority();
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        chatting.setUser(user);
         chatting.setType(ChattingType.USER);
         chatting.setCreatedDate(LocalDateTime.now());
         chatRepository.save(chatting);
@@ -71,6 +77,7 @@ public class ChatRealtimeApi {
     }
 
     @PostMapping("/employee-admin/post")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<?> chatByStaff(@RequestBody Chatting chatting){
         chatting.setType(ChattingType.STAFF);
         chatting.setCreatedDate(LocalDateTime.now());

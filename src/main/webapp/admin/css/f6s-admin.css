@@ -1,0 +1,14 @@
+/* Shared admin/employee refinements without changing navigation behavior. */
+body{font-family:"Segoe UI",Arial,sans-serif;background:#f3f6f9;color:#172b3e}
+.sb-sidenav-dark,.sb-topnav{background:#142333!important}
+.sb-sidenav .nav-link{border-radius:8px;margin:3px 10px;font-size:14px}
+.sb-sidenav .nav-link:hover{background:#ffffff12;color:#fff}
+.sb-sidenav-menu-heading{letter-spacing:1px;font-size:10px}
+.card{border:1px solid #dde5ed;border-radius:12px;box-shadow:0 3px 12px #14233307;overflow:hidden}
+.card-header{background:#fff;border-bottom:1px solid #e4eaf0;font-weight:650;padding:16px 20px}
+.table{font-size:14px;vertical-align:middle}.table thead th{background:#edf2f7;color:#30465a;border-bottom:1px solid #d7e0e9;padding:14px 12px}
+.table td{padding:12px;border-color:#edf1f5}.form-control,.form-select{border-radius:8px;border-color:#ccd7e1}
+.btn{border-radius:8px;font-weight:600}.btn-primary{background:#244d70;border-color:#244d70}
+.breadcrumb{font-size:13px}.modal-content{border-radius:14px}h1{font-weight:750;letter-spacing:-.6px}
+button:focus-visible,a:focus-visible{outline:3px solid #d46a32;outline-offset:3px}
+@media(max-width:768px){.card-body{padding:14px}.table-responsive{overflow-x:auto}}

@@ -38,6 +38,9 @@ public class GlobalModelAttributes {
     private UserUtils userUtils;
 
     @Autowired
+    private org.springframework.core.env.Environment environment;
+
+    @Autowired
     private InvoiceRepository invoiceRepository;
 
     private final WebSocketSessionListener sessionListener;
@@ -48,6 +51,10 @@ public class GlobalModelAttributes {
 
     @ModelAttribute
     public void addGlobalAttributes(Model model, HttpServletRequest request, @AuthenticationPrincipal Object principal, HttpSession session) {
+        model.addAttribute("googleLoginAvailable", org.springframework.util.StringUtils.hasText(
+                environment.getProperty("spring.security.oauth2.client.registration.google.client-secret")));
+        model.addAttribute("facebookLoginAvailable", org.springframework.util.StringUtils.hasText(
+                environment.getProperty("spring.security.oauth2.client.registration.facebook.client-secret")));
         List<Category> listParents = categoryService.getParentCategoriesUser();
         model.addAttribute("categories", listParents);
         String currentUrl = request.getRequestURI();

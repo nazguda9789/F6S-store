@@ -11,13 +11,18 @@ import org.springframework.http.HttpMethod;
 @Service
 public class SmsService {
 
-    @Value("${speedsms.api.key}")
+    @Value("${speedsms.api.key:}")
     private String apiKey;
 
-    @Value("${speedsms.api.url}")
+    @Value("${speedsms.api.url:}")
     private String apiUrl;
 
     public String sendOtp(String phoneNumber, String otp) {
+        if (!org.springframework.util.StringUtils.hasText(apiKey)
+                || !org.springframework.util.StringUtils.hasText(apiUrl)) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE, "SMS chưa được cấu hình.");
+        }
         String message = "Mã OTP của bạn là: " + otp;
         String url = String.format("%s?to=%s&message=%s&apiKey=%s", apiUrl, phoneNumber, message, apiKey);
 

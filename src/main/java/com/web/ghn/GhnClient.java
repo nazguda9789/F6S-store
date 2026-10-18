@@ -1,109 +1,76 @@
 package com.web.ghn;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import java.util.HashMap;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.Map;
 
 @Service
 public class GhnClient {
-
-    @Value("${ghn.api.key}")
+    @Value("${ghn.api.key:}")
     private String apiKey;
-
-    @Value("${ghn.shopId}")
+    @Value("${ghn.shopId:}")
     private String shopId;
-
+    @Value("${ghn.base-url:https://dev-online-gateway.ghn.vn/shiip/public-api}")
+    private String baseUrl;
+    @Value("${ghn.from-district-id:3440}")
+    private Integer fromDistrictId;
+    @Value("${ghn.from-ward-code:13010}")
+    private String fromWardCode;
     private final RestTemplate restTemplate;
 
     public GhnClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public Map<String, Object> calculateShippingFee(Integer weight ,Integer toDistrictId, String toWardCode) {
+    private Map<String, Object> request(String path, Map<String, Object> data, boolean needsShop) {
+        if (!StringUtils.hasText(apiKey) || (needsShop && !StringUtils.hasText(shopId))) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Vận chuyển chưa được cấu hình. Vui lòng liên hệ cửa hàng.");
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.set("Token", apiKey);
-        headers.set("shopId", shopId);
-        headers.set("Content-Type", "application/json");
-
-        Map<String, Object> shippingData = new HashMap<>();
-        // nam từ liêm - hà nội
-        shippingData.put("from_district_id", 3440);
-        shippingData.put("from_ward_code", "13010");
-        shippingData.put("to_district_id", toDistrictId);
-        shippingData.put("to_ward_code", toWardCode);
-        shippingData.put("weight", weight);
-        shippingData.put("service_type_id", 2);
-
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(shippingData, headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(
-                "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
-                HttpMethod.POST,
-                request,
-                Map.class
-        );
-        System.out.println(response.toString());
-        return response.getBody();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (needsShop) headers.set("ShopId", shopId);
+        try {
+            Map<String, Object> body = restTemplate.exchange(
+                    baseUrl.replaceAll("/+$", "") + path, HttpMethod.POST,
+                    new HttpEntity<>(data, headers), Map.class).getBody();
+            if (body == null || !(body.get("code") instanceof Number)
+                    || ((Number) body.get("code")).intValue() != 200 || body.get("data") == null) {
+                throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                        "Dịch vụ vận chuyển chưa trả về dữ liệu hợp lệ.");
+            }
+            return body;
+        } catch (RestClientException ex) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Tạm thời không kết nối được dịch vụ vận chuyển. Vui lòng thử lại sau.");
+        }
     }
 
+    public Map<String, Object> calculateShippingFee(Integer weight, Integer district, String ward) {
+        if (weight == null || weight <= 0 || district == null || district <= 0 || !StringUtils.hasText(ward)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Khối lượng và địa chỉ giao hàng không hợp lệ.");
+        }
+        return request("/v2/shipping-order/fee", Map.of(
+                "from_district_id", fromDistrictId, "from_ward_code", fromWardCode,
+                "to_district_id", district, "to_ward_code", ward, "weight", weight,
+                "service_type_id", 2), true);
+    }
 
     public Map<String, Object> getProvince() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Token", apiKey);
-        headers.set("Content-Type", "application/json");
-
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(
-                "https://online-gateway.ghn.vn/shiip/public-api/master-data/province",
-                HttpMethod.POST,
-                request,
-                Map.class
-        );
-        return response.getBody();
+        return request("/master-data/province", Map.of(), false);
     }
-
-
     public Map<String, Object> getDistrict(Integer provinceId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Token", apiKey);
-        headers.set("Content-Type", "application/json");
-        Map<String, Object> data = new HashMap<>();
-        data.put("province_id", provinceId);
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(data,headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(
-                "https://online-gateway.ghn.vn/shiip/public-api/master-data/district",
-                HttpMethod.POST,
-                request,
-                Map.class
-        );
-        return response.getBody();
+        if (provinceId == null || provinceId <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tỉnh không hợp lệ.");
+        return request("/master-data/district", Map.of("province_id", provinceId), false);
     }
-
     public Map<String, Object> getWard(Integer districtId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Token", apiKey);
-        headers.set("Content-Type", "application/json");
-        Map<String, Object> data = new HashMap<>();
-        data.put("district_id", districtId);
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(data,headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(
-                "https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id",
-                HttpMethod.POST,
-                request,
-                Map.class
-        );
-        return response.getBody();
+        if (districtId == null || districtId <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quận/huyện không hợp lệ.");
+        return request("/master-data/ward", Map.of("district_id", districtId), false);
     }
-
-
 }

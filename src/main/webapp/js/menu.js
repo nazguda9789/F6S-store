@@ -2,6 +2,7 @@ $( document ).ready(function() {
     if (window.innerWidth < 992) {
         document.querySelectorAll('.item-category-header > a').forEach(link => {
             link.addEventListener('click', function (e) {
+                if (!this.parentElement.querySelector('.submenu-category')) return;
                 e.preventDefault();
 
                 const parent = this.parentElement;

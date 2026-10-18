@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="400" viewBox="0 0 480 400">
+ <rect width="480" height="400" fill="#eef2f5"/>
+ <circle cx="240" cy="167" r="96" fill="#e1e8ee"/>
+ <path d="M143 191l29-57 45 33 35 5 27 24 50 14q18 5 18 20H137q-9-25 6-39z" fill="#fff" stroke="#8395a7" stroke-width="4" stroke-linejoin="round"/>
+ <path d="M139 218h207M212 173l-8 15m25-11-8 15m26-10-8 15" stroke="#8395a7" stroke-width="4"/>
+ <text x="240" y="293" text-anchor="middle" fill="#142333" font-family="Arial,sans-serif" font-size="24" font-weight="700">F6S SPORT STORE</text>
+ <text x="240" y="323" text-anchor="middle" fill="#647184" font-family="Arial,sans-serif" font-size="15">Ảnh đang được cập nhật</text>
+</svg>

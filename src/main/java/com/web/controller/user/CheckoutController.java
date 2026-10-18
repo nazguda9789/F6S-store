@@ -82,8 +82,14 @@ public class CheckoutController {
         int roundedWeight = (int) Math.ceil(weight);
         model.addAttribute("weight", weight);
         model.addAttribute("roundedWeight", roundedWeight);
-        Map<String, Object> province = ghnClient.getProvince();
-        model.addAttribute("province", province);
+        try {
+            model.addAttribute("province", ghnClient.getProvince());
+            model.addAttribute("shippingAvailable", true);
+        } catch (org.springframework.web.server.ResponseStatusException ex) {
+            model.addAttribute("province", Map.of("data", List.of()));
+            model.addAttribute("shippingAvailable", false);
+            model.addAttribute("shippingWarning", ex.getReason());
+        }
 
         return "user/checkout";
     }

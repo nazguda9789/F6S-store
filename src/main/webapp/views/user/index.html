@@ -1,12 +1,30 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head th:include="common/user/libuser :: libheader">
+    <title>F6S — Giày thể thao cho từng bước bứt phá</title>
 </head>
 <body>
 <div th:replace="common/user/headerUser :: headerUser">
 
 </div>
 <div class="section-bottom-menu"></div>
+
+<section class="container f6s-hero" aria-labelledby="f6s-hero-title">
+    <div class="f6s-hero-copy">
+        <span class="f6s-eyebrow">F6S / THỂ THAO &amp; PHONG CÁCH</span>
+        <h1 id="f6s-hero-title">Chọn đôi giày.<br><em>Bứt phá giới hạn.</em></h1>
+        <p>Tìm đôi giày phù hợp với mặt sân, phong cách và nhịp vận động của bạn. Khám phá sản phẩm, chọn size và bắt đầu hành trình cùng F6S.</p>
+        <div class="f6s-hero-actions">
+            <a class="f6s-primary-link" href="#f6s-products">Khám phá sản phẩm <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 13 13 3M3 3h10v10" stroke="currentColor" stroke-width="1.8"/></svg></a>
+            <a class="f6s-secondary-link" href="/gioi-thieu">Tìm hiểu F6S</a>
+        </div>
+        <div class="f6s-hero-notes"><span>01 / Chọn size &amp; màu</span><span>02 / Đặt hàng trực tuyến</span><span>03 / Theo dõi đơn dễ dàng</span></div>
+    </div>
+    <div class="f6s-hero-art">
+        <img src="/image/passion.webp" alt="Cảm hứng thể thao và chuyển động" fetchpriority="high">
+        <div class="f6s-hero-caption"><span>MOVE WITH PURPOSE</span><strong>Mỗi bước đi, một dấu ấn.</strong></div>
+    </div>
+</section>
 
 
 <div th:if="${bannerSlider.size() > 0}" id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
@@ -15,7 +33,6 @@
                 data-bs-target="#carouselExampleIndicators"
                 th:data-bs-slide-to="${stat.index}" th:class="${stat.index == 0 ?'active':''}"
                 th:aria-current="${stat.index == 0 ?'true':''}"></button>
-        </button>
     </div>
     <div class="carousel-inner">
         <div th:each="b, stat : ${bannerSlider}"
@@ -63,8 +80,8 @@
                     <img src="image/icon-index-4.png" alt="">
                 </div>
                 <div class="shipping-text">
-                    <strong>HỖ TRỢ 24/7</strong>
-                    <span>Hỗ trợ khách hàng 24/7</span>
+                    <strong>HỖ TRỢ MUA HÀNG</strong>
+                    <span>Tư vấn qua trang liên hệ</span>
                 </div>
             </div>
         </div>
@@ -105,11 +122,12 @@
         </div>
     </div>
 </div>
-<section class="container py-5" aria-label="Sản phẩm gợi ý dành cho bạn">
+<section id="f6s-products" class="container py-5" aria-label="Sản phẩm bán chạy">
     <header class="mb-4 text-center">
         <h2 class="h3 mb-1">Sản Phẩm Bán Chạy Tại Shop</h2>
-        <p class="text-muted mb-0">Sản phẩm bán chạy, còn hàng, giá tốt hôm nay</p>
+        <p class="text-muted mb-0">Khám phá những lựa chọn được khách hàng quan tâm</p>
     </header>
+    <div th:if="${#lists.isEmpty(sanPhamBanChay)}" class="f6s-empty-state">Sản phẩm bán chạy đang được cập nhật. Bạn có thể khám phá các danh mục trên thanh điều hướng.</div>
     <div class="row g-3 g-md-4">
         <article th:each="p: ${sanPhamBanChay}" class="col-6 col-sm-6 col-md-4 col-lg-20p">
             <div class="product-card h-100" itemscope itemtype="https://schema.org/Product">
@@ -257,7 +275,7 @@
             <div class="d-flex">
                     <span class="item-sm-last-blog-index">
                         <i class="fa fa-calendar order1-item"></i>
-                        <span>20/10/2023</span>
+                        <span th:text="${lastBlog.createdDate == null ? '' : #temporals.format(lastBlog.createdDate, 'dd/MM/yyyy')}"></span>
                     </span>
                 <span class="item-sm-last-blog-index">
                         <i class="fa fa-eye"></i>

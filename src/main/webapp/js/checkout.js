@@ -1,59 +1,86 @@
-async function loadHuyen(){
-    var province = document.getElementById("province").value;
-    let provinceName = $('#province').find(':selected').data('name');
-    document.getElementById("provinceName").value = provinceName;
-    var res = await fetch(`/api/shipping/public/district?provinceId=${province}`, {});
-    var result = await res.json();
-    var list = result.data;
-    var main = '';
-    for(i=0; i< list.length; i++){
-        main += `<option data-name="${list[i].DistrictName}" value="${list[i].DistrictID}">${list[i].DistrictName}</option>`
-    }
-    document.getElementById("district").innerHTML = main
-    $("#district").select2({
-        placeholder: "Chọn huyện"
-    });
-    loadXa(list[0].DistrictID);
+// Address requests are versioned so a slow previous selection cannot overwrite the latest one.
+let addressVersion = 0;
+let feeVersion = 0;
+function shippingStatus(message) {
+    const status = document.getElementById("shipping-status");
+    status.hidden = !message;
+    status.textContent = message || "";
+    document.querySelectorAll(".place-order-btn").forEach(button => button.disabled = Boolean(message));
 }
-
-async function loadXa(){
-    var district = document.getElementById("district").value;
-    let districtName = $('#district').find(':selected').data('name');
-    document.getElementById("districtName").value = districtName;
-    var res = await fetch(`/api/shipping/public/wards?districtId=${district}`, {});
-    var result = await res.json();
-    var list = result.data;
-    var main = '';
-    for(i=0; i< list.length; i++){
-        main += `<option data-name="${list[i].WardName}" value="${list[i].WardCode}">${list[i].WardName}</option>`
-    }
-    document.getElementById("ward").innerHTML = main
-    $("#ward").select2({
-        placeholder: "Chọn xã"
-    });
-    calShipping();
+async function shippingRequest(url) {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Không tải được thông tin vận chuyển. Vui lòng thử chọn lại địa chỉ.");
+    const result = await response.json();
+    if (result.code !== 200 || result.data == null) throw new Error("Dữ liệu vận chuyển không hợp lệ.");
+    return result.data;
 }
-
-async function calShipping(){
-    let wardName = $('#ward').find(':selected').data('name');
-    document.getElementById("wardName").value = wardName;
-
-    var district = document.getElementById("district").value;
-    var ward = document.getElementById("ward").value;
-    var khoiluong = document.getElementById("khoiluong").value;
-    var res = await fetch(`/api/shipping/public/tinh-phi?toDistrictId=${district}&toWardCode=${ward}&weight=${khoiluong}`, {});
-    var result = await res.json();
-    var data = result.data;
-    var shippingFee = data.total;
-    document.getElementById("ship-cost-change").innerHTML = formatmoney(shippingFee)
-    document.getElementById("phiship").value = shippingFee
+function setAddressOptions(id, rows, key, label) {
+    const select = document.getElementById(id);
+    select.replaceChildren(...rows.map(row => {
+        const option = new Option(row[label], row[key]);
+        option.dataset.name = row[label];
+        return option;
+    }));
+    if (window.jQuery) $(select).trigger("change.select2");
 }
-
-
+function selectedName(id) {
+    return document.getElementById(id).selectedOptions[0]?.dataset.name || "";
+}
+async function loadHuyen() {
+    const version = ++addressVersion;
+    ++feeVersion;
+    setAddressOptions("district", [], "DistrictID", "DistrictName");
+    setAddressOptions("ward", [], "WardCode", "WardName");
+    shippingStatus("Đang tải địa chỉ giao hàng…");
+    document.getElementById("provinceName").value = selectedName("province");
+    try {
+        const rows = await shippingRequest("/api/shipping/public/district?provinceId=" +
+                encodeURIComponent(document.getElementById("province").value));
+        if (version !== addressVersion) return;
+        if (!Array.isArray(rows) || !rows.length) throw new Error("Chưa có quận/huyện cho tỉnh đã chọn.");
+        setAddressOptions("district", rows, "DistrictID", "DistrictName");
+        await loadXa();
+    } catch (error) { if (version === addressVersion) shippingStatus(error.message); }
+}
+async function loadXa() {
+    const version = ++addressVersion;
+    ++feeVersion;
+    setAddressOptions("ward", [], "WardCode", "WardName");
+    shippingStatus("Đang tải phường/xã…");
+    document.getElementById("districtName").value = selectedName("district");
+    try {
+        const rows = await shippingRequest("/api/shipping/public/wards?districtId=" +
+                encodeURIComponent(document.getElementById("district").value));
+        if (version !== addressVersion) return;
+        if (!Array.isArray(rows) || !rows.length) throw new Error("Chưa có phường/xã cho địa chỉ đã chọn.");
+        setAddressOptions("ward", rows, "WardCode", "WardName");
+        await calShipping();
+    } catch (error) { if (version === addressVersion) shippingStatus(error.message); }
+}
+async function calShipping() {
+    const version = ++feeVersion;
+    shippingStatus("Đang tính phí vận chuyển…");
+    document.getElementById("wardName").value = selectedName("ward");
+    try {
+        const params = new URLSearchParams({
+            toDistrictId: document.getElementById("district").value,
+            toWardCode: document.getElementById("ward").value,
+            weight: document.getElementById("khoiluong").value
+        });
+        const data = await shippingRequest("/api/shipping/public/tinh-phi?" + params);
+        if (version !== feeVersion) return;
+        const fee = Number(data.total);
+        if (!Number.isFinite(fee) || fee < 0) throw new Error("Phí vận chuyển không hợp lệ.");
+        const subtotal = Number(document.getElementById("total-tam-tinh").dataset.provisional);
+        const effective = subtotal >= 500000 ? 0 : fee;
+        const label = document.querySelector(".ship-cost-change");
+        label.textContent = formatmoney(effective);
+        label.dataset.shipcost = effective;
+        document.getElementById("phiship").value = effective;
+        if (typeof calTotalPrice === "function") calTotalPrice();
+        shippingStatus("");
+    } catch (error) { if (version === feeVersion) shippingStatus(error.message); }
+}
 function formatmoney(money) {
-    const VND = new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND',
-    });
-    return VND.format(money);
+    return new Intl.NumberFormat("vi-VN", {style: "currency", currency: "VND"}).format(money);
 }

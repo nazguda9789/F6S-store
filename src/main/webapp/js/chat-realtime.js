@@ -167,6 +167,7 @@ function initStaffWebSocket() {
 
 // Hàm load tin nhắn từ server
 async function loadStaffMessages() {
+    if (!document.getElementById('userIdChat')) return;
     try {
         const response = await fetch('/api/chat-realtime/user/my-chat');
         if (response.ok) {

@@ -152,7 +152,7 @@ async function changeQuantityCart(dataId, quantity){
 }
 
 
-document.querySelector(".btnthanhtoan").addEventListener("click", function () {
+document.querySelectorAll(".btnthanhtoan").forEach(button => button.addEventListener("click", function () {
     let checked = document.querySelectorAll("input[type='checkbox']:checked");
     let ids = [];
     checked.forEach(cb => ids.push(cb.value));
@@ -164,7 +164,7 @@ document.querySelector(".btnthanhtoan").addEventListener("click", function () {
     let queryString = uniqueIds.map(id => "detail=" + encodeURIComponent(id)).join("&");
 
     window.location.href = "/checkout?" + queryString;
-});
+}));
 
 
 document.addEventListener("change", function (e) {
