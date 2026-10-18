@@ -1,8 +1,13 @@
 /* Shared admin/employee refinements without changing navigation behavior. */
 body{font-family:"Segoe UI",Arial,sans-serif;background:#f3f6f9;color:#172b3e}
 .sb-sidenav-dark,.sb-topnav{background:#142333!important}
+.sb-topnav.navbar-light .navbar-brand,.sb-topnav .div-content-header,.sb-topnav.navbar-light .navbar-nav .nav-link,.sb-topnav #sidebarToggle{color:#f3f7fc!important}
+.sb-topnav.navbar-light .navbar-brand:hover,.sb-topnav.navbar-light .navbar-nav .nav-link:hover,.sb-topnav #sidebarToggle:hover{color:#ffba86!important}
+.sb-topnav .text-green{color:#9df1bc!important}.sb-topnav .dropdown-menu{background:#fff;border:1px solid #d4dee8}.sb-topnav .dropdown-item{color:#172b3e}
+.sb-topnav .dropdown-item:hover,.sb-topnav .dropdown-item:focus{background:#edf2f7;color:#123b5c}
+.sb-sidenav-light .nav-link:hover{background:#e5edf5;color:#143f60}.sb-sidenav-light .nav-link:hover .sb-nav-link-icon{color:#143f60}
 .sb-sidenav .nav-link{border-radius:8px;margin:3px 10px;font-size:14px}
-.sb-sidenav .nav-link:hover{background:#ffffff12;color:#fff}
+.sb-sidenav-dark .nav-link:hover{background:#ffffff12;color:#fff}
 .sb-sidenav-menu-heading{letter-spacing:1px;font-size:10px}
 .card{border:1px solid #dde5ed;border-radius:12px;box-shadow:0 3px 12px #14233307;overflow:hidden}
 .card-header{background:#fff;border-bottom:1px solid #e4eaf0;font-weight:650;padding:16px 20px}

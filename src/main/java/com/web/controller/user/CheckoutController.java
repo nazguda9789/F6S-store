@@ -55,6 +55,9 @@ public class CheckoutController {
     @Autowired
     private GhnClient ghnClient;
 
+    @Autowired
+    private com.web.service.ShippingPolicy shippingPolicy;
+
     @GetMapping({"/checkout"})
     public String checkoutView(Model model, HttpServletRequest request, HttpSession session, RedirectAttributes redirectAttributes,
                                @RequestParam(value = "detail", required = false) List<Long> detailIds ){
@@ -79,10 +82,14 @@ public class CheckoutController {
         model.addAttribute("voucherAvailable", voucherRepository.availableCheckout(cartResponse.getTotalAmount()));
         model.addAttribute("voucherNotAvailable", voucherRepository.notAvailableCheckout(cartResponse.getTotalAmount()));
         Float weight = cartService.getWeightCart(session, cartResponse);
-        int roundedWeight = (int) Math.ceil(weight);
+        int roundedWeight = (int) Math.ceil(weight * 1000);
         model.addAttribute("weight", weight);
         model.addAttribute("roundedWeight", roundedWeight);
-        try {
+        model.addAttribute("localShipping", shippingPolicy.isLocal());
+        if (shippingPolicy.isLocal()) {
+            model.addAttribute("province", Map.of("data", List.of()));
+            model.addAttribute("shippingAvailable", true);
+        } else try {
             model.addAttribute("province", ghnClient.getProvince());
             model.addAttribute("shippingAvailable", true);
         } catch (org.springframework.web.server.ResponseStatusException ex) {

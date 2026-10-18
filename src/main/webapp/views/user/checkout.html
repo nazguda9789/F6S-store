@@ -7,7 +7,7 @@
     <script src="/lib/js/select2.min.js"></script>
     <script src="/js/checkout.js"></script>
 </head>
-<body>
+<body th:data-shipping-mode="${localShipping ? 'local' : 'ghn'}">
 <div th:replace="common/user/headerUser :: headerUser">
 
 </div>
@@ -101,6 +101,21 @@
                     </div>
                 </div>
                     <div id="shipping-status" th:hidden="${shippingAvailable != false}" class="alert alert-warning" role="alert" th:text="${shippingWarning}"></div>
+                    <div th:if="${localShipping}" class="alert alert-info" role="status">Giao hàng do cửa hàng sắp xếp. Vui lòng nhập địa chỉ nhận hàng bên dưới.</div>
+                    <div th:if="${localShipping}" class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="local-province" class="form-label">Tỉnh / thành phố</label>
+                            <input id="local-province" name="provinceName" class="form-control" placeholder="Ví dụ: Hà Nội" autocomplete="address-level1" maxlength="100" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="local-ward" class="form-label">Phường / xã</label>
+                            <input id="local-ward" name="wardName" class="form-control" placeholder="Nhập phường / xã nhận hàng" autocomplete="address-level2" maxlength="100" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="local-district" class="form-label">Quận / huyện (nếu có)</label>
+                            <input id="local-district" name="districtName" class="form-control" placeholder="Nhập quận / huyện nếu địa chỉ có" maxlength="100">
+                        </div>
+                    </div>
                     <div class="form-group-inline">
                         <div class="form-group">
                             <div class="form-floating mb-3">
@@ -115,7 +130,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group-inline">
+                    <div th:unless="${localShipping}" class="form-group-inline">
                         <div class="form-group">
                             <select onchange="loadHuyen()" name="province" id="province" class="select2 select-province">
                                 <option value="-1" selected disabled>Chọn tỉnh</option>
@@ -124,7 +139,7 @@
                             <input type="hidden" name="provinceName" id="provinceName">
                         </div>
                         <div class="form-group">
-                            <select onchange="loadXa()" id="district" class="select2 select-ward">
+                            <select onchange="loadXa()" name="districtId" id="district" class="select2 select-ward">
                             </select>
                             <input type="hidden" name="districtName" id="districtName">
 
@@ -154,9 +169,10 @@
             <div class="checkout-section methods">
                 <div class="shipping-methods">
                     <h2>Phương thức vận chuyển</h2>
-                    <div class="radio-option ship-cost-checkout" th:if="${cartResponse.totalAmount < 500000}">
+                    <div class="radio-option ship-cost-checkout">
                         <label>
-                            Đơn hàng sẽ được gửi qua đơn vị vận chuyển Giao hàng nhanh
+                            <span th:if="${localShipping}">Cửa hàng sắp xếp giao hàng — phí theo chính sách hiển thị trong đơn.</span>
+                            <span th:unless="${localShipping}">Đơn hàng được gửi qua Giao hàng nhanh.</span>
                         </label>
                     </div>
                 </div>
@@ -203,6 +219,7 @@
         document.querySelector('.select2-container--open .select2-search__field').focus();
     });
     $( document ).ready(function() {
+        if (document.body.dataset.shippingMode === 'local') return;
         $('.select-province').select2({
             placeholder: "Chọn tỉnh, thành phố"
         });
@@ -293,6 +310,11 @@
             return false;
         }
 
+        if (document.body.dataset.shippingMode === 'local' &&
+                (!document.getElementById('local-province').value.trim() || !document.getElementById('local-ward').value.trim())) {
+            toastr.error("Vui lòng nhập tỉnh/thành phố và phường/xã nhận hàng.");
+            return false;
+        }
         if (address.length < 10) {
             toastr.error("Địa chỉ quá ngắn, vui lòng nhập đầy đủ.");
             return false;

@@ -17,7 +17,7 @@ public class EmailInvoice {
     private MailService mailService;
 
     public void buildOrderSuccessEmail(Invoice invoice, List<InvoiceDetail> details) {
-        if(invoice.getEmail() == null){
+        if(invoice.getEmail() == null || invoice.getEmail().isBlank()){
             return;
         }
         NumberFormat vnFormat = NumberFormat.getInstance(new Locale("vi", "VN"));

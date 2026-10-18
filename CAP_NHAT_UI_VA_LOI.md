@@ -1,5 +1,17 @@
 # Cập nhật giao diện và xử lý lỗi F6S — 18/10/2026
 
+## Bổ sung: nhập địa chỉ không phụ thuộc GHN và sửa header admin
+
+- Mặc định `SHIPPING_PROVIDER=local`: có ô nhập tỉnh/thành phố, phường/xã và quận/huyện tùy chọn; đặt COD không cần GHN. Cửa hàng tự sắp xếp giao hàng, không tự tạo vận đơn GHN.
+- Phí giao hàng nội bộ lấy từ `shipping.cost` (mặc định 30.000đ); miễn phí từ `amount.freeShipping` (mặc định 500.000đ). Backend tính phí, không tin giá trị `phiShip` do client gửi.
+- Chọn `SHIPPING_PROVIDER=ghn` để dùng danh sách tỉnh/huyện/xã qua GHN; phải có khóa/shop đúng môi trường. Backend tính lại phí GHN, đổi kg sang gram, không âm thầm chuyển sang local nếu GHN lỗi.
+- Header admin/nhân viên dùng chữ và icon sáng trên nền navy, menu tài khoản nền trắng/chữ tối; sửa hover sidebar sáng bị chữ trắng, logo điều hướng đúng trang.
+- Dùng thư viện nền tảng local cho header admin, Flatpickr 4.6.13 local cho lịch; không gắn sự kiện kéo/đóng widget đơn hàng khi widget không có trên trang.
+- Kiểm thử mới: 20 unit test Java đạt; 4 test JavaScript đạt. Trình duyệt tạo được đơn COD không có GHN, trang xác nhận mở được, database lưu đúng địa chỉ và phí 30.000đ. Đăng nhập admin và xác nhận chữ rgb(243,247,252) trên nền rgb(20,35,51). Lượt kiểm tra này không có lỗi JavaScript không được bắt.
+- Ảnh bổ sung: [checkout nhập địa chỉ](docs/images/f6s-local-checkout.png), [header admin](docs/images/f6s-admin-contrast.png).
+
+Các nội dung bên dưới ghi lại đợt sửa trước; quy tắc khóa checkout thiếu GHN chỉ áp dụng khi chọn chế độ GHN, không áp dụng cho chế độ local mới.
+
 ## Nội dung đã thêm/thay
 
 | Khu vực | Thay đổi |

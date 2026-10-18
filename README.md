@@ -4,7 +4,7 @@ F6S là ứng dụng Java Spring Boot phục vụ khách mua giày online và nh
 
 > Các mục chức năng dưới đây được ghi nhận từ mã nguồn hiện tại, không có nghĩa tất cả đã được kiểm thử hoàn chỉnh. Xem phần trạng thái kiểm chứng ở cuối tài liệu.
 
-Đợt sửa lỗi và làm mới giao diện ngày 18/10/2026: xem [chi tiết những nội dung đã thêm/thay](CAP_NHAT_UI_VA_LOI.md). Không cần import lại SQL. Checkout hiển thị cảnh báo và tạm khóa đặt hàng khi GHN chưa cấu hình; cấu hình token và shop ID đúng môi trường để dùng vận chuyển.
+Đợt sửa lỗi và làm mới giao diện ngày 18/10/2026: xem [chi tiết những nội dung đã thêm/thay](CAP_NHAT_UI_VA_LOI.md). Không cần import lại SQL. Mặc định `SHIPPING_PROVIDER=local`: nhập địa chỉ nhận hàng trực tiếp và đặt COD, cửa hàng tự sắp xếp vận chuyển; phí mặc định 30.000đ, miễn phí từ 500.000đ. Chỉ đặt `SHIPPING_PROVIDER=ghn` khi có tài khoản GHN hợp lệ; chế độ GHN vẫn chặn xác nhận khi không tải được địa chỉ/phí vận chuyển.
 
 ## 1. Website hiện có những gì?
 
@@ -157,7 +157,7 @@ Cài phần mềm và import SQL giúp chuẩn bị chạy local. Để dùng c�
 | Upload ảnh Cloudinary | Tạo tài khoản Cloudinary, đăng nhập admin → quản lý Cloudinary, thêm cloud name/API key/API secret và chọn cấu hình chính. Dữ liệu lưu bảng `cloud_key`; biến `CLOUDINARY_URL` không được service hiện tại sử dụng |
 | Google/Facebook login | Tạo ứng dụng OAuth của bạn, thay client ID trong profile dev và đặt `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET` hoặc `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_SECRET`. Cấu hình redirect URI tương ứng `http://localhost:8080/login/oauth2/code/google` hoặc `/facebook` trên trang nhà cung cấp |
 | VNPay | Tài khoản sandbox, `VNPAY_TMN_CODE`, `VNPAY_HASH_SECRET`; kiểm tra URL trả về khớp cấu hình và luồng thanh toán. Code mặc định gọi VNPay sandbox, không phải môi trường thu tiền thật |
-| GHN | Tài khoản/shop GHN đúng môi trường; đặt `GHN_API_KEY` (hoặc `GHN_TOKEN`) và `GHN_SHOP_ID`. Chỉnh `ghn.base-url` đúng dev/production; `GHN_FROM_DISTRICT_ID`, `GHN_FROM_WARD_CODE` là địa chỉ kho thực tế. Không có cấu hình hợp lệ thì checkout không xác nhận đơn |
+| GHN — tùy chọn | Mặc định giao hàng nội bộ không cần GHN. Để dùng GHN: đặt `SHIPPING_PROVIDER=ghn`, `GHN_API_KEY` (hoặc `GHN_TOKEN`), `GHN_SHOP_ID`, chỉnh `ghn.base-url` đúng dev/production và địa chỉ kho `GHN_FROM_DISTRICT_ID`/`GHN_FROM_WARD_CODE`. Chế độ GHN cần cấu hình hợp lệ để xác nhận đơn |
 | Telegram | Nếu cần bot, cấu hình `TELEGRAM_BOT_TOKEN` và `telegram.bot.username`. Khi thiếu token hoặc username, phần đăng ký bot thủ công được bỏ qua |
 | Chatbot AI | Đặt `GEMINI_API_KEY`/`GROQ_API_KEY` cho nhà cung cấp được sử dụng; phụ thuộc Internet, model và hạn mức API |
 | SMS | Có mã tích hợp SpeedSMS; cần kiểm tra luồng thực tế, `speedsms.api.key`/`speedsms.api.url` và client `SpeedSMSAPI` dùng `SPEEDSMS_TOKEN`. Chưa có một cấu hình thống nhất được xác minh cho mọi luồng SMS |
@@ -198,4 +198,4 @@ DANH_SACH_BO_SUNG.md            Danh sách sản phẩm, bài viết, tài kho�
 
 Đã kiểm tra bản SQL đầy đủ import được trên MySQL 8, bản bổ sung chạy lại không tăng số dòng và các liên kết sản phẩm–danh mục/size/màu không bị thiếu. Đã bổ sung kiểm thử cho cơ chế đặt lại mật khẩu admin.
 
-Ngày 18/10/2026 đã build bằng JDK 17, chạy đạt 15 unit test Java và 4 test JavaScript checkout; khởi động Spring Boot với MySQL 8. Trình duyệt đã kiểm tra trang chủ desktop/mobile, đăng nhập, giỏ hàng, bài viết, giới thiệu, chi tiết sản phẩm và checkout khi thiếu cấu hình GHN. Chưa kiểm chứng MariaDB/XAMPP, thanh toán thật, API dịch vụ bằng khóa thật hoặc toàn bộ nghiệp vụ từ đầu đến cuối. Xem phạm vi chi tiết tại [CAP_NHAT_UI_VA_LOI.md](CAP_NHAT_UI_VA_LOI.md).
+Ngày 18/10/2026 đã build bằng JDK 17, chạy đạt 20 unit test Java và 4 test JavaScript checkout; khởi động Spring Boot với MySQL 8. Trình duyệt đã kiểm tra các trang chính, tạo thành công đơn COD bằng địa chỉ nhập tay, xác nhận địa chỉ/phí ship lưu đúng và đăng nhập admin kiểm tra header sáng trên nền navy. Chưa kiểm chứng MariaDB/XAMPP, thanh toán thật, API dịch vụ bằng khóa thật hoặc toàn bộ nghiệp vụ từ đầu đến cuối. Xem phạm vi chi tiết tại [CAP_NHAT_UI_VA_LOI.md](CAP_NHAT_UI_VA_LOI.md).

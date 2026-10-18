@@ -5,7 +5,7 @@
 <body>
 
 <nav th:fragment="headerAdmin" class="sb-topnav navbar navbar-expand navbar-light bg-light">
-    <a class="navbar-brand ps-3" href="index.html">STORE</a>
+    <a class="navbar-brand ps-3" href="/emp-prj/qtht-001/invoice/list">F6S STAFF</a>
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
     <div class="div-content-header">
         <span>Đang truy cập <strong id="dangtruycap" class="text-green" th:text="${onlineUsers}"></strong></span>
@@ -262,6 +262,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const widget = document.getElementById('new-orders-widget');
             const closeBtn = document.getElementById('close-widget');
+            if (!widget || !closeBtn) return;
 
             let isDragging = false;
             let offsetX, offsetY;

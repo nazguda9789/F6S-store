@@ -42,6 +42,9 @@ public class InvoiceService {
     private CartService cartService;
 
     @Autowired
+    private ShippingPolicy shippingPolicy;
+
+    @Autowired
     private WardRepository wardRepository;
 
     @Autowired
@@ -122,14 +125,11 @@ public class InvoiceService {
             }
         }
         invoice.setUserId(user == null ? null : user.getId());
-        if(phiShip != null){
-            invoice.setShipCost(phiShip);
-        }
-        else{
-            invoice.setShipCost(shipCost);
-        }
-        if(invoice.getTotalAmount() >= amountFreeShipping){
-            invoice.setShipCost(0D);
+        try {
+            invoice.setShipCost(shippingPolicy.fee(invoice.getTotalAmount(),
+                    (int) Math.ceil(invoice.getWeight() * 1000), request));
+        } catch (org.springframework.web.server.ResponseStatusException ex) {
+            return new Result<>(false, null, ex.getReason());
         }
         invoice.setIpAddress(getIp(request));
 
@@ -231,14 +231,11 @@ public class InvoiceService {
             }
         }
         invoice.setUserId(user == null ? null : user.getId());
-        if(phiship != null){
-            invoice.setShipCost(phiship);
-        }
-        else{
-            invoice.setShipCost(shipCost);
-        }
-        if(invoice.getTotalAmount() >= amountFreeShipping){
-            invoice.setShipCost(0D);
+        try {
+            invoice.setShipCost(shippingPolicy.fee(invoice.getTotalAmount(),
+                    (int) Math.ceil(invoice.getWeight() * 1000), request));
+        } catch (org.springframework.web.server.ResponseStatusException ex) {
+            return new Result<>(false, null, ex.getReason());
         }
         invoice.setIpAddress(getIp(request));
 

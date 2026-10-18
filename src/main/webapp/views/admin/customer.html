@@ -9,7 +9,7 @@
   <title>Khách hàng</title>
   <head th:replace="common/libadmin :: libheaderadmin"></head>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+  <link href="/lib/css/flatpickr.min.css" rel="stylesheet">
 </head>
 <body class="sb-nav-fixed">
 <div th:replace="common/navbarAdmin :: headerAdmin"></div>
@@ -155,8 +155,8 @@
     </main>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+<script src="/lib/js/flatpickr.min.js"></script>
+<script src="/lib/js/flatpickr-vn.js"></script>
 <script>
   flatpickr("#fromDate", {
     dateFormat: "Y-m-d",
