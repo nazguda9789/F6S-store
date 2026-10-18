@@ -5,7 +5,7 @@
 
    ```text
    VNPAY_TMN_CODE=ELBGJW4B
-   VNPAY_HASH_SECRET=<khóa Sandbox mới của bạn>
+   VNPAY_HASH_SECRET= COVAANSJMDJDJVYLISYWSZMDINZNAVJB
    ```
 
    Không nhập dấu `< >`. Không gửi khóa qua chat, không lưu khóa vào Git. Nếu khóa đã bị chia sẻ, yêu cầu đổi khóa trong cổng VNPay Sandbox hoặc liên hệ hỗ trợ.
