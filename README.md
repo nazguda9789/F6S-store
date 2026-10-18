@@ -96,13 +96,15 @@ Nếu máy dùng cổng hoặc mật khẩu khác, đặt biến trong IntelliJ 
 
 Tạo cấu hình Run bằng cách mở `src/main/java/com/web/ShopgiaythethaoApplication.java`, chọn Run cạnh hàm `main`, sau đó Stop để chỉnh Environment variables.
 
-SQL chứa các email đăng nhập sau, nhưng chỉ giữ hash mật khẩu gốc:
+SQL chứa các email đăng nhập sau. Admin demo đã đặt mật khẩu `123123` (lưu BCrypt trong database); nhân viên vẫn giữ hash gốc, chưa biết mật khẩu rõ:
 
 | Vai trò | Email |
 |---|---|
 | Admin | `admin@gmail.com` |
 | Nhân viên | `nhanvien@gmail.com` |
 | Nhân viên | `employee@gmail.com` |
+
+**Admin demo: `admin@gmail.com` / `123123`. Chỉ dùng demo, đổi trước khi công khai web.** Cài mới bằng SQL mới có thể dùng ngay. Nếu đã import database trước đó, chọn đúng database trong phpMyAdmin rồi import [sql/dat_lai_admin_demo.sql](sql/dat_lai_admin_demo.sql) để đổi riêng admin có sẵn; không import lại file SQL đầy đủ vì sẽ xóa database. File reset không nâng quyền nhân viên/khách hàng và không tạo admin nếu chưa tồn tại. Git pull không tự đổi mật khẩu database đang chạy.
 
 ### Đặt mật khẩu mới cho admin
 

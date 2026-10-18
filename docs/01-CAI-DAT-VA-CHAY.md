@@ -64,7 +64,9 @@ Profile mặc định là `dev`. Các giá trị mặc định phục vụ XAMPP
 
 Nếu MySQL chạy cổng 3307 thì sửa URL datasource sang 3307, không sửa cổng Apache để giải quyết lỗi kết nối database. Không dùng tài khoản root/mật khẩu trống khi triển khai công khai.
 
-Để tạo/reset admin, thêm tạm:
+Admin demo trong SQL mới: **`admin@gmail.com` / `123123`** (database lưu BCrypt). Chỉ dùng cho demo, đổi trước khi public. Nếu database đã được import từ bản cũ, chọn đúng database trong phpMyAdmin rồi import [dat_lai_admin_demo.sql](../sql/dat_lai_admin_demo.sql); file chỉ reset admin này nếu đã tồn tại, không tạo mới/nâng quyền user và không xóa sản phẩm/đơn. Pull Git không tự cập nhật database. Không import lại `f6s_shop.sql` để chỉ đổi mật khẩu.
+
+Nếu muốn tạo admin khác hoặc dùng mật khẩu riêng, thêm tạm:
 
 ```text
 F6S_ADMIN_EMAIL=admin@gmail.com

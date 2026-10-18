@@ -1,6 +1,6 @@
 # Danh sách dữ liệu bổ sung từ shopgiaythethao.sql
 
-Giữ nguyên dữ liệu mẫu cũ. Các bảng Java được bổ sung vì ứng dụng không đọc bảng tiếng Việt. Không sao chép khách hàng, đơn hàng, tin nhắn, OTP, phiên đăng nhập hoặc khóa dịch vụ. Mật khẩu tài khoản được giữ dưới dạng hash gốc, không biết mật khẩu rõ.
+Giữ nguyên dữ liệu mẫu cũ. Các bảng Java được bổ sung vì ứng dụng không đọc bảng tiếng Việt. Không sao chép khách hàng, đơn hàng, tin nhắn, OTP, phiên đăng nhập hoặc khóa dịch vụ. Admin demo đã được đổi thành `admin@gmail.com` / `123123`, lưu BCrypt; tài khoản nhân viên giữ hash gốc, chưa biết mật khẩu rõ. Đổi mật khẩu demo trước khi công khai web.
 
 ## Sản phẩm
 
@@ -104,6 +104,6 @@ Giữ 176 biến thể trong `product_detail`. Khi ánh xạ sang bảng tiếng
 
 ## Cách import
 
-Đã kiểm thử trên MySQL 8: import đầy đủ thành công và import bổ sung lần hai không tạo thêm dòng. Không có liên kết thiếu giữa sản phẩm/danh mục hoặc sản phẩm/size/màu. Không đưa vào khách hàng ROLE_USER hay remember_key. Chưa kiểm thử Spring Boot hoặc MariaDB. Mật khẩu không thể suy ra từ hash; dùng mật khẩu gốc đã biết hoặc tạo tài khoản quản trị riêng theo README.
+Đã kiểm thử trên MySQL 8: import đầy đủ thành công và import bổ sung lần hai không tạo thêm dòng. Không có liên kết thiếu giữa sản phẩm/danh mục hoặc sản phẩm/size/màu. Không đưa vào khách hàng ROLE_USER hay remember_key. Mật khẩu nhân viên không thể suy ra từ hash; dùng mật khẩu gốc đã biết hoặc tạo tài khoản quản trị riêng theo README. Với database cũ, đổi riêng admin demo bằng [sql/dat_lai_admin_demo.sql](sql/dat_lai_admin_demo.sql), không import lại file đầy đủ. Bản bổ sung dùng INSERT IGNORE nên không tự đổi mật khẩu tài khoản đã tồn tại. Các kiểm chứng ứng dụng mới hơn xem [README](README.md); chưa xác minh MariaDB/XAMPP.
 
 Database mới: import `f6s_shop.sql` (có DROP DATABASE, cần sao lưu). Database đang dùng: sao lưu, chọn database `f6s_shop` trong phpMyAdmin, import `sql/bo_sung_du_lieu.sql` để giữ dữ liệu hiện có. Bản bổ sung bỏ qua ID đã tồn tại trong bảng Java, không cập nhật/ghi đè dòng đó. Bảng tiếng Việt tránh trùng tên sản phẩm và email; bài viết so sánh tiêu đề và nội dung. Bài viết nguồn không có tác giả được gắn admin trong bảng tiếng Việt; bảng Java giữ NULL gốc.
