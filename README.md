@@ -4,7 +4,21 @@ F6S là ứng dụng Java Spring Boot phục vụ khách mua giày online và nh
 
 > Các mục chức năng dưới đây được ghi nhận từ mã nguồn hiện tại, không có nghĩa tất cả đã được kiểm thử hoàn chỉnh. Xem phần trạng thái kiểm chứng ở cuối tài liệu.
 
-Đợt sửa lỗi và làm mới giao diện ngày 18/10/2026: xem [chi tiết những nội dung đã thêm/thay](CAP_NHAT_UI_VA_LOI.md). Không cần import lại SQL. Mặc định `SHIPPING_PROVIDER=local`: nhập địa chỉ nhận hàng trực tiếp và đặt COD, cửa hàng tự sắp xếp vận chuyển; phí mặc định 30.000đ, miễn phí từ 500.000đ. Chỉ đặt `SHIPPING_PROVIDER=ghn` khi có tài khoản GHN hợp lệ; chế độ GHN vẫn chặn xác nhận khi không tải được địa chỉ/phí vận chuyển.
+## Bộ hướng dẫn đầy đủ
+
+| Mục | Nội dung |
+|---|---|
+| [Mục lục tài liệu](docs/README.md) | Chọn hướng dẫn theo người chạy demo, người nhận code hoặc người viết báo cáo |
+| [01 — Cài đặt và chạy web](docs/01-CAI-DAT-VA-CHAY.md) | Cần tải gì, IntelliJ + XAMPP, import SQL, admin, chạy và cập nhật |
+| [02 — Kiến trúc và model](docs/02-KIEN-TRUC-VA-MODEL.md) | MVC, cấu trúc source, entity/DTO, bảng và sơ đồ quan hệ |
+| [03 — Chức năng và phân quyền](docs/03-CHUC-NANG-VA-PHAN-QUYEN.md) | Module, màn hình, vai trò, đường dẫn, API và trạng thái hoàn thiện |
+| [04 — Luồng nghiệp vụ](docs/04-LUONG-NGHIEP-VU.md) | Giỏ, COD, VNPay, địa chỉ, tại quầy, trạng thái, tài khoản và thống kê |
+| [05 — Cấu hình và tích hợp](docs/05-CAU-HINH-VA-TICH-HOP.md) | Biến môi trường, email, upload, OAuth, GHN, VNPay/ngrok và bot |
+| [06 — Kiểm thử và xử lý lỗi](docs/06-KIEM-THU-VA-XU-LY-LOI.md) | Lệnh test, checklist, lỗi thường gặp và giới hạn trước production |
+
+Phần dưới là hướng dẫn nhanh; bộ tài liệu trên giải thích chi tiết theo mã nguồn hiện tại. Không cần bật GitHub Wiki hay cài thêm phần mềm để đọc.
+
+Đợt sửa lỗi và làm mới giao diện ngày 18/10/2026: xem [chi tiết những nội dung đã thêm/thay](CAP_NHAT_UI_VA_LOI.md). Không cần import lại SQL. Mặc định `SHIPPING_PROVIDER=local`: chọn/tìm Tỉnh/Thành phố → Phường/Xã → tự điền Quận/Huyện, hỗ trợ nhập địa chỉ mới ngoài danh mục cũ trước 07/2025; cửa hàng tự sắp xếp vận chuyển. Phí mặc định 30.000đ, miễn phí từ 500.000đ. Chỉ đặt `SHIPPING_PROVIDER=ghn` khi có tài khoản GHN hợp lệ; chế độ GHN vẫn chặn xác nhận khi không tải được địa chỉ/phí vận chuyển.
 
 ## 1. Website hiện có những gì?
 
@@ -198,4 +212,4 @@ DANH_SACH_BO_SUNG.md            Danh sách sản phẩm, bài viết, tài kho�
 
 Đã kiểm tra bản SQL đầy đủ import được trên MySQL 8, bản bổ sung chạy lại không tăng số dòng và các liên kết sản phẩm–danh mục/size/màu không bị thiếu. Đã bổ sung kiểm thử cho cơ chế đặt lại mật khẩu admin.
 
-Ngày 18/10/2026 đã build bằng JDK 17, chạy đạt 20 unit test Java và 4 test JavaScript checkout; khởi động Spring Boot với MySQL 8. Trình duyệt đã kiểm tra các trang chính, tạo thành công đơn COD bằng địa chỉ nhập tay, xác nhận địa chỉ/phí ship lưu đúng và đăng nhập admin kiểm tra header sáng trên nền navy. Chưa kiểm chứng MariaDB/XAMPP, thanh toán thật, API dịch vụ bằng khóa thật hoặc toàn bộ nghiệp vụ từ đầu đến cuối. Xem phạm vi chi tiết tại [CAP_NHAT_UI_VA_LOI.md](CAP_NHAT_UI_VA_LOI.md).
+Ngày 18/10/2026 đã build bằng JDK 17; các lượt kiểm chứng gần nhất đạt 22 unit test Java chọn lọc và 9 test JavaScript, khởi động Spring Boot với MySQL 8. Trình duyệt đã kiểm tra các trang chính, tạo thành công đơn COD bằng địa chỉ local, xác nhận địa chỉ/phí ship lưu đúng và đăng nhập admin kiểm tra header sáng trên nền navy. Đã kiểm tra tìm/chọn địa chỉ, tự điền quận, nhập địa chỉ mới và tình huống không tải được danh mục. Chưa kiểm chứng MariaDB/XAMPP, thanh toán thật, API dịch vụ bằng khóa thật hoặc toàn bộ nghiệp vụ từ đầu đến cuối. Xem [kiểm thử và giới hạn](docs/06-KIEM-THU-VA-XU-LY-LOI.md) và [chi tiết cập nhật](CAP_NHAT_UI_VA_LOI.md).
