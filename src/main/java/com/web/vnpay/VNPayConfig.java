@@ -15,9 +15,18 @@ import java.util.*;
 @Component
 public class VNPayConfig {
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_TmnCode = java.util.Objects.requireNonNullElse(System.getenv("VNPAY_TMN_CODE"), "");
+    public static String vnp_TmnCode = java.util.Objects.requireNonNullElse(System.getenv("VNPAY_TMN_CODE"), "ELBGJW4B").trim();
     public static String vnp_HashSecret = java.util.Objects.requireNonNullElse(System.getenv("VNPAY_HASH_SECRET"), "");
     public static String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+
+    public static void requireConfigured() {
+        if (vnp_TmnCode == null || vnp_TmnCode.isBlank()
+                || vnp_HashSecret == null || vnp_HashSecret.isBlank()) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE,
+                    "VNPay Sandbox chưa được cấu hình. Hãy đặt VNPAY_TMN_CODE và VNPAY_HASH_SECRET trong cấu hình Run rồi khởi động lại.");
+        }
+    }
 
     public static String md5(String message) {
         String digest = null;

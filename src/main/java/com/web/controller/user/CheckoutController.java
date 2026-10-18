@@ -158,6 +158,13 @@ public class CheckoutController {
             return "redirect:/cart";
         }
 
+        try {
+            com.web.vnpay.VNPayConfig.requireConfigured();
+        } catch (org.springframework.web.server.ResponseStatusException ex) {
+            redirectAttributes.addFlashAttribute(TypeSystem.ERROR, ex.getReason());
+            return "redirect:/checkout?" + detailIds.stream().map(id -> "detail=" + id)
+                    .collect(java.util.stream.Collectors.joining("&"));
+        }
         Result<?> result = invoiceService.createInvoiceSession(session, request, fullName, email, phone, provinceName, districtName, wardName, addressDetail, voucher, note, detailIds, phiShip);
         if(!result.isSuccess()){
             redirectAttributes.addFlashAttribute(TypeSystem.ERROR, result.getMessage());
