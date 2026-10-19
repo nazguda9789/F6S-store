@@ -13,6 +13,7 @@ import com.web.enums.UserType;
 import com.web.exception.MessageException;
 import com.web.repository.CategoryRepository;
 import com.web.repository.OtpCodeRepository;
+import com.web.repository.PendingRegistrationRepository;
 import com.web.repository.UserRepository;
 import com.web.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ public class UserService {
     private OtpCodeRepository otpCodeRepository;
 
     @Autowired
+    private PendingRegistrationRepository pendingRegistrationRepository;
+
+    @Autowired
     private MailService mailService;
 
     @Autowired
@@ -63,112 +67,105 @@ public class UserService {
 
     @org.springframework.transaction.annotation.Transactional
     public void registerUser(String email, String rawPassword, String fullName, String phone, String rePassword) {
-        email = email == null ? null : email.trim().toLowerCase(java.util.Locale.ROOT);
-        if(email == null){
-            throw new MessageException("Email không được để trống");
-        }
-        if(rawPassword == null){
-            throw new MessageException("Mật khẩu không được để trống");
-        }
-        if(fullName == null){
-            throw new MessageException("Họ tên không được để trống");
-        }
-        if(userRepository.findByEmail(email).isPresent()) {
-            throw new MessageException("Email đã tồn tại");
-        }
-        if(EmailValidator.isValidEmail(email) == false){
-            throw new MessageException("Email không hợp lệ");
-        }
-        if(phone != null){
-            if(PhoneValidator.isValidPhone(phone) == false){
-                throw new MessageException("Số điện thoại không hợp lệ");
-            }
-        }
-        if(rawPassword == null || rawPassword.length() < 6){
+        email = normalizedEmail(email);
+        if (!EmailValidator.isValidEmail(email)) throw new MessageException("Email không hợp lệ");
+        if (!StringUtils.hasText(fullName)) throw new MessageException("Họ tên không được để trống");
+        if (phone != null && !phone.isBlank() && !PhoneValidator.isValidPhone(phone))
+            throw new MessageException("Số điện thoại không hợp lệ");
+        if (rawPassword == null || rawPassword.length() < 6)
             throw new MessageException("Mật khẩu tối thiểu 6 ký tự");
-        }
-        if(!rawPassword.equals(rePassword)){
-            throw new MessageException("Mật khẩu không hợp lệ");
-        }
+        if (!rawPassword.equals(rePassword)) throw new MessageException("Mật khẩu nhập lại không khớp");
+        if (userRepository.findByEmail(email).isPresent())
+            throw new MessageException("Email đã tồn tại. Nếu chưa xác thực, mở bước xác thực để gửi lại mã.");
+        var previous = pendingRegistrationRepository.findForUpdate(email);
+        if (previous.isPresent() && previous.get().getExpiresAt().isAfter(LocalDateTime.now()))
+            throw new MessageException("Email đang chờ xác thực. Hãy mở bước xác thực để gửi lại mã.");
         mailService.requireConfigured();
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(rawPassword));
-        user.setFullName(fullName);
-        user.setPhone(phone);
-        user.setRole(Role.ROLE_USER);
-        user.setActived(true);
-        user.setDeleted(false);
-        user.setUserType(UserType.NORMAL);
-        user.setActivationStatus(false);
-        user.setCreatedDate(LocalDateTime.now());
-        userRepository.save(user);
-
-        // Tạo OTP
-        String otp = sendOtp.genOtp();
-        OtpCode otpCode = new OtpCode();
-        otpCode.setEmail(email);
-        otpCode.setCode(otp);
-        otpCode.setOtpType(OtpType.REGISTER_OTP);
-        otpCode.setExpiryTime(LocalDateTime.now().plusMinutes(maxTimeVerify));
-        otpCode.setUsed(false);
-        otpCode.setLocalDateTime(LocalDateTime.now());
-        otpCodeRepository.save(otpCode);
-
-        // Gửi email OTP
-        sendOtp.sendOtp(email, otpCode.getCode());
+        var pending = new com.web.entity.PendingRegistration();
+        pending.setEmail(email);
+        pending.setPasswordHash(passwordEncoder.encode(rawPassword));
+        pending.setFullName(fullName.trim());
+        pending.setPhone(phone);
+        pending.setCreatedDate(LocalDateTime.now());
+        pending.setExpiresAt(LocalDateTime.now().plusMinutes(maxTimeVerify));
+        pendingRegistrationRepository.save(pending);
+        OtpCode code = newRegistrationCode(email);
+        otpCodeRepository.save(code);
+        sendOtp.sendOtp(email, code.getCode());
+        otpCodeRepository.invalidatePreviousRegistrationCodes(email, code.getId());
+        // No users row is created until the email owner verifies the code.
     }
 
     @org.springframework.transaction.annotation.Transactional
     public boolean verifyOtp(String email, String otp) {
-        email = email == null ? null : email.trim().toLowerCase(java.util.Locale.ROOT);
-        Optional<OtpCode> opt = otpCodeRepository.findByEmailAndCodeAndUsedFalse(email, otp);
-        if(opt.isPresent()) {
-            OtpCode otpCode = opt.get();
-            if(otpCode.getExpiryTime().isAfter(LocalDateTime.now())) {
-                otpCode.setUsed(true);
-                otpCodeRepository.save(otpCode);
-                // Kích hoạt user
-                User user = userRepository.findByEmail(email).get();
-                user.setActivationStatus(true);
-                userRepository.save(user);
-                return true;
-            }
-            else{
-                throw new MessageException("Mã kích hoạt đã hết hạn");
-            }
+        email = normalizedEmail(email);
+        var pending = pendingRegistrationRepository.findForUpdate(email).orElse(null);
+        OtpCode code = otpCodeRepository.findByEmailAndCodeAndUsedFalse(email, otp)
+                .orElseThrow(() -> new MessageException("Mã kích hoạt không chính xác hoặc đã dùng"));
+        if (!code.getExpiryTime().isAfter(LocalDateTime.now()))
+            throw new MessageException("Mã kích hoạt đã hết hạn");
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (pending != null) {
+            if (!pending.getExpiresAt().isAfter(LocalDateTime.now()))
+                throw new MessageException("Yêu cầu đăng ký đã hết hạn. Vui lòng gửi lại mã.");
+            if (user != null) throw new MessageException("Tài khoản đã tồn tại. Vui lòng đăng nhập.");
+            user = new User();
+            user.setEmail(email); user.setPassword(pending.getPasswordHash());
+            user.setFullName(pending.getFullName()); user.setPhone(pending.getPhone());
+            user.setRole(Role.ROLE_USER); user.setUserType(UserType.NORMAL);
+            user.setActived(true); user.setDeleted(false); user.setCreatedDate(LocalDateTime.now());
+        } else if (!isLegacyPending(user)) {
+            throw new MessageException("Không còn yêu cầu đăng ký cần xác thực. Vui lòng đăng nhập hoặc đăng ký lại.");
         }
-        else{
-            throw new MessageException("Mã kích hoạt không chính xác");
-        }
+        user.setActivationStatus(true);
+        userRepository.save(user);
+        code.setUsed(true);
+        otpCodeRepository.save(code);
+        otpCodeRepository.invalidatePreviousRegistrationCodes(email,code.getId());
+        if (pending != null) pendingRegistrationRepository.delete(pending);
+        return true;
     }
 
     @org.springframework.transaction.annotation.Transactional
     public void sendNewOtp(String email) {
-        email = email == null ? null : email.trim().toLowerCase(java.util.Locale.ROOT);
-        Optional<User> user = userRepository.findByEmail(email);
-        if(user.isEmpty()){
-            throw new MessageException("Có lỗi xảy ra");
-        }
-        if(Boolean.TRUE.equals(user.get().getActivationStatus())){
-            throw new MessageException("Có lỗi xảy ra");
-        }
+        email = normalizedEmail(email);
+        var pending = pendingRegistrationRepository.findForUpdate(email).orElse(null);
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user != null && !isLegacyPending(user))
+            throw new MessageException("Tài khoản không cần xác thực hoặc không khả dụng. Vui lòng đăng nhập.");
+        if (pending == null && !isLegacyPending(user))
+            throw new MessageException("Không tìm thấy yêu cầu đăng ký. Vui lòng đăng ký trước.");
         mailService.requireConfigured();
         otpCodeRepository.findTopByEmailAndOtpTypeOrderByLocalDateTimeDesc(email, OtpType.REGISTER_OTP)
                 .filter(previous -> previous.getLocalDateTime() != null
                         && previous.getLocalDateTime().isAfter(LocalDateTime.now().minusSeconds(60)))
                 .ifPresent(previous -> { throw new MessageException("Vui lòng chờ 60 giây trước khi gửi lại mã."); });
-        String otp = sendOtp.genOtp();
-        OtpCode otpCode = new OtpCode();
-        otpCode.setEmail(email);
-        otpCode.setOtpType(OtpType.REGISTER_OTP);
-        otpCode.setCode(otp);
-        otpCode.setExpiryTime(LocalDateTime.now().plusMinutes(maxTimeVerify));
-        otpCode.setUsed(false);
-        otpCode.setLocalDateTime(LocalDateTime.now());
-        otpCodeRepository.save(otpCode);
-        sendOtp.sendOtp(email, otp);
-        otpCodeRepository.invalidatePreviousRegistrationCodes(email, otpCode.getId());
+        OtpCode code = newRegistrationCode(email);
+        otpCodeRepository.save(code);
+        sendOtp.sendOtp(email, code.getCode());
+        otpCodeRepository.invalidatePreviousRegistrationCodes(email, code.getId());
+        if (pending != null) {
+            pending.setExpiresAt(LocalDateTime.now().plusMinutes(maxTimeVerify));
+            pendingRegistrationRepository.save(pending);
+        }
+    }
+
+    private String normalizedEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase(java.util.Locale.ROOT);
+    }
+
+    private boolean isLegacyPending(User user) {
+        return user != null && user.getRole() == Role.ROLE_USER && user.getUserType() == UserType.NORMAL
+                && !Boolean.TRUE.equals(user.getActivationStatus()) && Boolean.TRUE.equals(user.getActived())
+                && !Boolean.TRUE.equals(user.getDeleted()) && user.isAccountNonLocked();
+    }
+
+    private OtpCode newRegistrationCode(String email) {
+        OtpCode code = new OtpCode();
+        code.setEmail(email); code.setCode(sendOtp.genOtp()); code.setOtpType(OtpType.REGISTER_OTP);
+        code.setExpiryTime(LocalDateTime.now().plusMinutes(maxTimeVerify));
+        code.setUsed(false); code.setLocalDateTime(LocalDateTime.now());
+        return code;
     }
 
     public Result<Void> sendMailForgotPass(String email){

@@ -16,8 +16,11 @@ F6S là ứng dụng Java Spring Boot phục vụ khách mua giày online và nh
 | [05 — Cấu hình và tích hợp](docs/05-CAU-HINH-VA-TICH-HOP.md) | Biến môi trường, email, upload, OAuth, GHN, VNPay/ngrok và bot |
 | [06 — Kiểm thử và xử lý lỗi](docs/06-KIEM-THU-VA-XU-LY-LOI.md) | Lệnh test, checklist, lỗi thường gặp và giới hạn trước production |
 | [07 — Sửa email và cập nhật nội dung](docs/07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md) | Cấu hình gửi mã đăng ký, 5 banner từ source cũ, 12 danh mục đủ ít nhất 3 sản phẩm |
+| [08 — Đăng nhập Google và xác thực](docs/08-DANG-NHAP-GOOGLE-VA-XAC-THUC.md) | Sửa Google, chỉ tạo tài khoản sau OTP, điều hướng an toàn và xử lý trang 404 |
 
 Phần dưới là hướng dẫn nhanh; bộ tài liệu trên giải thích chi tiết theo mã nguồn hiện tại. Không cần bật GitHub Wiki hay cài thêm phần mềm để đọc.
+
+Cập nhật đăng nhập 19/10: đăng ký email mới chỉ lưu yêu cầu chờ trong `pending_registration`, chưa thêm vào `users` trước OTP. Google yêu cầu email đã xác minh, lấy đúng ID/quyền tài khoản và không đưa người dùng về URL cache sai. Cấu hình **cả Client ID và Client Secret** của Google Web application; xem [hướng dẫn Google/OTP và schema cập nhật](docs/08-DANG-NHAP-GOOGLE-VA-XAC-THUC.md). Không tự xóa hoặc kích hoạt hàng loạt tài khoản chờ cũ.
 
 Cập nhật 19/10/2026: sửa đăng ký báo thành công dù email gửi thất bại; SMTP thiếu/sai cấu hình sẽ báo lỗi và rollback đăng ký. Bạn vẫn cần đặt `MAIL_USERNAME`/`MAIL_PASSWORD` hợp lệ trên máy chạy (không có khóa gửi mail chung trong Git). Đã khôi phục 3 slider + 2 banner phụ từ ảnh source cũ và bổ sung 4 liên kết để cả 12 danh mục trong seed có ít nhất 3 sản phẩm đang bật; không tạo sản phẩm giả. Database cũ chỉ cần import [script cập nhật nội dung](sql/cap_nhat_noi_dung_20261019.sql), không import lại SQL đầy đủ. [Chi tiết cách cấu hình và danh sách thay đổi](docs/07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md).
 

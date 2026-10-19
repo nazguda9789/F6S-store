@@ -51,10 +51,8 @@ public class GlobalModelAttributes {
 
     @ModelAttribute
     public void addGlobalAttributes(Model model, HttpServletRequest request, @AuthenticationPrincipal Object principal, HttpSession session) {
-        model.addAttribute("googleLoginAvailable", org.springframework.util.StringUtils.hasText(
-                environment.getProperty("spring.security.oauth2.client.registration.google.client-secret")));
-        model.addAttribute("facebookLoginAvailable", org.springframework.util.StringUtils.hasText(
-                environment.getProperty("spring.security.oauth2.client.registration.facebook.client-secret")));
+        model.addAttribute("googleLoginAvailable", com.web.config.OAuthAvailabilityFilter.available(environment,"google"));
+        model.addAttribute("facebookLoginAvailable", com.web.config.OAuthAvailabilityFilter.available(environment,"facebook"));
         List<Category> listParents = categoryService.getParentCategoriesUser();
         model.addAttribute("categories", listParents);
         String currentUrl = request.getRequestURI();

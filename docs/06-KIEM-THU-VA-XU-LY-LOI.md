@@ -13,25 +13,28 @@
 | `ShippingPolicyTests` | Phí local/GHN, ngưỡng miễn phí, dữ liệu sai | 5 |
 | `VNPayServiceTests` | Thiếu cấu hình, URL/chữ ký, tiền, múi giờ, thời hạn | 2 |
 | `MailServiceTests` | From cấu hình, gửi đồng bộ, lỗi SMTP/mất cấu hình, mail tùy chọn | 4 |
-| `RegistrationTests` | Email chuẩn hóa, cấu hình, lỗi gửi, gửi lại và mã hết hạn | 7 |
+| `RegistrationTests` | Yêu cầu chờ, không tạo user trước OTP, lỗi mail, gửi lại, tài khoản cũ và mã hết hạn | 10 |
 | `BannerServiceTests` | Trang chủ không khớp banner mọi trang, giữ quy ước trang khác | 2 |
+| `OAuthAccountServiceTests` | Google email xác minh, role, liên kết, mật khẩu chờ và tài khoản khóa/xóa | 11 |
+| `AuthFlowTests` | Redirect, trạng thái tài khoản, principal email và cấu hình OAuth | 13 |
 | JavaScript checkout | Danh sách địa chỉ rỗng, lỗi provider, phí và miễn phí | 4 |
 | JavaScript địa chỉ local | Phường trùng tên, tự điền/reset, tìm không dấu, nhập mới, lỗi dữ liệu, tính toàn vẹn danh mục | 5 |
+| JavaScript presence | Không gửi trước khi socket mở, dừng khi rời trang, kết nối lại khi khôi phục trang | 3 |
 
-Tổng lượt kiểm chứng gần nhất: **35 test Java chọn lọc, 9 test JavaScript**. Đây không phải coverage toàn bộ ứng dụng. Test VNPay dùng khóa giả, SMTP dùng sink cục bộ; test/mock dịch vụ không chứng minh nhà cung cấp thật đã chấp nhận giao dịch hoặc thư tới Inbox.
+Tổng lượt kiểm chứng gần nhất: **62 test Java chọn lọc, 12 test JavaScript**. Đây không phải coverage toàn bộ ứng dụng. VNPay dùng khóa giả, SMTP dùng sink, Google dùng provider giả lập cục bộ cho vòng authorization/code/token/userinfo/callback. Chưa chứng minh Google Client thật hoạt động hoặc thư tới Inbox.
 
 ## 2. Lệnh chạy lại
 
 PowerShell tại thư mục có `pom.xml`, JDK 17:
 
 ```powershell
-.\mvnw.cmd "-Dtest=DataInitializerTests,GhnClientTests,CloudinaryServiceTests,ChatRealtimeApiTests,ShippingPolicyTests,VNPayServiceTests,MailServiceTests,RegistrationTests,BannerServiceTests" test
+.\mvnw.cmd "-Dtest=DataInitializerTests,GhnClientTests,CloudinaryServiceTests,ChatRealtimeApiTests,ShippingPolicyTests,VNPayServiceTests,MailServiceTests,RegistrationTests,BannerServiceTests,OAuthAccountServiceTests,AuthFlowTests" test
 ```
 
 JavaScript cần Node.js nhưng không cần `npm install` vì các test hiện dùng thư viện chuẩn:
 
 ```powershell
-node --test src/test/js/checkout.test.cjs src/test/js/local-address.test.cjs
+node --test src/test/js/checkout.test.cjs src/test/js/local-address.test.cjs src/test/js/online-presence.test.cjs
 ```
 
 Chạy toàn bộ test bằng `.\mvnw.cmd test`; test context như `ShopgiaythethaoApplicationTests` có thể yêu cầu cấu hình/database. Chạy trên database thử, không dùng reset admin hoặc test tích hợp không rõ tác động với dữ liệu thật. Đọc `target/surefire-reports`: phân biệt tests run, failures, errors, skipped; build thành công với 0 test không chứng minh chức năng đúng.

@@ -48,6 +48,7 @@ Các tên dưới đây là tên lớp Java. Tên bảng/cột thực tế xem a
 |---|---|---|
 | Tài khoản | `User` | Email, BCrypt password, họ tên, điện thoại, địa chỉ, vai trò, kích hoạt, xóa/khóa, số lần sai và thời điểm khóa |
 | Xác thực | `OtpCode` | Dữ liệu mã xác thực, liên hệ/tài khoản và thời gian |
+| Đăng ký chờ | `PendingRegistration` | Email, hash mật khẩu, thông tin đăng ký và thời hạn; chưa phải tài khoản. Chỉ tạo `User` sau OTP, hoặc xóa yêu cầu chờ khi Google xác minh cùng email |
 | Sản phẩm | `Product` | Tên, slug, ảnh, giá chung, mô tả, trọng lượng, SEO, active, số đã bán |
 | Biến thể | `ProductDetail` | Product ID, màu, size, SKU, giá riêng, giá cũ, tồn kho, active |
 | Thuộc tính | `Color`, `Size` | Danh mục màu và kích cỡ |

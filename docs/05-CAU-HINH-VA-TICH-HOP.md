@@ -84,6 +84,7 @@ Thử tải tỉnh/huyện/phường rồi báo phí. Lỗi cấu hình/API khô
 
 ## 8. Google/Facebook OAuth
 
+Hướng dẫn Google mới: [đăng ký/đăng nhập và cấu hình đủ cặp Client ID/Secret](08-DANG-NHAP-GOOGLE-VA-XAC-THUC.md). Tài khoản Google chỉ hoàn tất khi provider trả email đã xác minh; không cần OTP cửa hàng cho bước Google hợp lệ.
 Tạo ứng dụng nhà cung cấp của chính bạn; thay client ID cấu hình bằng ID ứng dụng đó. Đặt secret qua:
 
 ```text

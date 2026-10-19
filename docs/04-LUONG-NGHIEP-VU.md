@@ -113,11 +113,11 @@ Service ghi lịch sử khi chuyển trạng thái. Khi hoàn thành có ghi th�
 
 ## 8. Tài khoản và phân quyền
 
-Đăng ký → validate → tạo dữ liệu tài khoản/OTP và gửi mail → `/verify-otp` → kích hoạt → đăng nhập. Quên mật khẩu: `/forgot` → mail chứa email/key → `/dat-lai-mat-khau` → kiểm tra key, mật khẩu mới và nhập lại → lưu mật khẩu mới. SMTP chưa cấu hình thì chưa thể xác minh luồng gửi thư.
+Đăng ký email mới → validate → tạo `PendingRegistration`/OTP, gửi mail → `/verify-otp` → mã đúng/còn hạn mới tạo `User` đã xác thực, xóa yêu cầu chờ → đăng nhập. Tài khoản chờ từ bản cũ vẫn có nhánh xác thực riêng, không tự xóa/kích hoạt hàng loạt. Quên mật khẩu: `/forgot` → mail chứa email/key → `/dat-lai-mat-khau` → kiểm tra key, mật khẩu mới và nhập lại → lưu mật khẩu mới. SMTP chưa cấu hình thì chưa thể xác minh luồng gửi thư.
 
-Đăng nhập form gửi `/perform_login` → Spring Security và BCrypt → handler thành công. Có saved request thì ưu tiên quay lại URL đó; nếu không, admin/nhân viên về danh sách hóa đơn, user về trang chủ hoặc xác thực OTP theo trạng thái. Sai mật khẩu có cơ chế khóa sau 5 lần, thời gian khóa 2 phút trong `LoginAttemptService`; cần kiểm thử trạng thái khóa/kích hoạt theo dữ liệu thực.
+Đăng nhập form gửi `/perform_login` → Spring Security và BCrypt → handler thành công. Kiểm tra trạng thái trước, chỉ khôi phục saved request GET cùng host thuộc danh sách an toàn/đúng vai trò; nếu không, admin/nhân viên về danh sách hóa đơn, user về trang chủ. Người còn chờ OTP không được cấp phiên đăng nhập. Sai mật khẩu có cơ chế khóa sau 5 lần, thời gian khóa 2 phút trong `LoginAttemptService`; cần kiểm thử trạng thái khóa/kích hoạt theo dữ liệu thực.
 
-OAuth Google/Facebook đi qua provider bên ngoài và success handler; không thay thế việc cấu hình client của chính bạn. Reset admin bằng biến môi trường là cơ chế khởi tạo có chủ đích, không phải đường “quên mật khẩu” dành cho khách.
+Google đi qua provider và xác minh email trước khi hoàn tất tài khoản; principal dùng email, authority lấy từ role DB. Khi chưa xác thực mật khẩu mà chuyển sang Google, bỏ credential chờ chưa đáng tin. Xem [luồng và cấu hình mới](08-DANG-NHAP-GOOGLE-VA-XAC-THUC.md). Reset admin bằng biến môi trường là cơ chế khởi tạo có chủ đích, không phải đường “quên mật khẩu” dành cho khách.
 
 ## 9. Quản lý sản phẩm, nội dung và khuyến mại
 

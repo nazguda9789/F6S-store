@@ -33,6 +33,7 @@ public class RegisController {
     public String register(UserRegis userRegis, RedirectAttributes redirectAttributes, HttpServletRequest request, Model model) {
         try {
             userService.registerUser(userRegis.getEmail(), userRegis.getPassword(), userRegis.getFullName(), userRegis.getPhone(), userRegis.getRePassword());
+            redirectAttributes.addFlashAttribute("verificationNotice","Đã gửi yêu cầu xác thực. Tài khoản chỉ được tạo sau khi bạn nhập đúng mã; vui lòng kiểm tra Inbox và Spam.");
             return verificationRedirect(userRegis.getEmail());
         } catch (MessageException e) {
             redirectAttributes.addFlashAttribute(TypeSystem.ERROR, e.getDefaultMessage());
@@ -44,7 +45,10 @@ public class RegisController {
     }
 
     @GetMapping("/verify-otp")
-    public String verifyView() {
+    public String verifyView(org.springframework.ui.Model model, jakarta.servlet.http.HttpSession session) {
+        Object notice=session.getAttribute("verificationNotice");
+        if (notice!=null && !model.containsAttribute("verificationNotice")) model.addAttribute("verificationNotice",notice);
+        session.removeAttribute("verificationNotice");
         return "user/verifyOtp";
     }
 
@@ -52,7 +56,7 @@ public class RegisController {
     public String verifyAction(@RequestParam String otp, String email, RedirectAttributes redirectAttributes, HttpServletRequest request, Model model) {
         try {
             userService.verifyOtp(email, otp);
-            redirectAttributes.addFlashAttribute(TypeSystem.SUCCESS,"Xác thực tài khoản thành công");
+            redirectAttributes.addFlashAttribute(TypeSystem.SUCCESS,"Đăng ký/xác thực thành công. Bạn có thể đăng nhập bằng email và mật khẩu.");
             return "redirect:/login";
         }
         catch (MessageException e) {

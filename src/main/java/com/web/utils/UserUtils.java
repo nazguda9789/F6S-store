@@ -43,7 +43,7 @@ public class UserUtils {
             return null;
         }
 
-        return userRepository.findByEmail(email).orElse(null);
+        return userRepository.findByEmail(email.trim().toLowerCase(java.util.Locale.ROOT)).orElse(null);
     }
 
     public Long getIdUserLogged() {
@@ -53,12 +53,8 @@ public class UserUtils {
             return null;
         }
         if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            if(username.equalsIgnoreCase("anonymousUser")){
-                return null;
-            }
-            Long userId = userRepository.findIdByEmail(username);
-            return userId;
+            User user = getUserWithAuthority();
+            return user == null ? null : user.getId();
         }
         return null;
     }

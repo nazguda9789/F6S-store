@@ -84,24 +84,7 @@
         </nav>
     </section>
 
-    <script>
-        let stompClient = null;
-
-        function connect() {
-            const socket = new SockJS('/ws');
-            stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/online', function (message) {
-                });
-            }, function (error) {
-                console.error('Connection socket failed:', error);
-                setTimeout(connect, 5000);
-            });
-        }
-
-        connect();
-    </script>
+    <script src="/js/online-presence.js" defer></script>
 </div>
 </body>
 </html>

@@ -1,9 +1,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:include="common/user/libuser :: libheader"></head>
+<head th:replace="~{common/user/libuser :: libheader}"></head>
 
 <body>
-<head th:replace="common/user/headerUser :: headerUser"></head>
+<div th:replace="~{common/user/headerUser :: headerUser}"></div>
 
 <div class="section-bottom-menu"></div>
 
@@ -27,7 +27,7 @@
   </div>
 </div>
 
-<div th:replace="common/user/footeruser :: footerMain"></div>
+<div th:replace="~{common/user/footeruser :: footerMain}"></div>
 
 </body>
 <script>

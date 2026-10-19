@@ -1,9 +1,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:include="common/user/libuser :: libheader"></head>
+<head th:replace="~{common/user/libuser :: libheader}"></head>
 
 <body>
-<head th:replace="common/user/headerUser :: headerUser"></head>
+<div th:replace="~{common/user/headerUser :: headerUser}"></div>
 
 <div class="section-bottom-menu"></div>
 
@@ -15,6 +15,7 @@
     <h2 style="font-size: 28px; font-weight: 600; margin-bottom: 20px; color: #333;">
       Oops! Trang bạn tìm không tồn tại
     </h2>
+    <p th:if="${requestPath != null}" class="text-muted">Đường dẫn không tìm thấy: <code th:text="${requestPath}"></code></p>
     <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
       Có thể đường dẫn đã bị thay đổi hoặc bạn nhập sai URL.<br>
       Vui lòng quay về trang chủ hoặc tiếp tục khám phá các sản phẩm khác.
@@ -27,82 +28,7 @@
   </div>
 </div>
 
-<div th:replace="common/user/footeruser :: footerMain"></div>
+<div th:replace="~{common/user/footeruser :: footerMain}"></div>
 
 </body>
-<script>
-  const vouchers = [
-    {code: "VOUCHER15K", discount: "15K", condition: "Mã giảm 15K cho đơn hàng tối thiểu 499K"},
-    {code: "VOUCHER30K", discount: "30K", condition: "Mã giảm 30K cho đơn hàng tối thiểu 599K"},
-    {code: "VOUCHER50K", discount: "50K", condition: "Mã giảm 50K cho đơn hàng tối thiểu 799K"},
-    {code: "VOUCHER70K", discount: "70K", condition: "Mã giảm 70K cho đơn hàng tối thiểu 1TR"}
-  ];
-
-  const voucherList = document.getElementById('voucherList');
-
-  vouchers.forEach(v => {
-    const card = document.createElement('div');
-    card.className = 'voucher-card';
-    card.innerHTML = `
-            <div class="voucher-left">
-                <div class="ticket">${v.discount}</div>
-            </div>
-            <div class="voucher-right">
-                <div>
-                    <h4>NHẬP MÃ: ${v.code}</h4>
-                    <p>${v.condition}</p>
-                </div>
-                <div class="voucher-actions">
-                    <button class="btn-copy" onclick="copyCode('${v.code}')">Sao chép</button>
-                    <button class="btn-condition">Điều kiện</button>
-                </div>
-            </div>
-        `;
-    voucherList.appendChild(card);
-  });
-
-  function copyCode(code) {
-    navigator.clipboard.writeText(code).then(() => {
-      toastr.success("Đã sao chép mã: " + code, "Thông báo", {
-        timeOut: 3000,
-        positionClass: "toast-top-right"
-      });
-    });
-  }
-
-  if (window.innerWidth < 992) {
-    document.querySelectorAll('.item-category-header > a').forEach(link => {
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-
-        const parent = this.parentElement;
-
-        // Đóng tất cả submenu khác trước
-        document.querySelectorAll('.item-category-header.open').forEach(item => {
-          if (item !== parent) {
-            item.classList.remove('open');
-          }
-        });
-
-        // Toggle cái vừa click
-        parent.classList.toggle('open');
-      });
-    });
-
-    // Khi click ra ngoài thì đóng tất cả submenu
-    document.addEventListener('click', function (e) {
-      const isClickInside = e.target.closest('.item-category-header');
-      if (!isClickInside) {
-        document.querySelectorAll('.item-category-header.open').forEach(item => {
-          item.classList.remove('open');
-        });
-      }
-    });
-  }
-
-
-
-
-
-</script>
 </html>

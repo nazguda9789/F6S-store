@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <th:block th:include="common/user/libuser :: libheader"></th:block>
-</head>
+<head th:replace="~{common/user/libuser :: libheader}"></head>
 <body>
-    <div th:replace="common/user/headerUser :: headerUser"></div>
+    <div th:replace="~{common/user/headerUser :: headerUser}"></div>
     <div class="section-bottom-menu"></div>
 
     <div class="login-section">
@@ -14,7 +12,8 @@
         <div class="content-modal-login">
             <h1 class="h3 fw-bold">Chào mừng trở lại</h1>
             <p class="text-muted">Đăng nhập để quản lý tài khoản và đơn hàng của bạn.</p>
-            <button th:if="${googleLoginAvailable}" class="btn-login-google w-100" onclick="window.location.href='/oauth2/authorization/google'"><img src="/image/google-icon.png" alt=""> Tiếp tục với Google</button>
+            <a th:if="${googleLoginAvailable}" class="btn-login-google w-100" href="/oauth2/authorization/google"><img src="/image/google-icon.png" alt=""> Tiếp tục với Google</a>
+            <p th:unless="${googleLoginAvailable}" class="text-muted">Đăng nhập Google chưa được bật. Vui lòng dùng email và mật khẩu.</p>
 
             <div th:if="${googleLoginAvailable}" class="divider"><span>Hoặc đăng nhập bằng email</span></div>
             <form action="/perform_login" method="post">

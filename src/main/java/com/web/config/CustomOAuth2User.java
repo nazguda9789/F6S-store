@@ -29,7 +29,8 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public String getName() {
-        return oauth2User.getAttribute("name");
+        String email = oauth2User.getAttribute("email");
+        return email == null ? oauth2User.getName() : email.trim().toLowerCase(java.util.Locale.ROOT);
     }
 }
 

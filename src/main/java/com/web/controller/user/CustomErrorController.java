@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class CustomErrorController implements ErrorController {
 
     @RequestMapping("/error")
-    public String handleError(HttpServletRequest request, Model model) {
+    public String handleError(HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Model model) {
+        model.addAttribute("requestPath",request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI));
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         if (status != null) {
             Integer statusCode = Integer.valueOf(status.toString());
@@ -28,6 +29,7 @@ public class CustomErrorController implements ErrorController {
                 return "error/500";
             }
         }
-        return "error/error.html";
+        response.setStatus(500);
+        return "error/500";
     }
 }

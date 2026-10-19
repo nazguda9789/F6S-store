@@ -1,5 +1,11 @@
 # Cập nhật giao diện và xử lý lỗi F6S — 18/10/2026
 
+## Sửa đăng nhập Google và đăng ký chờ xác thực — 19/10/2026
+
+Nút Google trang đăng ký đã có hành động OAuth thật; chỉ hoàn tất khi email Google được xác minh, lấy đúng ID/quyền từ DB và không giữ credential đăng ký chưa xác thực. Đăng ký email mới lưu vào `pending_registration`, chỉ tạo `users` sau OTP. Giữ khả năng xác thực tài khoản chờ cũ, không tự xóa/kích hoạt dữ liệu. Handler không quay lại URL cache sai quyền/404, thêm lỗi OAuth thân thiện. Đổi fragment cũ ở các trang auth/error, sửa logo OTP, bỏ script voucher không có DOM ở 404 và sửa race WebSocket khi rời trang.
+
+62 test Java chọn lọc, 12 test JavaScript đạt; đã kiểm tra trình duyệt với provider OAuth và SMTP giả lập cục bộ, chưa kiểm chứng Google Client/hộp thư thật. Xem [chi tiết và hướng dẫn cấu hình](docs/08-DANG-NHAP-GOOGLE-VA-XAC-THUC.md).
+
 ## Cập nhật tiếp ngày 19/10/2026
 
 Sửa gửi mã đăng ký bị báo thành công dù SMTP lỗi; From lấy từ cấu hình, lỗi gửi rollback và hiện thông báo, gửi lại mã bằng POST với kiểm tra 60 giây. Khôi phục 5 ảnh banner từ source cũ (3 slider, 2 phụ), bổ sung 4 liên kết để 12 danh mục trong seed có ít nhất 3 sản phẩm đang bật; đổi nhãn Adidas F50 Messi thành Adidas nổi bật để đúng các mẫu liên kết. Bộ lọc giá dùng noUiSlider 15.7.0 local thay CDN bị lỗi tải.

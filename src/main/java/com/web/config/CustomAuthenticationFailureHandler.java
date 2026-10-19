@@ -1,83 +1,48 @@
 package com.web.config;
 
-
 import com.web.doss.LoginAttemptService;
 import com.web.entity.User;
-import com.web.exception.LoginException;
-import com.web.exception.UserNotActivatedException;
+import com.web.exception.*;
 import com.web.repository.UserRepository;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
-import java.util.Optional;
-import java.util.UUID;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 @Component
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
+    @Autowired private UserRepository userRepository;
+    @Autowired private LoginAttemptService loginAttemptService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private LoginAttemptService loginAttemptService;
-
-    @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-                                        AuthenticationException exception) throws IOException, ServletException {
-        HttpSession session = request.getSession();
-
-        // lấy email từ form login
-        String emailCheck = request.getParameter("username");
-
-        if (exception instanceof InternalAuthenticationServiceException
-                && exception.getCause() instanceof UserNotActivatedException) {
-            String email = ((UserNotActivatedException) exception.getCause()).getEmail();
-            response.sendRedirect("/verify-otp?email=" + email+"&duaration="+ UUID.randomUUID().toString());
+    @Override public void onAuthenticationFailure(HttpServletRequest request,HttpServletResponse response,
+                                                   AuthenticationException exception) throws IOException {
+        Throwable cause=exception instanceof InternalAuthenticationServiceException && exception.getCause()!=null
+                ? exception.getCause() : exception;
+        if (cause instanceof UserNotActivatedException pending) {
+            request.getSession().setAttribute("verificationNotice","Đăng ký chưa hoàn tất. Vui lòng nhập mã hoặc gửi lại mã để xác thực email.");
+            response.sendRedirect("/verify-otp?email="+URLEncoder.encode(pending.getEmail(),StandardCharsets.UTF_8)); return;
         }
-        else if(exception instanceof InternalAuthenticationServiceException
-                && exception.getCause() instanceof LoginException){
-            if (emailCheck != null) {
-                Optional<User> userOpt = userRepository.findByEmail(emailCheck);
-                if (userOpt.isPresent()) {
-                    User user = userOpt.get();
-                    if (user.isAccountNonLocked()) {
-                        loginAttemptService.increaseFailedAttempts(user);
-                    }
-                }
+        String message="Tài khoản hoặc mật khẩu không chính xác";
+        if (cause instanceof LoginException) message=cause.getMessage();
+        else if (cause instanceof LockedException)
+            message="Tài khoản tạm khóa do đăng nhập sai nhiều lần. Vui lòng thử lại sau "+LoginAttemptService.LOCK_TIME_DURATION+" phút.";
+        // Provider-only accounts and activation/configuration errors are not bad passwords.
+        if (exception instanceof BadCredentialsException) {
+            String email=request.getParameter("username");
+            if (email!=null) {
+                User user=userRepository.findByEmail(email.trim().toLowerCase(Locale.ROOT)).orElse(null);
+                if (user!=null && Boolean.TRUE.equals(user.getActived()) && !Boolean.TRUE.equals(user.getDeleted())
+                        && Boolean.TRUE.equals(user.getActivationStatus()) && user.isAccountNonLocked())
+                    loginAttemptService.increaseFailedAttempts(user);
             }
-            String email = ((LoginException) exception.getCause()).getEmail();
-            String message = exception.getCause().getMessage();
-            session.setAttribute("loginError", message); // lưu message vào session
-            response.sendRedirect("/login");
         }
-        else if(exception instanceof InternalAuthenticationServiceException
-                && exception.getCause() instanceof LockedException){
-            String message = exception.getCause().getMessage();
-            session.setAttribute("loginError", message); // lưu message vào session
-            response.sendRedirect("/login");
-        }
-        else {
-            if (emailCheck != null) {
-                Optional<User> userOpt = userRepository.findByEmail(emailCheck);
-                if (userOpt.isPresent()) {
-                    User user = userOpt.get();
-                    if (user.isAccountNonLocked()) {
-                        loginAttemptService.increaseFailedAttempts(user);
-                    }
-                }
-            }
-            session.setAttribute("loginError", "Tài khoản hoặc mật khẩu không chính xác");
-            response.sendRedirect("/login");
-        }
+        request.getSession().setAttribute("loginError",message);
+        response.sendRedirect("/login");
     }
 }

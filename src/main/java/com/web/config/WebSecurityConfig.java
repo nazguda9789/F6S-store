@@ -58,9 +58,14 @@ public class WebSecurityConfig  extends AbstractSecurityWebSocketMessageBrokerCo
     @Autowired
     private LoginAttemptService loginAttemptService;
 
+    @Autowired private com.web.repository.PendingRegistrationRepository pendingRegistrationRepository;
+    @Autowired private org.springframework.core.env.Environment environment;
+    @Autowired private OAuthLoginFailureHandler oauthLoginFailureHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(new OAuthAvailabilityFilter(environment), org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(TypeSystem.ADMIN_URL+"/api/**").hasAnyAuthority(Role.ROLE_ADMIN.toString(), Role.ROLE_EMPLOYEE.toString())
                         .requestMatchers(TypeSystem.ADMIN_URL+"/**").hasAuthority(Role.ROLE_ADMIN.toString())
@@ -93,6 +98,7 @@ public class WebSecurityConfig  extends AbstractSecurityWebSocketMessageBrokerCo
                                 .userService(customOAuth2UserService) // dùng service ở trên
                         )
                         .successHandler(customLoginSuccessHandler)
+                        .failureHandler(oauthLoginFailureHandler)
                 )
 //                .rememberMe(remember -> remember
 //                        .key("fhwuiefhiurhfrghiureghslkfjie123") // key mã hóa cookie
@@ -142,20 +148,25 @@ public class WebSecurityConfig  extends AbstractSecurityWebSocketMessageBrokerCo
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
+            username = username == null ? "" : username.trim().toLowerCase(java.util.Locale.ROOT);
             Optional<com.web.entity.User> user = userRepository.findByEmail(username);
             if (user.isEmpty()) {
+                if (pendingRegistrationRepository.existsById(username))
+                    throw new UserNotActivatedException("Đăng ký chưa hoàn tất",username);
                 throw new LoginException("Tài khoản hoặc mật khẩu không chính xác", username);
             }
-            else if (user.get().getActivationStatus() != null && !user.get().getActivationStatus()) {
+            else if ((Boolean.FALSE.equals(user.get().getActivationStatus())
+                    || (user.get().getRole()==Role.ROLE_USER && user.get().getActivationStatus()==null))
+                    && Boolean.TRUE.equals(user.get().getActived()) && !Boolean.TRUE.equals(user.get().getDeleted())) {
                 throw new UserNotActivatedException("Tài khoản chưa được kích hoạt", user.get().getEmail());
             }
-            else if (!user.get().getActived()) {
+            else if (!Boolean.TRUE.equals(user.get().getActived()) || Boolean.TRUE.equals(user.get().getDeleted())) {
                 throw new LoginException("Tài khoản đã bị khóa do phát hiện nghi ngờ", user.get().getEmail());
             }
-            else if (user.get().getUserType().equals(UserType.GOOGLE)) {
+            else if (user.get().getUserType() == UserType.GOOGLE && !org.springframework.util.StringUtils.hasText(user.get().getPassword())) {
                 throw new LoginException("Hãy login bằng google", username);
             }
-            else if (user.get().getUserType().equals(UserType.FACEBOOK)) {
+            else if (user.get().getUserType() == UserType.FACEBOOK && !org.springframework.util.StringUtils.hasText(user.get().getPassword())) {
                 throw new LoginException("Hãy login bằng facebook", username);
             }
 
@@ -172,6 +183,7 @@ public class WebSecurityConfig  extends AbstractSecurityWebSocketMessageBrokerCo
 
 
             List<String> roles = new ArrayList<>();
+            if (user.get().getRole() == null) throw new LoginException("Tài khoản chưa được cấp quyền",username);
             roles.add(user.get().getRole().toString());
             List<GrantedAuthority> grantList = new ArrayList<GrantedAuthority>();
             if (roles != null) {

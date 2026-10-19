@@ -2,6 +2,8 @@
 
 [Mục lục](README.md) · [Cài đặt](01-CAI-DAT-VA-CHAY.md)
 
+**Cập nhật tiếp:** luồng đăng ký mới đã chuyển sang bảng `pending_registration`, chỉ tạo `users` khi OTP đúng. Google và lỗi điều hướng/404 được xử lý trong [tài liệu 08](08-DANG-NHAP-GOOGLE-VA-XAC-THUC.md); các số test ở cuối mục này ghi lại đợt sửa email/banner trước đó.
+
 ## 1. Vì sao không nhận được mã đăng ký?
 
 Mã cũ gắn cứng địa chỉ From của một tài khoản khác, trong khi SMTP lấy thông tin từ biến môi trường. Hàm gửi thư chạy bất đồng bộ và bỏ qua lỗi gửi, nên trang đăng ký vẫn chuyển sang nhập OTP dù SMTP thất bại. Môi trường thử không có `MAIL_USERNAME`/`MAIL_PASSWORD`; sửa code không tự tạo tài khoản email hay App Password cho người chạy.

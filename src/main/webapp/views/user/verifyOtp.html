@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <th:block th:include="common/user/libuser :: libheader"></th:block>
-</head>
+<head th:replace="~{common/user/libuser :: libheader}"></head>
 <body>
-<div th:replace="common/user/headerUser :: headerUser"></div>
+<div th:replace="~{common/user/headerUser :: headerUser}"></div>
 <div class="section-bottom-menu"></div>
 
 <div class="login-section">
   <div class="block-img-login">
-    <img src="image/logo.jpg" alt="" class="img-logo-login">
+    <a class="f6s-wordmark" href="/">F6S<span>SPORT STORE</span></a>
   </div>
   <div class="content-modal-login">
     <div class="divider"><span>Nhập Mã Xác Thực</span></div>
+    <p th:if="${verificationNotice}" th:text="${verificationNotice}" class="alert alert-info" role="status"></p>
     <p class="text-muted">Mã có hiệu lực 10 phút. Kiểm tra cả thư mục Spam/Thư rác. Nếu chưa nhận được mã, dùng nút gửi lại bên dưới (cách nhau ít nhất 60 giây).</p>
+    <form action="/verify-otp" method="post">
+    <label for="verification-email" class="form-label">Email cần xác thực</label>
+    <input id="verification-email" name="email" th:value="${param.email}" type="email" class="form-control mb-3" autocomplete="email" required>
     <div class="otp-container">
       <input type="text" class="otp-input" id="otp-1" />
       <input type="text" class="otp-input" id="otp-2" />
@@ -22,22 +24,17 @@
       <input type="text" class="otp-input" id="otp-5" />
       <input type="text" class="otp-input" id="otp-6" />
     </div>
-    <form action="/verify-otp" method="post">
       <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
         <span th:text="${error}">Lỗi xảy ra</span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-      <input name="email" th:value="${param.email}" type="hidden">
       <input id="otp-main" name="otp" type="hidden">
       <button class="w-100 btn btn-primary btn-login-main form-control">Xác Thực Tài Khoản</button>
-    </form>
-    <form action="/new-otp-verify" method="post" class="mt-3">
-      <input name="email" th:value="${param.email}" type="hidden">
-      <button type="submit" class="btn btn-outline-primary w-100">Gửi lại mã xác thực</button>
+      <button type="submit" formaction="/new-otp-verify" class="btn btn-outline-primary w-100 mt-3">Gửi lại mã xác thực</button>
     </form>
 
     <div class="center-block">
-      <a class="text-center" href="login">← Quay lại đăng nhập</a>
+      <a class="text-center" href="/login">← Quay lại đăng nhập</a>
     </div>
   </div>
 </div>
