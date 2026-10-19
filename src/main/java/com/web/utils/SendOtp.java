@@ -85,7 +85,7 @@ public class SendOtp {
                 "</table></td></tr></table>" +
                 "</body></html>";
 
-        mailService.sendEmail(email, "Mã OTP xác thực - " + brandName, html, false, true);
+        mailService.sendEmailRequired(email, "Mã OTP xác thực - " + brandName, html, false, true);
     }
 
 

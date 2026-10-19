@@ -12,6 +12,6 @@ public interface BannerRepository extends JpaRepository<Banner, Long> {
 
     List<Banner> findAllByActiveTrueOrderByDisplayOrderAsc();
 
-    @Query("select b from Banner b where b.pageName like ?1 and b.bannerType = ?2 order by b.displayOrder")
+    @Query("select b from Banner b where b.active = true and b.pageName like ?1 and b.bannerType = ?2 order by b.displayOrder, b.id")
     List<Banner> findByPageName(String pageName, BannerType bannerType);
 }

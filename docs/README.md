@@ -2,7 +2,7 @@
 
 [Về trang chính](../README.md)
 
-Tài liệu đối chiếu mã nguồn ngày **18/10/2026**, dành cho người cài demo, thành viên phát triển và người viết báo cáo. “Có trong code” không đồng nghĩa “đã kiểm thử đầy đủ”.
+Tài liệu đối chiếu mã nguồn đến ngày **19/10/2026**, dành cho người cài demo, thành viên phát triển và người viết báo cáo. “Có trong code” không đồng nghĩa “đã kiểm thử đầy đủ”.
 
 ## Đọc theo mục đích
 
@@ -14,6 +14,7 @@ Tài liệu đối chiếu mã nguồn ngày **18/10/2026**, dành cho người 
 | Hiểu luồng mua hàng, tại quầy, thanh toán, đơn hàng | [04 — Luồng nghiệp vụ](04-LUONG-NGHIEP-VU.md) |
 | Cấu hình email, VNPay, GHN, upload và dịch vụ khác | [05 — Cấu hình và tích hợp](05-CAU-HINH-VA-TICH-HOP.md) |
 | Chạy kiểm thử, tìm lỗi và biết giới hạn hiện tại | [06 — Kiểm thử và xử lý lỗi](06-KIEM-THU-VA-XU-LY-LOI.md) |
+| Sửa gửi mã đăng ký, lấy banner cũ, cập nhật danh mục đủ sản phẩm | [07 — Email và nội dung 19/10](07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md) |
 
 ## Tài liệu bổ trợ
 

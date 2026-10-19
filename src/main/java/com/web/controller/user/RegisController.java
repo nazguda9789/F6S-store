@@ -33,12 +33,13 @@ public class RegisController {
     public String register(UserRegis userRegis, RedirectAttributes redirectAttributes, HttpServletRequest request, Model model) {
         try {
             userService.registerUser(userRegis.getEmail(), userRegis.getPassword(), userRegis.getFullName(), userRegis.getPhone(), userRegis.getRePassword());
-            return "redirect:/verify-otp?email="+userRegis.getEmail();
+            return verificationRedirect(userRegis.getEmail());
         } catch (MessageException e) {
             redirectAttributes.addFlashAttribute(TypeSystem.ERROR, e.getDefaultMessage());
             redirectAttributes.addFlashAttribute("userRegis", userRegis);
-            String referer = request.getHeader("Referer");
-            return "redirect:" + referer;
+            userRegis.setPassword(null);
+            userRegis.setRePassword(null);
+            return "redirect:/register";
         }
     }
 
@@ -56,12 +57,11 @@ public class RegisController {
         }
         catch (MessageException e) {
             redirectAttributes.addFlashAttribute(TypeSystem.ERROR, e.getDefaultMessage());
-            String referer = request.getHeader("Referer");
-            return "redirect:" + referer;
+            return verificationRedirect(email);
         }
     }
 
-    @GetMapping("/new-otp-verify")
+    @PostMapping("/new-otp-verify")
     public String sendNewOtp(@RequestParam String email, RedirectAttributes redirectAttributes, HttpServletRequest request, Model model) {
         try {
             userService.sendNewOtp(email);
@@ -70,7 +70,11 @@ public class RegisController {
         catch (MessageException e) {
             redirectAttributes.addFlashAttribute(TypeSystem.ERROR, e.getDefaultMessage());
         }
-        return "redirect:/verify-otp?email="+email;
+        return verificationRedirect(email);
+    }
+
+    private String verificationRedirect(String email) {
+        return "redirect:/verify-otp?email=" + java.net.URLEncoder.encode(email == null ? "" : email.trim(), java.nio.charset.StandardCharsets.UTF_8);
     }
 
 }

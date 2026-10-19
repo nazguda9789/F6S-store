@@ -37,7 +37,9 @@
     <div class="carousel-inner">
         <div th:each="b, stat : ${bannerSlider}"
              th:class="'carousel-item ' + (${stat.first} ? 'active' : '')">
-            <img th:src="${b.imageUrl}" class="d-block w-100" th:alt="${b.title}">
+            <a th:href="${b.linkUrl}" th:aria-label="${b.title}">
+                <img th:src="${b.imageUrl}" class="d-block w-100" th:alt="${b.title}" style="aspect-ratio:16/6;object-fit:contain;background:#142333" decoding="async">
+            </a>
         </div>
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
@@ -344,9 +346,17 @@
     for (var i = 0; i < bannerList.length && i < listBannerDiv.length; i++) {
         var banner = bannerList[i];
         var div = listBannerDiv[i];
-        div.innerHTML = `<a href="${banner.linkUrl}">
-                         <img src="${banner.imageUrl}" alt="${banner.title}" class="img-banner-normal" loading="lazy" decoding="async">
-                     </a>`;
+        var link = document.createElement('a');
+        var target = new URL(banner.linkUrl || '/', window.location.origin);
+        link.href = target.origin === window.location.origin ? target.href : '/';
+        var img = document.createElement('img');
+        img.src = banner.imageUrl;
+        img.alt = banner.title || 'Banner F6S';
+        img.className = 'img-banner-normal';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        link.appendChild(img);
+        div.replaceChildren(link);
     }
     /*]]>*/
 </script>

@@ -15,8 +15,11 @@ F6S là ứng dụng Java Spring Boot phục vụ khách mua giày online và nh
 | [04 — Luồng nghiệp vụ](docs/04-LUONG-NGHIEP-VU.md) | Giỏ, COD, VNPay, địa chỉ, tại quầy, trạng thái, tài khoản và thống kê |
 | [05 — Cấu hình và tích hợp](docs/05-CAU-HINH-VA-TICH-HOP.md) | Biến môi trường, email, upload, OAuth, GHN, VNPay/ngrok và bot |
 | [06 — Kiểm thử và xử lý lỗi](docs/06-KIEM-THU-VA-XU-LY-LOI.md) | Lệnh test, checklist, lỗi thường gặp và giới hạn trước production |
+| [07 — Sửa email và cập nhật nội dung](docs/07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md) | Cấu hình gửi mã đăng ký, 5 banner từ source cũ, 12 danh mục đủ ít nhất 3 sản phẩm |
 
 Phần dưới là hướng dẫn nhanh; bộ tài liệu trên giải thích chi tiết theo mã nguồn hiện tại. Không cần bật GitHub Wiki hay cài thêm phần mềm để đọc.
+
+Cập nhật 19/10/2026: sửa đăng ký báo thành công dù email gửi thất bại; SMTP thiếu/sai cấu hình sẽ báo lỗi và rollback đăng ký. Bạn vẫn cần đặt `MAIL_USERNAME`/`MAIL_PASSWORD` hợp lệ trên máy chạy (không có khóa gửi mail chung trong Git). Đã khôi phục 3 slider + 2 banner phụ từ ảnh source cũ và bổ sung 4 liên kết để cả 12 danh mục trong seed có ít nhất 3 sản phẩm đang bật; không tạo sản phẩm giả. Database cũ chỉ cần import [script cập nhật nội dung](sql/cap_nhat_noi_dung_20261019.sql), không import lại SQL đầy đủ. [Chi tiết cách cấu hình và danh sách thay đổi](docs/07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md).
 
 Đợt sửa lỗi và làm mới giao diện ngày 18/10/2026: xem [chi tiết những nội dung đã thêm/thay](CAP_NHAT_UI_VA_LOI.md). Không cần import lại SQL. Mặc định `SHIPPING_PROVIDER=local`: chọn/tìm Tỉnh/Thành phố → Phường/Xã → tự điền Quận/Huyện, hỗ trợ nhập địa chỉ mới ngoài danh mục cũ trước 07/2025; cửa hàng tự sắp xếp vận chuyển. Phí mặc định 30.000đ, miễn phí từ 500.000đ. Chỉ đặt `SHIPPING_PROVIDER=ghn` khi có tài khoản GHN hợp lệ; chế độ GHN vẫn chặn xác nhận khi không tải được địa chỉ/phí vận chuyển.
 

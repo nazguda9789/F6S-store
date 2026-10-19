@@ -21,13 +21,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 <input th:field="*{fullName}" type="text" name="fullName" class="form-control input-login" placeholder="Nhập họ tên">
-                <input th:field="*{email}" type="text" name="" class="form-control input-login" placeholder="Nhập email của bạn" autocomplete="off">
+                <input th:field="*{email}" type="email" class="form-control input-login" placeholder="Nhập email của bạn" autocomplete="email" required>
                 <input th:field="*{phone}" type="text" class="form-control input-login" placeholder="Nhập số điện thoại">
                 <input th:field="*{password}" type="password" class="form-control input-login" placeholder="Mật khẩu">
                 <span class="note-regis">Lưu ý: (Mật khẩu tối thiểu 6 ký tự)</span>
                 <input th:field="*{rePassword}" type="password" class="form-control input-login" placeholder="Nhập lại mật khẩu">
                 <button class="w-100 btn btn-primary btn-login-main form-control">Đăng Ký</button>
             </form>
+            <p th:if="${userRegis.email != null && !#strings.isEmpty(userRegis.email)}" class="mt-3">
+                Đã đăng ký nhưng chưa nhận mã?
+                <a th:href="@{/verify-otp(email=${userRegis.email})}">Mở bước xác thực để gửi lại mã</a>
+            </p>
 
             <div class="center-block">
                 <a class="text-center" href="login">← Quay lại đăng nhập</a>

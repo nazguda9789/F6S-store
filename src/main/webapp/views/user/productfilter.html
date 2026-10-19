@@ -13,8 +13,8 @@
     <meta property="og:url" th:content="@{/category/{slug}(slug=${category.slug})}" />
 
     <th:block th:include="common/user/libuser :: libheader"></th:block>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
+    <link rel="stylesheet" href="/lib/css/nouislider-15.7.0.min.css">
+    <script src="/lib/js/nouislider-15.7.0.min.js"></script>
     <script type="application/ld+json" th:utext="${jsonLd}"></script>
 </head>
 <body>

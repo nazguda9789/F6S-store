@@ -13,6 +13,7 @@
   </div>
   <div class="content-modal-login">
     <div class="divider"><span>Nhập Mã Xác Thực</span></div>
+    <p class="text-muted">Mã có hiệu lực 10 phút. Kiểm tra cả thư mục Spam/Thư rác. Nếu chưa nhận được mã, dùng nút gửi lại bên dưới (cách nhau ít nhất 60 giây).</p>
     <div class="otp-container">
       <input type="text" class="otp-input" id="otp-1" />
       <input type="text" class="otp-input" id="otp-2" />
@@ -28,10 +29,11 @@
       </div>
       <input name="email" th:value="${param.email}" type="hidden">
       <input id="otp-main" name="otp" type="hidden">
-      <div style="position: relative;height: 10px">
-        <a th:href="@{/new-otp-verify(email=${param.email})}" style="position: absolute;right: 0">Gửi mã kích hoạt mới?</a>
-      </div>
       <button class="w-100 btn btn-primary btn-login-main form-control">Xác Thực Tài Khoản</button>
+    </form>
+    <form action="/new-otp-verify" method="post" class="mt-3">
+      <input name="email" th:value="${param.email}" type="hidden">
+      <button type="submit" class="btn btn-outline-primary w-100">Gửi lại mã xác thực</button>
     </form>
 
     <div class="center-block">

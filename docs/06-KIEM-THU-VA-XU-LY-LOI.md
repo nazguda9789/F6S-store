@@ -12,17 +12,20 @@
 | `ChatRealtimeApiTests` | Kiểm tra API hội thoại liên quan quyền | 2 |
 | `ShippingPolicyTests` | Phí local/GHN, ngưỡng miễn phí, dữ liệu sai | 5 |
 | `VNPayServiceTests` | Thiếu cấu hình, URL/chữ ký, tiền, múi giờ, thời hạn | 2 |
+| `MailServiceTests` | From cấu hình, gửi đồng bộ, lỗi SMTP/mất cấu hình, mail tùy chọn | 4 |
+| `RegistrationTests` | Email chuẩn hóa, cấu hình, lỗi gửi, gửi lại và mã hết hạn | 7 |
+| `BannerServiceTests` | Trang chủ không khớp banner mọi trang, giữ quy ước trang khác | 2 |
 | JavaScript checkout | Danh sách địa chỉ rỗng, lỗi provider, phí và miễn phí | 4 |
 | JavaScript địa chỉ local | Phường trùng tên, tự điền/reset, tìm không dấu, nhập mới, lỗi dữ liệu, tính toàn vẹn danh mục | 5 |
 
-Tổng lượt kiểm chứng gần nhất: **22 test Java chọn lọc, 9 test JavaScript**. Đây không phải coverage toàn bộ ứng dụng. Test VNPay dùng khóa giả, test/mock dịch vụ không chứng minh nhà cung cấp thật đã chấp nhận giao dịch.
+Tổng lượt kiểm chứng gần nhất: **35 test Java chọn lọc, 9 test JavaScript**. Đây không phải coverage toàn bộ ứng dụng. Test VNPay dùng khóa giả, SMTP dùng sink cục bộ; test/mock dịch vụ không chứng minh nhà cung cấp thật đã chấp nhận giao dịch hoặc thư tới Inbox.
 
 ## 2. Lệnh chạy lại
 
 PowerShell tại thư mục có `pom.xml`, JDK 17:
 
 ```powershell
-.\mvnw.cmd "-Dtest=DataInitializerTests,GhnClientTests,CloudinaryServiceTests,ChatRealtimeApiTests,ShippingPolicyTests,VNPayServiceTests" test
+.\mvnw.cmd "-Dtest=DataInitializerTests,GhnClientTests,CloudinaryServiceTests,ChatRealtimeApiTests,ShippingPolicyTests,VNPayServiceTests,MailServiceTests,RegistrationTests,BannerServiceTests" test
 ```
 
 JavaScript cần Node.js nhưng không cần `npm install` vì các test hiện dùng thư viện chuẩn:

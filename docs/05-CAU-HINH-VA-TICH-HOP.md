@@ -39,6 +39,7 @@ Các property `shipping.cost`, `amount.freeShipping` cấu hình phí local và 
 
 ## 4. Email
 
+- Đợt sửa 19/10: đăng ký và gửi lại mã dùng gửi đồng bộ, báo lỗi/rollback khi SMTP không chấp nhận thư; xem [hướng dẫn mới](07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md). Không có tài khoản SMTP hoặc App Password dùng chung trong Git.
 - Biến: `MAIL_USERNAME`, `MAIL_PASSWORD`; mật khẩu dùng App Password phù hợp tài khoản SMTP, không ghi vào repository.
 - Cấu hình hiện tại dùng SMTP Gmail cổng 587 và STARTTLS. Tài khoản cần hỗ trợ/phê duyệt cơ chế đăng nhập đó.
 - Kiểm tra `support.url`, `datlaimatkhau.url` nếu host/cổng thay đổi để link gửi email trỏ đúng web đang chạy.

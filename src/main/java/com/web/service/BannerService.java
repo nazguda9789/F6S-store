@@ -17,7 +17,9 @@ public class BannerService {
     private BannerRepository bannerRepository;
 
     public List<Banner> findByPageNameAndType(String pageName, BannerType bannerType) {
-        return bannerRepository.findByPageName("%"+pageName+"%", bannerType);
+        // The home path '/' must not match every other page containing a slash.
+        return bannerRepository.findByPageName("/".equals(pageName) || "/index".equals(pageName)
+                ? "/" : "%"+pageName+"%", bannerType);
     }
 
     // Lấy tất cả banner (admin)

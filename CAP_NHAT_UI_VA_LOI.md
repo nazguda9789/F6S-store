@@ -1,5 +1,11 @@
 # Cập nhật giao diện và xử lý lỗi F6S — 18/10/2026
 
+## Cập nhật tiếp ngày 19/10/2026
+
+Sửa gửi mã đăng ký bị báo thành công dù SMTP lỗi; From lấy từ cấu hình, lỗi gửi rollback và hiện thông báo, gửi lại mã bằng POST với kiểm tra 60 giây. Khôi phục 5 ảnh banner từ source cũ (3 slider, 2 phụ), bổ sung 4 liên kết để 12 danh mục trong seed có ít nhất 3 sản phẩm đang bật; đổi nhãn Adidas F50 Messi thành Adidas nổi bật để đúng các mẫu liên kết. Bộ lọc giá dùng noUiSlider 15.7.0 local thay CDN bị lỗi tải.
+
+35 test Java chọn lọc và 9 test JavaScript đạt; đã kiểm tra trình duyệt và SMTP sink cục bộ, chưa gửi đến hộp thư thật. Database cũ dùng script cập nhật nội dung riêng, không import lại dump đầy đủ. Xem [chi tiết cấu hình email và danh sách thêm/thay](docs/07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md).
+
 ## Bổ sung: tìm địa chỉ theo thành phố → phường/xã → quận/huyện
 
 - Trong chế độ giao hàng nội bộ, thay hai ô nhập tỉnh và phường bằng danh sách có tìm kiếm không dấu; chọn phường tự điền quận/huyện, đổi tỉnh xóa địa chỉ cấp dưới cũ.
