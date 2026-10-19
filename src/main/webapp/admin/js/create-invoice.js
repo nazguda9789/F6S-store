@@ -376,8 +376,11 @@ async function createDonTam(){
         });
         var order = result.data;
         if(order != null){
-            var main = `<option value="${order.id}">${order.id} - ${order.fullName} - ${order.phone} - ${order.createdDate}</option>`
-            document.getElementById("select-invoice").innerHTML += main
+            const select = document.getElementById('select-invoice');
+            const option = new Option(`${order.id} - ${order.fullName || 'Khách lẻ'} - ${order.phone || ''}`, String(order.id));
+            select.append(option);
+            select.value = String(order.id);
+            select.dispatchEvent(new Event('change'));
         }
     }
     else{

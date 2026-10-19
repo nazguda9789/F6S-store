@@ -16,6 +16,7 @@ Tài liệu đối chiếu mã nguồn đến ngày **19/10/2026**, dành cho ng
 | Chạy kiểm thử, tìm lỗi và biết giới hạn hiện tại | [06 — Kiểm thử và xử lý lỗi](06-KIEM-THU-VA-XU-LY-LOI.md) |
 | Sửa gửi mã đăng ký, lấy banner cũ, cập nhật danh mục đủ sản phẩm | [07 — Email và nội dung 19/10](07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md) |
 | Google, tài khoản chờ OTP và điều hướng sau đăng nhập | [08 — Google và xác thực tài khoản](08-DANG-NHAP-GOOGLE-VA-XAC-THUC.md) |
+| Bộ khung quản trị theo ảnh tham khảo và phạm vi đã đổi | [09 — Giao diện Workspace](09-GIAO-DIEN-WORKSPACE.md) |
 
 ## Tài liệu bổ trợ
 

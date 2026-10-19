@@ -302,7 +302,7 @@
         document.querySelector('.select2-container--open .select2-search__field').focus();
     });
     $( document ).ready(function() {
-        $('.select-province').select2({
+        if ($.fn.select2) $('.select-province').select2({
             placeholder: "Chọn tỉnh, thành phố"
         });
     });
@@ -324,7 +324,7 @@
                 main += `<option value="${wards[i].code}" data-shipcost="${wards[i].shipCost}" data-ward-name="${wards[i].name}">${wards[i].name}</option>`
             }
             document.getElementById("ward").innerHTML = main
-            $('.select-ward').select2({
+            if ($.fn.select2) $('.select-ward').select2({
                 placeholder: "Chọn xã, phường",
             });
         });
@@ -332,7 +332,7 @@
         let firstProvince = provinceData.length > 0 ? provinceData[0].code : null;
         if (firstProvince) {
             $('#province').val(firstProvince).trigger('change');
-            $('.select-ward').select2({
+            if ($.fn.select2) $('.select-ward').select2({
                 placeholder: "Chọn xã, phường",
             });
         }
