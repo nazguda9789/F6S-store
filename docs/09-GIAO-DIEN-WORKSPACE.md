@@ -1,5 +1,7 @@
 # Giao diện quản trị F6S theo ảnh tham khảo
 
+Ghi chú: nội dung dưới đây mô tả đợt giao diện đầu. Đợt tiếp theo đã có tạo đơn nhanh và hộp thoại chọn khách; xem [11 — Giao dịch tương đồng Bee](11-GIAO-DICH-TUONG-DONG-BEE.md) cho hiện trạng mới hơn.
+
 Đợt này điều chỉnh bộ khung chung cho quản trị và nhân viên theo ảnh mẫu bán giày mới: nền xám nhạt, header trắng, sidebar tím than có logo chữ F6S lớn, điểm nhấn xanh ngọc, đầu bảng xanh ngọc, thẻ nội dung, phân trang, ô nhập và trạng thái chọn. Giữ tên F6S, đường dẫn, phân quyền, API và dữ liệu hiện có.
 
 ## Những gì thay đổi

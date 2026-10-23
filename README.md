@@ -6,6 +6,8 @@ F6S là ứng dụng Java Spring Boot phục vụ khách mua giày online và nh
 
 ## Bộ hướng dẫn đầy đủ
 
+**Giao dịch tương đồng Bee:** thêm tạo hóa đơn chờ nhanh, picker khách hàng, kiểm tra số lượng/tồn kho và bộ lọc loại giao dịch kết hợp từ khóa/trạng thái/ngày. [Phạm vi và cách dùng](docs/11-GIAO-DICH-TUONG-DONG-BEE.md). Đợt giao dịch này không cần SQL hay secret mới.
+
 **SQL đã gộp module mới (23/10):** cài mới chỉ import [f6s_shop.sql](f6s_shop.sql), đã có bảng OTP và thuộc tính thương hiệu/đế giày/chất liệu. Máy đang có database: sao lưu rồi chạy [sql/nang_cap_f6s.sql](sql/nang_cap_f6s.sql), không import lại dump đầy đủ. [Chọn đúng file SQL](sql/README.md) · [Phạm vi module](docs/10-DOI-CHIEU-VIDEO-BEE.md). Không cần secret mới.
 
 | Mục | Nội dung |

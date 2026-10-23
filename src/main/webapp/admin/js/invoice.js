@@ -1,5 +1,6 @@
 async function filterInvoice(page) {
     var dto = {
+        "invoiceType": document.getElementById('invoiceTypeFilter')?.value || null,
         "invoiceStatus": $(".active-status-list").attr("data-status") == ""?null:$(".active-status-list").attr("data-status"),
         "from": $("#fromDate").val(),
         "to": $("#toDate").val(),
@@ -87,8 +88,18 @@ function vanDon(){
 }
 
 function filterNotSearch(){
-    document.getElementById("search").value = "";
     filterInvoice(0)
+}
+
+function resetInvoiceFilters() {
+    for (const id of ['search', 'fromDate', 'toDate', 'invoiceTypeFilter']) {
+        const input = document.getElementById(id);
+        if (input) { input.value = ''; if (input._flatpickr) input._flatpickr.clear(false); }
+    }
+    document.querySelectorAll('.btn-status-list').forEach(button => button.classList.remove('active-status-list'));
+    const all = document.querySelector('.btn-status-list[data-stt=""]');
+    if (all) { all.classList.add('active-status-list'); all.dataset.status = ''; }
+    filterInvoice(0);
 }
 
 async function getHistoryStatus(id){

@@ -31,26 +31,21 @@ public class InvoiceSpecification implements Specification<Invoice> {
         Predicate predicate = cb.conjunction();
         query.distinct(true);
 
-        // Nếu có search, chỉ lọc theo search và bỏ các điều kiện khác
+        // Search combines with status/date filters rather than bypassing them.
         if (search != null && !search.isEmpty() && !search.isBlank()) {
             String searchPattern = "%" + search.trim() + "%";
             Predicate phonePredicate = cb.equal(root.get("phone"), search.trim());
             Predicate codePredicate = cb.equal(root.get("code"), search.trim());
             Predicate namePredicate = cb.like(cb.lower(root.get("fullName")), searchPattern.toLowerCase());
             Predicate addressPredicate = cb.like(cb.lower(root.get("addressDetail")), searchPattern.toLowerCase());
-            return cb.or(phonePredicate, codePredicate, namePredicate, addressPredicate);
+            predicate = cb.and(predicate, cb.or(phonePredicate, codePredicate, namePredicate, addressPredicate));
         }
 
         if (invoiceStatus != null) {
             predicate = cb.and(predicate, cb.equal(root.get("invoiceStatus"), invoiceStatus));
         }
-        if (from != null && to != null) {
-            LocalDateTime fromDateTime = from.toLocalDate().atStartOfDay();
-            LocalDateTime toDateTime = to.toLocalDate().atTime(LocalTime.MAX); // 23:59:59.999999999
-            predicate = cb.and(predicate,
-                    cb.between(root.get("createdDate"), fromDateTime, toDateTime)
-            );
-        }
+        if (from != null) predicate = cb.and(predicate, cb.greaterThanOrEqualTo(root.get("createdDate"), from.toLocalDate().atStartOfDay()));
+        if (to != null) predicate = cb.and(predicate, cb.lessThan(root.get("createdDate"), to.toLocalDate().plusDays(1).atStartOfDay()));
 
 
         return predicate;

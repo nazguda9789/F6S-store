@@ -471,7 +471,9 @@ public class InvoiceService {
 
     public Page<Invoice> searchFull(InvoiceRequest request, Pageable pageable){
         InvoiceSpecification invoiceSpecification = new InvoiceSpecification(request.getInvoiceStatus(), request.getFrom(), request.getTo(), request.getSearch());
-        return invoiceRepository.findAll(invoiceSpecification, pageable);
+        org.springframework.data.jpa.domain.Specification<Invoice> filtered = invoiceSpecification;
+        if (request.getInvoiceType() != null) filtered = filtered.and((root, query, cb) -> cb.equal(root.get("invoiceType"), request.getInvoiceType()));
+        return invoiceRepository.findAll(filtered, pageable);
     }
 
     public HistoryResponse getHistoryById(Long invoiceId){

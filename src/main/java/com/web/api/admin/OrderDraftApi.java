@@ -17,6 +17,23 @@ import java.util.List;
 @RestController
 @RequestMapping(TypeSystem.ADMIN_URL+ "/api/order-draft")
 public class OrderDraftApi {
+    @Autowired private com.web.repository.UserRepository users;
+
+    @GetMapping("/customers")
+    public ResponseEntity<?> customers(@RequestParam(defaultValue = "") String search) {
+        if (search.length() > 100) return ResponseEntity.badRequest().body(Result.fail("Từ khóa tối đa 100 ký tự."));
+        return ResponseEntity.ok(users.findPosCustomers(com.web.enums.Role.ROLE_USER, search.strip(),
+                org.springframework.data.domain.PageRequest.of(0, 20)));
+    }
+
+    @PostMapping("/new")
+    public ResponseEntity<?> newDraft() {
+        OrderDraft draft = new OrderDraft(); draft.setFullName("Khách lẻ");
+        Result<?> result = orderDraftService.create(draft);
+        if (result.isSuccess() && result.getData() instanceof OrderDraft saved)
+            return ResponseEntity.ok(Result.ok(java.util.Map.of("id", saved.getId(), "fullName", saved.getFullName()), result.getMessage()));
+        return ResponseEntity.ok(result);
+    }
 
     @Autowired
     private OrderDraftService orderDraftService;

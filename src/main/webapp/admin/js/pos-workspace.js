@@ -15,6 +15,63 @@ document.addEventListener('DOMContentLoaded', () => {
     tabs.setAttribute('role', 'group');
     tabs.setAttribute('aria-label', 'Chọn hóa đơn chờ');
     root.prepend(heading, subtitle, tabs);
+    const actions = document.createElement('div'); actions.className = 'pos-toolbar';
+    const newDraft = document.createElement('button'); newDraft.type = 'button'; newDraft.className = 'btn btn-primary'; newDraft.id = 'pos-new-draft';
+    newDraft.textContent = '+ Tạo hóa đơn chờ';
+    const chooseCustomer = document.createElement('button'); chooseCustomer.type = 'button'; chooseCustomer.className = 'btn btn-outline-primary'; chooseCustomer.id = 'pos-choose-customer';
+    chooseCustomer.textContent = 'Chọn khách hàng';
+    const status = document.createElement('p'); status.className = 'text-muted'; status.setAttribute('role', 'status'); status.id = 'pos-action-status';
+    actions.append(newDraft, chooseCustomer); tabs.after(actions, status);
+    newDraft.addEventListener('click', async () => {
+        newDraft.disabled = true;
+        try {
+            const response = await fetch('/adm-prj/qtht-001/api/order-draft/new', {method:'POST'});
+            if (!response.ok) throw new Error('Không tạo được đơn chờ. Kiểm tra đăng nhập và thử lại.');
+            const result = await response.json();
+            if (!result.success || !result.data?.id) throw new Error(result.message || 'Không tạo được đơn chờ.');
+            const option = new Option(result.data.id + ' - Khách lẻ', String(result.data.id));
+            select.append(option); select.value = option.value;
+            await window.loadDetailOrder(); render();
+            status.textContent = 'Đã tạo hóa đơn #' + option.value + '. Chọn giày và lưu thay đổi thông tin trước khi chuyển đơn.';
+        } catch(error) { status.textContent = error.message; }
+        finally { newDraft.disabled = false; }
+    });
+    const picker = document.createElement('dialog'); picker.className = 'pos-customer-dialog'; picker.setAttribute('aria-labelledby', 'pos-customer-title');
+    const customerTitle = document.createElement('h2'); customerTitle.id = 'pos-customer-title'; customerTitle.className = 'fs-5'; customerTitle.textContent = 'Chọn khách hàng';
+    const searchForm = document.createElement('form'); searchForm.className = 'd-flex gap-2 mb-3';
+    const search = document.createElement('input'); search.className = 'form-control'; search.maxLength = 100; search.placeholder = 'Tên, email hoặc số điện thoại'; search.setAttribute('aria-label', search.placeholder);
+    const submit = document.createElement('button'); submit.className = 'btn btn-primary'; submit.textContent = 'Tìm kiếm'; searchForm.append(search, submit);
+    const results = document.createElement('div'); results.className = 'pos-customer-results'; results.setAttribute('role', 'status');
+    const close = document.createElement('button'); close.type = 'button'; close.className = 'btn btn-secondary mt-3'; close.textContent = 'Đóng'; close.addEventListener('click', () => picker.close());
+    picker.append(customerTitle, searchForm, results, close); document.body.append(picker);
+    const loadCustomers = async () => {
+        submit.disabled = true; results.textContent = 'Đang tải…';
+        try {
+            const response = await fetch('/adm-prj/qtht-001/api/order-draft/customers?' + new URLSearchParams({search: search.value}));
+            if (!response.ok) throw new Error('Không tải được khách hàng. Vui lòng thử lại.');
+            const customers = await response.json(); results.replaceChildren();
+            if (!customers.length) results.textContent = 'Không tìm thấy khách hàng đã xác thực đang hoạt động. Có thể nhập khách lẻ trên form.';
+            customers.forEach(customer => {
+                const line = document.createElement('div'); line.className = 'pos-customer-row';
+                const label = document.createElement('span'); label.textContent = [customer.fullName, customer.phone, customer.email].filter(Boolean).join(' · ');
+                const choose = document.createElement('button'); choose.type = 'button'; choose.className = 'btn btn-outline-primary btn-sm'; choose.textContent = 'Chọn';
+                choose.addEventListener('click', () => {
+                    for (const [id, value] of [['fullName',customer.fullName],['phone',customer.phone],['email',customer.email],['addressDetail',customer.address]]) {
+                        const input = document.getElementById(id); if (input) { input.value = value || ''; input.dispatchEvent(new Event('input', {bubbles:true})); }
+                    }
+                    status.textContent = 'Đã điền thông tin liên hệ. Kiểm tra lại tỉnh/phường, sau đó bấm Cập nhật đơn chờ để lưu.';
+                    picker.close();
+                });
+                line.append(label, choose); results.append(line);
+            });
+        } catch(error) { results.textContent = error.message; }
+        finally { submit.disabled = false; }
+    };
+    searchForm.addEventListener('submit', event => { event.preventDefault(); loadCustomers(); });
+    chooseCustomer.addEventListener('click', () => {
+        if (Number(select.value) < 1) { status.textContent = 'Tạo hoặc chọn hóa đơn chờ trước khi chọn khách hàng.'; return; }
+        picker.showModal(); search.focus(); loadCustomers();
+    });
     const render = () => {
         tabs.replaceChildren();
         const options = [...select.options].filter(option => Number(option.value) > 0);

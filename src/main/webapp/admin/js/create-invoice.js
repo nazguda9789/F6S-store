@@ -155,6 +155,7 @@ async function loadDetailOrder() {
 }
 
 function showSingleProductItem(detail){
+    noOrderItem.style.display = 'none';
     orderItemsTableBody.innerHTML += `<tr id="tr-product-${detail.id}">
         <td>${detail.sku}</td>
         <td>${detail.productName}</td>
@@ -178,6 +179,7 @@ async function deleteOrderDetailById(id) {
     if(result.success == true){
         toastr.success(result.message)
         document.getElementById("tr-product-"+id).remove();
+        noOrderItem.style.display = orderItemsTableBody.children.length ? 'none' : 'block';
         $("#totalAmount").val(result.data)
     }
     else{

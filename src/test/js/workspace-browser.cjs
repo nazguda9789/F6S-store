@@ -37,6 +37,18 @@ const base = process.env.F6S_BASE_URL || 'http://127.0.0.1:18080';
                 console.log('PASS POS product picker, persisted-draft tab strip and live customer summary');
             }
             console.log('PASS desktop: ' + route);
+            if (route === 'invoice/list') {
+                await page.locator('#search').fill('POS test');
+                const filtered = page.waitForResponse(r => r.url().includes('/api/invoice/filter?') && r.request().method() === 'POST' && r.request().postDataJSON().invoiceType === 'TAI_QUAY');
+                await page.locator('#invoiceTypeFilter').selectOption('TAI_QUAY');
+                const response = await filtered;
+                assert.equal(response.status(), 200);
+                assert.equal(response.request().postDataJSON().search, 'POS test');
+                const reset = page.waitForResponse(r => r.url().includes('/api/invoice/filter?') && r.request().method() === 'POST' && r.request().postDataJSON().invoiceType === null && r.request().postDataJSON().search === '');
+                await page.locator('button[onclick="resetInvoiceFilters()"]').click();
+                assert.equal((await reset).status(), 200);
+                console.log('PASS transaction type + search filter and reset');
+            }
         }
         if (process.env.F6S_MUTATING_SMOKE === '1') {
             // Explicit opt-in: only use a disposable local demo database.

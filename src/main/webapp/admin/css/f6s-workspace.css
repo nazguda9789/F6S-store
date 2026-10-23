@@ -72,6 +72,8 @@ button:focus-visible,a:focus-visible{outline-color:#20b99a}
 .pos-draft-tabs{display:flex;gap:10px;overflow-x:auto;padding:8px 0 18px;margin-bottom:16px;border-bottom:1px solid #e8ebf1}
 .pos-draft-tab{white-space:nowrap;padding:12px 20px;border:1px solid #dce1e8;background:#fff;border-radius:8px;color:#526071;font-weight:600}
 .pos-draft-tab[aria-pressed="true"]{border-color:#107c70;background:#e4f5f0;color:#096257}
+.pos-customer-dialog{border:1px solid #dce1e8;border-radius:12px;width:min(760px,94vw);max-height:85vh;padding:24px;color:#253044;box-shadow:0 16px 60px #211e3830}.pos-customer-dialog::backdrop{background:#211e3880}.pos-customer-results{max-height:50vh;overflow:auto}.pos-customer-row{display:flex;gap:16px;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #e8ebf1}.pos-customer-row span{overflow-wrap:anywhere;min-width:0}
+.sweet-overlay{z-index:2000!important}.sweet-alert{z-index:2001!important}
 .pos-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 20px}
 .pos-empty-mark{display:grid;place-items:center;margin:18px auto;width:80px;height:80px;border:2px dashed #7ac9b7;border-radius:24px;font-size:40px;color:#107c70;background:#f1faf7}
 .pos-summary{margin-top:22px;padding:22px;background:#fff;border:1px solid #e8ebf1;border-radius:10px;max-width:600px;margin-left:auto}

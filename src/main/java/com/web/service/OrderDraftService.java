@@ -67,7 +67,25 @@ public class OrderDraftService {
     @Autowired
     private UserUtils userUtils;
 
-    public Result<?> create(OrderDraft orderDraft){
+    @Transactional
+    public Result<?> create(OrderDraft input){
+        if ((input.getDiscount() != null && (!Double.isFinite(input.getDiscount()) || input.getDiscount() < 0))
+                || (input.getShipCost() != null && (!Double.isFinite(input.getShipCost()) || input.getShipCost() < 0)))
+            return Result.fail("Giảm giá và phí vận chuyển phải là số không âm.");
+        OrderDraft orderDraft;
+        if (input.getId() == null) orderDraft = new OrderDraft();
+        else {
+            orderDraft = orderDraftRepository.findById(input.getId()).orElse(null);
+            if (orderDraft == null) return Result.fail("Đơn chờ không tồn tại. Vui lòng tải lại danh sách.");
+        }
+        orderDraft.setFullName(input.getFullName() == null || input.getFullName().isBlank() ? "Khách lẻ" : input.getFullName().strip());
+        orderDraft.setPhone(input.getPhone()); orderDraft.setEmail(input.getEmail()); orderDraft.setNote(input.getNote());
+        orderDraft.setAddressDetail(input.getAddressDetail()); orderDraft.setProvinceCode(input.getProvinceCode());
+        orderDraft.setProvinceName(input.getProvinceName()); orderDraft.setWardCode(input.getWardCode()); orderDraft.setWardName(input.getWardName());
+        orderDraft.setDiscount(input.getDiscount() == null ? 0D : input.getDiscount());
+        orderDraft.setShipCost(input.getShipCost() == null ? 0D : input.getShipCost()); orderDraft.setVoucherCode(input.getVoucherCode());
+        Double serverTotal = input.getId() == null ? Double.valueOf(0D) : orderDetailDraftRepository.totalByOrderId(input.getId());
+        orderDraft.setTotalAmount(serverTotal == null ? 0D : serverTotal);
         String mess = "Cập nhật đơn chờ thành công";
         boolean isCreate = false;
         if(orderDraft.getId() == null){
@@ -79,14 +97,23 @@ public class OrderDraftService {
         return new Result<>(true, isCreate==true?orderDraft:null, mess);
     }
 
+    @Transactional
     public Result<?> addToOrder(Long detailId, Long orderId) {
+        if (!orderDraftRepository.existsById(orderId)) return Result.fail("Đơn chờ không tồn tại.");
+        ProductDetail selectedVariant = productDetailRepository.findById(detailId).orElse(null);
+        if (selectedVariant == null || !Boolean.TRUE.equals(selectedVariant.getActive()) || selectedVariant.getStock() == null || selectedVariant.getStock() < 1)
+            return Result.fail("Biến thể không tồn tại, đã ngừng bán hoặc hết hàng.");
+        Product selectedProduct = productRepository.findById(selectedVariant.getProductId()).orElse(null);
+        if (selectedProduct == null || !Boolean.TRUE.equals(selectedProduct.getActive())) return Result.fail("Sản phẩm đã ngừng kinh doanh.");
+        Double price = selectedVariant.getPrice() == null ? selectedProduct.getPrice() : selectedVariant.getPrice();
+        if (price == null || !Double.isFinite(price) || price < 0) return Result.fail("Giá sản phẩm chưa hợp lệ.");
         Optional<OrderDetailDraft> orderDetailDraft = orderDetailDraftRepository.findByDetailAndOrderId(detailId, orderId);
         if(orderDetailDraft.isPresent()){
             return new Result<>(false, null, "Đã tồn tại sản phẩm này trong đơn hàng chờ "+orderDetailDraft.get().getOrderDraft().getId());
         }
         OrderDraft orderDraft = new OrderDraft();
         orderDraft.setId(orderId);
-        ProductDetail productDetail = productDetailRepository.findById(detailId).get();
+        ProductDetail productDetail = selectedVariant;
         Float weight = productRepository.getWeightById(productDetail.getProductId());
         String image = productColorImageRepository.getImageByProductAndColor(productDetail.getProductId(), productDetail.getColor().getId());
         if(image == null){
@@ -96,7 +123,7 @@ public class OrderDraftService {
         orderDetailDraft1.setIdProductDetail(detailId);
         orderDetailDraft1.setOrderDraft(orderDraft);
         orderDetailDraft1.setWeight(weight);
-        orderDetailDraft1.setPrice(productDetail.getPrice());
+        orderDetailDraft1.setPrice(price);
         orderDetailDraft1.setSku(productDetail.getSku());
         orderDetailDraft1.setColorName(productDetail.getColor().getName());
         orderDetailDraft1.setQuantity(1);
@@ -128,11 +155,16 @@ public class OrderDraftService {
         return new Result<>(true, total, "Đã xóa sản khỏi đơn chờ");
     }
 
+    @Transactional
     public Result<?> changeQuantity(Long detailId, Integer quantity) {
+        if (quantity == null || quantity < 1) return Result.fail("Số lượng phải là số nguyên lớn hơn 0.");
         Optional<OrderDetailDraft> orderDetailDraft = orderDetailDraftRepository.findById(detailId);
         if(orderDetailDraft.isEmpty()){
             return new Result<>(false, null, "Không tìm thấy chi tiết đơn hàng chờ");
         }
+        ProductDetail variant = productDetailRepository.findById(orderDetailDraft.get().getIdProductDetail()).orElse(null);
+        if (variant == null || !Boolean.TRUE.equals(variant.getActive()) || variant.getStock() == null || quantity > variant.getStock())
+            return Result.fail("Biến thể ngừng bán hoặc số lượng vượt tồn kho hiện tại.");
         orderDetailDraft.get().setQuantity(quantity);
         orderDetailDraftRepository.save(orderDetailDraft.get());
         updateTotalAmount(orderDetailDraft.get().getOrderDraft().getId());
@@ -169,9 +201,21 @@ public class OrderDraftService {
         if(orderDetailDrafts.size() == 0){
             return new Result<>(false, null, "Chưa có sản phẩm nào trong đơn chờ này");
         }
+        double merchandiseTotal = 0D;
+        for (OrderDetailDraft line : orderDetailDrafts) {
+            if (line.getQuantity() == null || line.getQuantity() < 1 || line.getPrice() == null || !Double.isFinite(line.getPrice()) || line.getPrice() < 0)
+                return Result.fail("Giỏ hàng có số lượng hoặc giá không hợp lệ. Vui lòng kiểm tra lại.");
+            merchandiseTotal += line.getPrice() * line.getQuantity();
+        }
+        Double discount = orderDraftOptional.get().getDiscount();
+        Double shipping = orderDraftOptional.get().getShipCost();
+        if (!Double.isFinite(merchandiseTotal) || discount == null || !Double.isFinite(discount) || discount < 0 || discount > merchandiseTotal
+                || shipping == null || !Double.isFinite(shipping) || shipping < 0)
+            return Result.fail("Tiền giảm giá hoặc phí vận chuyển không hợp lệ.");
+        orderDraftOptional.get().setTotalAmount(merchandiseTotal);
         Float weight = 0F;
         for(OrderDetailDraft o : orderDetailDrafts){
-            weight += o.getWeight() * o.getQuantity();
+            weight += (o.getWeight() == null ? 0F : o.getWeight()) * o.getQuantity();
         }
         Invoice invoice = invoiceMapper.orderToInvoice(orderDraftOptional.get());
         List<InvoiceDetail> list = invoiceMapper.orderDetailToInvoiceDetail(orderDetailDrafts);
@@ -181,7 +225,7 @@ public class OrderDraftService {
         invoice.setInvoiceStatus(invoiceStatus);
         invoice.setPayType(PayType.COD);
         invoice.setWeight(weight);
-        invoice.setShipCost(0D);
+        invoice.setShipCost(shipping);
         invoice.setDiscount(orderDraftOptional.get().getDiscount());
         invoiceRepository.save(invoice);
 

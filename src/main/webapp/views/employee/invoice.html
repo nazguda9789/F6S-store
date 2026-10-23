@@ -43,6 +43,8 @@
                             </div>
 
                             <div class="headcontent-invoice filter-section d-flex align-items-center justify-content-between">
+                                <button class="btn btn-outline-secondary" type="button" onclick="resetInvoiceFilters()">Làm mới bộ lọc</button>
+                                <div><label for="invoiceTypeFilter">Loại giao dịch</label><select id="invoiceTypeFilter" class="form-select" onchange="filterInvoice(0)"><option value="">Tất cả</option><option value="TAI_QUAY">Tại quầy</option><option value="ONLINE">Online</option><option value="FACEBOOK">Facebook</option></select></div>
                                 <div class="d-flex align-items-center gap-3">
                                     <span class="text-muted mobile-none">Thời gian tạo đơn</span>
                                     <div class="row container-head-time d-flex gap-2">
@@ -72,8 +74,8 @@
                                         <select onchange="filterInvoice(0)" class="form-select form-select-sm" id="sortby">
                                             <option value="id,desc">Mới nhất</option>
                                             <option value="id,asc">Cũ nhất</option>
-                                            <option value="price,desc">giá cao đến thấp</option>
-                                            <option value="price,asc">giá thấp đến cao</option>
+                                            <option value="totalAmount,desc">Tiền hàng cao đến thấp</option>
+                                            <option value="totalAmount,asc">Tiền hàng thấp đến cao</option>
                                         </select>
                                     </div>
                                     <div class="col-sm-auto d-flex align-items-center">

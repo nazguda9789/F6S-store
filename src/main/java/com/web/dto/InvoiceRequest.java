@@ -13,6 +13,7 @@ import java.sql.Date;
 public class InvoiceRequest {
 
     private InvoiceStatus invoiceStatus;
+    private com.web.enums.InvoiceType invoiceType;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date from;

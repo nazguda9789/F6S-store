@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+    @Query("select new com.web.dto.PosCustomerOption(u.id,u.fullName,u.email,u.phone,u.address) from User u " +
+            "where u.role = :role and u.actived = true and u.deleted = false and u.activationStatus = true " +
+            "and (lower(u.fullName) like lower(concat('%',:search,'%')) or lower(u.email) like lower(concat('%',:search,'%')) or u.phone like concat('%',:search,'%')) order by u.fullName,u.id")
+    List<com.web.dto.PosCustomerOption> findPosCustomers(@org.springframework.data.repository.query.Param("role") Role role,
+            @org.springframework.data.repository.query.Param("search") String search, org.springframework.data.domain.Pageable pageable);
 
     @Query("select u from User u where u.email = ?1")
     Optional<User> findByEmail(String email);
