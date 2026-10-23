@@ -1,5 +1,7 @@
 # F6S — Website quản lý bán giày thể thao
 
+**Bộ demo các module:** [tải SQL demo riêng](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-DEMO-ALL-MODULES-20261024.zip) → Download raw. Có 5 nhân viên, 5 khách hàng, 5 mẫu giày và dữ liệu giỏ/đơn/giảm giá/nội dung. [Danh sách, cách import và các bảng không nên chèn giả](docs/18-DU-LIEU-MAU-TAT-CA-MODULE.md). Chỉ dùng database `_demo`, không trộn hóa đơn mẫu vào dữ liệu thật.
+
 [Tải gói SQL mới 24/10/2026](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SQL-20261024.zip) → chọn **Download raw**. [Chi tiết model, thuộc tính và dữ liệu mẫu](docs/17-CATALOG-SQL-VA-DU-LIEU-MAU.md).
 
 **Bản catalog 24/10: bắt buộc nâng SQL trước khi chạy code mới.** Có metadata/mã thuộc tính và bộ 5 giày demo/25 biến thể. Máy cũ: dừng web, sao lưu, import `sql/nang_cap_f6s.sql`; muốn thêm mẫu thì import tiếp `sql/du_lieu_mau_catalog_20261024.sql`. Cài mới dùng `f6s_shop.sql` (có DROP DATABASE). [Hướng dẫn SQL hiện hành](sql/HUONG_DAN_GOI_SQL.md).
