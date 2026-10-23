@@ -6,6 +6,8 @@ F6S là ứng dụng Java Spring Boot phục vụ khách mua giày online và nh
 
 ## Bộ hướng dẫn đầy đủ
 
+**Cập nhật module theo video Bee (23/10):** thêm thuộc tính thương hiệu/đế giày/chất liệu, lọc thương hiệu và thư viện ảnh. Máy đang có database: sao lưu rồi chạy riêng [SQL bổ sung](sql/cap_nhat_module_giay_20261023.sql), không import lại dump đầy đủ. Xem [phạm vi đã làm và còn thiếu](docs/10-DOI-CHIEU-VIDEO-BEE.md). Không cần secret mới.
+
 | Mục | Nội dung |
 |---|---|
 | [Mục lục tài liệu](docs/README.md) | Chọn hướng dẫn theo người chạy demo, người nhận code hoặc người viết báo cáo |

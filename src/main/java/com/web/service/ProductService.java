@@ -22,6 +22,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+    @Autowired
+    private ShoeAttributeService shoeAttributes;
+
+    private void applyShoeAttributes(Product product, ProductCreateRequest request) {
+        product.setBrandId(shoeAttributes.validate(request.getBrandId(), ShoeAttribute.Kind.BRAND, product.getBrandId()));
+        product.setSoleId(shoeAttributes.validate(request.getSoleId(), ShoeAttribute.Kind.SOLE, product.getSoleId()));
+        product.setMaterialId(shoeAttributes.validate(request.getMaterialId(), ShoeAttribute.Kind.MATERIAL, product.getMaterialId()));
+    }
 
     @Autowired
     private ProductRepository productRepository;
@@ -57,6 +65,7 @@ public class ProductService {
     public Product createProduct(ProductCreateRequest request) {
         // Tạo Product
         Product product = new Product();
+        applyShoeAttributes(product, request);
         product.setName(request.getName());
         product.setSlug(request.getSlug());
         product.setImage(request.getImage());
@@ -136,6 +145,7 @@ public class ProductService {
     public Product updateProduct(ProductCreateRequest request, Long id) {
         // Tạo Product
         Product product = productRepository.findById(id).get();
+        applyShoeAttributes(product, request);
         product.setName(request.getName());
         product.setSlug(request.getSlug());
         product.setImage(request.getImage());
@@ -215,7 +225,9 @@ public class ProductService {
 
     public Page<Product> allProductByAdmin(ProductSearchAdmin search, Pageable pageable) {
         ProductSpecification spec = new ProductSpecification(search.getIdCategory(), search.getSearch(), search.getActive(), search.getSmallPrice(), search.getLargePrice());
-        Page<Product> page = productRepository.findAll(spec, pageable);
+        org.springframework.data.jpa.domain.Specification<Product> filtered = spec;
+        if (search.getBrandId() != null) filtered = filtered.and((root, query, cb) -> cb.equal(root.get("brandId"), search.getBrandId()));
+        Page<Product> page = productRepository.findAll(filtered, pageable);
         List<Long> productIds = page.getContent().stream().map(Product::getId).toList();
         List<ProductStatisticProjection> list = productRepository.getProductStatistics(productIds);
         List<Product> products = page.getContent();

@@ -24,6 +24,7 @@
         <main>
             <div class="container-fluid">
                 <h1 class="mt-4">Quản lý Sản Phẩm</h1>
+                <div class="mb-3"><label for="filterBrand">Thương hiệu</label><select id="filterBrand" class="form-select" style="max-width:320px" onchange="filterProduct(0)"><option value="">Tất cả thương hiệu</option><option th:each="a : ${brands}" th:value="${a.id}" th:text="${a.name}"></option></select></div>
 
                 <div class="card mb-4">
                     <div class="card-header-product">

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping(TypeSystem.ADMIN_URL+ "/product")
 public class ProductAdminController {
+    @Autowired private com.web.repository.ShoeAttributeRepository shoeAttributes;
 
     @Autowired
     private ProductService productService;
@@ -43,6 +44,7 @@ public class ProductAdminController {
 
     @GetMapping("/list")
     public String viewPage(Model model){
+        model.addAttribute("brands", shoeAttributes.findByKindOrderByNameAsc(com.web.entity.ShoeAttribute.Kind.BRAND));
         model.addAttribute("listCategory", categoryService.findAllList());
         model.addAttribute("totalProduct", productService.totalProduct());
         return "admin/product.html";
@@ -50,6 +52,9 @@ public class ProductAdminController {
 
     @GetMapping("/save")
     public String viewSavePage(Model model, @RequestParam(required = false) Long id){
+        model.addAttribute("brands", shoeAttributes.findByKindOrderByNameAsc(com.web.entity.ShoeAttribute.Kind.BRAND));
+        model.addAttribute("soles", shoeAttributes.findByKindOrderByNameAsc(com.web.entity.ShoeAttribute.Kind.SOLE));
+        model.addAttribute("materials", shoeAttributes.findByKindOrderByNameAsc(com.web.entity.ShoeAttribute.Kind.MATERIAL));
         model.addAttribute("listCategory", categoryService.findAllList());
         model.addAttribute("listSize", sizeService.findAllList());
         model.addAttribute("listColor", colorService.findAllList());

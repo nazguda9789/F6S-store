@@ -8,6 +8,7 @@ import lombok.Setter;
 public class ProductSearchAdmin {
 
     private Long idCategory;
+    private Long brandId;
     private Double smallPrice;
     private Double largePrice;
     private Boolean active;

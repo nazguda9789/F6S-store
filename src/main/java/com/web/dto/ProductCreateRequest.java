@@ -8,6 +8,9 @@ import java.util.List;
 public class ProductCreateRequest {
 
     private String name;
+    private Long brandId;
+    private Long soleId;
+    private Long materialId;
     private String slug;
     private String image;
     private Double price;

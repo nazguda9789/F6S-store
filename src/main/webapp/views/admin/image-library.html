@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><title>Thư viện hình ảnh | F6S</title><th:block th:replace="~{common/libadmin :: libheaderadmin}"></th:block></head>
+<body class="sb-nav-fixed"><div th:replace="~{common/navbarAdmin :: headerAdmin}"></div><div id="layoutSidenav"><div th:replace="~{common/navbarAdmin :: sidenavAdmin}"></div><div id="layoutSidenav_content"><main>
+<h1>Thư viện hình ảnh</h1><p class="text-muted">Ảnh chi tiết sản phẩm hiện có. Thêm ảnh trong màn chỉnh sửa sản phẩm; không cần nhập lại ảnh cũ.</p>
+<form method="get" class="d-flex gap-2 mb-4"><input name="search" class="form-control" th:value="${search}" placeholder="Tìm theo tên sản phẩm" aria-label="Tên sản phẩm"><button class="btn btn-primary">Tìm kiếm</button></form>
+<div class="row g-3"><div class="col-6 col-md-4 col-xl-3" th:each="image : ${images.content}"><div class="card h-100"><img th:src="${image.linkImage}" th:alt="${image.product.name}" loading="lazy" style="height:180px;object-fit:contain"><div class="card-body"><h2 class="fs-6" th:text="${image.product.name}"></h2><a class="btn btn-outline-primary" th:href="@{/adm-prj/qtht-001/product/save(id=${image.product.id})}">Quản lý ảnh sản phẩm</a></div></div></div></div>
+<p class="alert alert-light" th:if="${images.empty}">Không có ảnh phù hợp.</p>
+<nav class="d-flex gap-3 mt-4" aria-label="Phân trang ảnh"><a th:if="${images.hasPrevious()}" th:href="@{/adm-prj/qtht-001/image-library(page=${images.number - 1},search=${search})}">Trang trước</a><span th:text="'Trang ' + ${images.number + 1}"></span><a th:if="${images.hasNext()}" th:href="@{/adm-prj/qtht-001/image-library(page=${images.number + 1},search=${search})}">Trang sau</a></nav>
+</main></div></div></body></html>

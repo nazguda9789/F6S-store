@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><title th:text="${label} + ' | F6S'">Thuộc tính giày</title><th:block th:replace="~{common/libadmin :: libheaderadmin}"></th:block></head>
+<body class="sb-nav-fixed">
+<div th:replace="~{common/navbarAdmin :: headerAdmin}"></div>
+<div id="layoutSidenav"><div th:replace="~{common/navbarAdmin :: sidenavAdmin}"></div><div id="layoutSidenav_content"><main>
+<h1 th:text="${label}"></h1><p class="text-muted">Quản lý thuộc tính giày. Ngừng sử dụng không xóa liên kết của sản phẩm cũ.</p>
+<p th:if="${notice}" th:text="${notice}" class="alert alert-success"></p>
+<p th:if="${errorMessage}" th:text="${errorMessage}" class="alert alert-danger"></p>
+<div class="card mb-4"><div class="card-body"><form method="get" class="d-flex gap-2">
+<input type="hidden" name="kind" th:value="${kind}"><input class="form-control" name="search" th:value="${search}" placeholder="Tìm theo tên" aria-label="Tìm theo tên"><button class="btn btn-primary">Tìm kiếm</button>
+</form></div></div>
+<div class="card mb-4"><div class="card-header">Thêm mới</div><form class="card-body d-flex flex-wrap gap-3 align-items-center" method="post" action="/adm-prj/qtht-001/shoe-attributes/save">
+<input type="hidden" name="kind" th:value="${kind}"><input class="form-control" style="max-width:400px" name="name" required maxlength="100" placeholder="Tên thuộc tính" aria-label="Tên thuộc tính">
+<label><input type="checkbox" name="active" value="true" checked> Đang sử dụng</label><button class="btn btn-primary">Thêm</button></form></div>
+<div class="card"><div class="card-header">Danh sách <span th:text="${label}"></span></div><div class="card-body table-responsive">
+<table class="table"><thead><tr><th>Mã</th><th>Tên / cập nhật trạng thái</th></tr></thead><tbody>
+<tr th:each="item : ${items}"><td th:text="${item.id}"></td><td><form class="d-flex flex-wrap gap-3 align-items-center" method="post" action="/adm-prj/qtht-001/shoe-attributes/save">
+<input type="hidden" name="kind" th:value="${kind}"><input type="hidden" name="id" th:value="${item.id}">
+<input class="form-control" style="max-width:400px" name="name" th:value="${item.name}" required maxlength="100" aria-label="Tên thuộc tính">
+<label><input type="checkbox" name="active" value="true" th:checked="${item.active}"> Đang sử dụng</label><button class="btn btn-outline-primary">Lưu</button></form></td></tr>
+<tr th:if="${#lists.isEmpty(items)}"><td colspan="2" class="text-center text-muted">Chưa có thuộc tính phù hợp.</td></tr>
+</tbody></table></div></div>
+</main></div></div></body></html>

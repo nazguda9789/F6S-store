@@ -23,6 +23,10 @@ import java.util.List;
 @RestController
 @RequestMapping(TypeSystem.ADMIN_URL+ "/api/product")
 public class ProductAdminApi {
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> invalidAttribute(IllegalArgumentException exception) {
+        return ResponseEntity.badRequest().body(java.util.Map.of("message", exception.getMessage() == null ? "Dữ liệu không hợp lệ" : exception.getMessage()));
+    }
 
     @Autowired
     private ProductService productService;

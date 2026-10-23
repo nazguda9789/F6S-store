@@ -375,13 +375,25 @@
 
 
     <script>
+        (() => {
         let stompClient = null;
+        let stopped = false;
+        let retryTimer;
+        let notificationSocket;
+        window.addEventListener('pagehide', () => {
+            stopped = true;
+            clearTimeout(retryTimer);
+            if (notificationSocket) notificationSocket.close();
+        }, { once: true });
 
         function connect() {
+            if (stopped) return;
             const socket = new SockJS('/ws');
+            notificationSocket = socket;
             stompClient = Stomp.over(socket);
 
             stompClient.connect({}, function (frame) {
+                if (socket.readyState !== SockJS.OPEN) return;
                 console.log('Connected: ' + frame);
                 // Subscribe to a topic
                 stompClient.subscribe('/topic/notifications', function (notification) {
@@ -434,11 +446,12 @@
                 });
             }, function (error) {
                 console.error('Connection failed:', error);
-                setTimeout(connect, 5000); // Tự động kết nối lại sau 5 giây
+                if (!stopped) retryTimer = setTimeout(connect, 5000);
             });
         }
 
         connect();
+        })();
     </script>
 </div>
 

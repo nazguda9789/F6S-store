@@ -9,7 +9,7 @@ const base = process.env.F6S_BASE_URL || 'http://127.0.0.1:18080';
     const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox'] });
     try {
         const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-        page.on('pageerror', error => console.error('Browser error:', error.message));
+        page.on('pageerror', error => console.error('Browser error:', error.stack));
         await page.goto(base + '/login');
         await page.locator('[name=username]').fill(process.env.F6S_TEST_EMAIL || 'admin@gmail.com');
         await page.locator('[name=password]').fill(process.env.F6S_TEST_PASSWORD || '123123');

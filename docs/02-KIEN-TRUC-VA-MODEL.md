@@ -50,6 +50,7 @@ Các tên dưới đây là tên lớp Java. Tên bảng/cột thực tế xem a
 | Xác thực | `OtpCode` | Dữ liệu mã xác thực, liên hệ/tài khoản và thời gian |
 | Đăng ký chờ | `PendingRegistration` | Email, hash mật khẩu, thông tin đăng ký và thời hạn; chưa phải tài khoản. Chỉ tạo `User` sau OTP, hoặc xóa yêu cầu chờ khi Google xác minh cùng email |
 | Sản phẩm | `Product` | Tên, slug, ảnh, giá chung, mô tả, trọng lượng, SEO, active, số đã bán |
+| Thuộc tính giày (23/10) | `ShoeAttribute` | Nhóm BRAND/SOLE/MATERIAL, tên, trạng thái; Product lưu brandId/soleId/materialId nullable, service kiểm tra tham chiếu |
 | Biến thể | `ProductDetail` | Product ID, màu, size, SKU, giá riêng, giá cũ, tồn kho, active |
 | Thuộc tính | `Color`, `Size` | Danh mục màu và kích cỡ |
 | Danh mục | `Category` | Danh mục có quan hệ cha–con, slug, thứ tự, ảnh |

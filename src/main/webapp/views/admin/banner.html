@@ -73,6 +73,7 @@
 <script>
     window.addEventListener('DOMContentLoaded', event => {
         $(document).ready(function() {
+            if (!$.fn.DataTable) return; // Native table remains usable without CDN.
             $('#datatablesSimple').DataTable({
                 "paging": true,
                 "lengthChange": true,
@@ -105,14 +106,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 <script>
-    var colorPicker = new iro.ColorPicker("#picker", {
+    var colorPicker = window.iro && document.getElementById('picker') ? new iro.ColorPicker("#picker", {
         width: 200,
         color: "#f00"
-    });
+    }) : null;
 
     var hexInput = document.getElementById("hexInput");
 
-    colorPicker.on("color:change", function(color) {
+    if (colorPicker) colorPicker.on("color:change", function(color) {
         document.getElementById("mamau").value = color.hexString;
     });
 

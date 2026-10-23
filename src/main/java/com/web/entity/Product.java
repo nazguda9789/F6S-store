@@ -23,6 +23,9 @@ public class Product {
     private Long id;
 
     private String name;
+    private Long brandId;
+    private Long soleId;
+    private Long materialId;
 
     private String slug;              // slug SEO (unique)
 

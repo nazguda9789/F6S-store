@@ -1,7 +1,7 @@
 /* Progressive layout only: no changes to order/account API behavior. */
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.querySelector('#sidenavAccordion .sb-sidenav-menu > .nav');
-    const main = document.querySelector('#layoutSidenav_content main');
+    const main = document.querySelector('#layoutSidenav_content main') || document.querySelector('#layoutSidenav_content');
     if (!sidebar || !main) return;
     if (sidebar.dataset.workspaceReady) return;
     sidebar.dataset.workspaceReady = 'true';
@@ -24,11 +24,22 @@ document.addEventListener('DOMContentLoaded', () => {
         link.insertBefore(caption, link.querySelector('.number-counter-navbar, .sb-sidenav-collapse-arrow'));
     };
     rename('[data-bs-target="#collapseProducts"]', 'Quản lý sản phẩm');
-    rename('[data-bs-target="#collapseInvoice"]', 'Quản lý hóa đơn');
-    rename('[data-bs-target="#collapseVoucher"]', 'Khuyến mại');
+    rename('[data-bs-target="#collapseInvoice"]', 'Quản lý giao dịch');
+    rename('[data-bs-target="#collapseVoucher"]', 'Giảm giá');
     rename('[data-bs-target="#collapseVendors"]', 'Quản lý tài khoản');
     rename('[data-bs-target="#collapseBlog"]', 'Nội dung website');
     rename('[data-bs-target="#collapseHeThong"]', 'Cấu hình hệ thống');
+    if (!location.pathname.startsWith('/emp-prj/')) {
+        const productMenu = sidebar.querySelector('#collapseProducts nav');
+        for (const [kind, label] of [['BRAND', 'Thương hiệu'], ['SOLE', 'Đế giày'], ['MATERIAL', 'Chất liệu']]) {
+            const link = document.createElement('a'); link.className = 'navchild';
+            link.href = prefix + '/shoe-attributes?kind=' + kind; link.textContent = label;
+            productMenu?.append(link);
+        }
+        const gallery = document.createElement('a'); gallery.className = 'nav-link';
+        gallery.href = prefix + '/image-library'; gallery.textContent = 'Thư viện hình ảnh';
+        sidebar.append(gallery);
+    }
     // Reuse server-rendered links instead of exposing new routes or permissions.
     const content = sidebar.querySelector('#collapseBlog nav');
     const settings = sidebar.querySelector('#collapseHeThong nav');
@@ -53,10 +64,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (panel) toggle.dataset.urls = JSON.stringify([...panel.querySelectorAll('a[href]')].map(a => new URL(a.href).pathname));
     });
     const accounts = sidebar.querySelector('#collapseVendors nav');
+    if (accounts) {
+        for (const [role, label] of [['ROLE_EMPLOYEE', 'Nhân viên'], ['ROLE_USER', 'Khách hàng đăng ký']]) {
+            const link = document.createElement('a'); link.className = 'navchild';
+            link.href = prefix + '/user/list?role=' + role; link.textContent = label;
+            accounts.prepend(link);
+        }
+    }
     const customerGroup = sidebar.querySelector('#collapseCustomers');
     if (accounts && customerGroup) {
         const customer = customerGroup.querySelector('a');
-        if (customer) { customer.textContent = 'Khách hàng'; accounts.append(customer); }
+        if (customer) { customer.textContent = 'Khách hàng giao dịch'; accounts.append(customer); }
         sidebar.querySelector('[data-bs-target="#collapseCustomers"]')?.remove();
         customerGroup.remove();
     }
@@ -66,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         firstProduct.parentElement.prepend(firstProduct);
     }
     const report = sidebar.querySelector('a[href$="/thong-ke/doanh-thu"]');
-    if (report) sidebar.prepend(report);
+    if (report) { rename('a[href$="/thong-ke/doanh-thu"]', 'Tổng quan – Thống kê'); sidebar.prepend(report); }
     // Primary selling workflow first, supporting modules below.
     let cursor = sale;
     for (const id of ['collapseInvoice', 'collapseProducts', 'collapseVendors', 'collapseCustomers', 'collapseVoucher', 'collapseBlog', 'collapseHeThong']) {
@@ -88,7 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
     links.forEach(link => {
         link.classList.remove('active');
         link.removeAttribute('aria-current');
-        if (new URL(link.href).pathname === location.pathname && link.getAttribute('href') !== '#') {
+        const target = new URL(link.href);
+        const kindMatches = !target.searchParams.has('kind') || target.searchParams.get('kind') === (new URLSearchParams(location.search).get('kind') || 'BRAND');
+        const currentRole = new URLSearchParams(location.search).get('role');
+        const roleMatches = target.pathname.endsWith('/user/list') ? target.searchParams.get('role') === currentRole : true;
+        if (target.pathname === location.pathname && kindMatches && roleMatches && link.getAttribute('href') !== '#') {
             link.classList.add('active');
             link.setAttribute('aria-current', 'page');
             current = link;

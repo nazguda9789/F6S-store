@@ -72,6 +72,7 @@
 <script>
   window.addEventListener('DOMContentLoaded', event => {
     $(document).ready(function() {
+      if (!$.fn.DataTable) return; // Keep native table when CDN is unavailable.
       $('#datatablesSimple').DataTable({
         "paging": true,
         "lengthChange": true,

@@ -39,7 +39,13 @@
                 <div class="lb-form">Thông tin sản phẩm</div>
                 <label class="form-label">Tên sản phẩm</label>
                 <input th:value="${product.name}" class="form-control form-control-sm" id="name" onkeyup="createSlug(this.value)">
-                <label class="form-label">Slug</label>
+                <label class="form-label" for="brandId">Thương hiệu</label>
+                <select id="brandId" class="form-select"><option value="">Chưa phân loại</option><option th:each="a : ${brands}" th:if="${a.active or a.id == product.brandId}" th:value="${a.id}" th:text="${a.name}" th:selected="${a.id == product.brandId}"></option></select>
+                <label class="form-label" for="soleId">Đế giày</label>
+                <select id="soleId" class="form-select"><option value="">Chưa phân loại</option><option th:each="a : ${soles}" th:if="${a.active or a.id == product.soleId}" th:value="${a.id}" th:text="${a.name}" th:selected="${a.id == product.soleId}"></option></select>
+                <label class="form-label" for="materialId">Chất liệu</label>
+                <select id="materialId" class="form-select"><option value="">Chưa phân loại</option><option th:each="a : ${materials}" th:if="${a.active or a.id == product.materialId}" th:value="${a.id}" th:text="${a.name}" th:selected="${a.id == product.materialId}"></option></select>
+                <label class="form-label" for="slug">Slug</label>
                 <input th:value="${product.slug}" class="form-control form-control-sm" id="slug">
                 <label class="form-label">Danh mục</label>
                 <select class="form-control form-control-sm selectpicker" multiple id="categoryIds" data-live-search="true">
@@ -75,7 +81,7 @@
                 <label class="form-label">Meta title</label>
                 <input th:field="*{metaTitle}" class="form-control form-control-sm" id="metaTitle">
                 <label class="form-label">Meta description</label>
-                <textarea th:field="*{metaDescription}"  class="form-control form-control-sm" rows="4" id="metaDescription">Mua áo sơ mi nam cao cấp, thiết kế trẻ trung, vải mát, giao hàng toàn quốc. Khuyến mãi lên đến 50% tại ShopHieu</textarea>
+                <textarea th:field="*{metaDescription}" class="form-control form-control-sm" rows="4" id="metaDescription" placeholder="Mô tả giày thể thao F6S"></textarea>
             </div>
             <div class="col-sm-2">
                 <div onclick="choosefile.click()" class="divchooseimg">

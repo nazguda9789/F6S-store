@@ -2,6 +2,7 @@ var listFile = [];
 var exceptionCode = 417;
 async function filterProduct(page) {
     var productsearch = {
+        "brandId": document.getElementById('filterBrand')?.value || null,
         "idCategory": document.getElementById("listcategory").value == -1?null:document.getElementById("listcategory").value,
         "smallPrice": document.getElementById("priceRange").value.split("-")[0],
         "largePrice": document.getElementById("priceRange").value.split("-")[1],
@@ -97,7 +98,7 @@ function renderPagination(currentPage, totalPages) {
     document.getElementById("pageable").innerHTML = mainpage;
 }
 
-var linkbanner = document.getElementById("productimage").value
+var linkbanner = document.getElementById("productimage")?.value || '';
 async function saveProduct() {
     var uls = new URL(document.URL)
     var id = uls.searchParams.get("id");
@@ -112,6 +113,9 @@ async function saveProduct() {
     var listDetail = await getProductDetailsFromUI();
     var product = {
         "name": document.getElementById("name").value,
+        "brandId": document.getElementById('brandId')?.value || null,
+        "soleId": document.getElementById('soleId')?.value || null,
+        "materialId": document.getElementById('materialId')?.value || null,
         "slug": document.getElementById("slug").value,
         "image": linkbanner,
         "price": document.getElementById("giaban").value,
