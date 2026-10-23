@@ -74,6 +74,9 @@ public class Invoice {
 
     private Long userId;
 
+    // Customer identity is separate from the staff member who created the sale.
+    private Long customerId;
+
     private String token;
 
     @Enumerated(EnumType.STRING)

@@ -21,7 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const chooseCustomer = document.createElement('button'); chooseCustomer.type = 'button'; chooseCustomer.className = 'btn btn-outline-primary'; chooseCustomer.id = 'pos-choose-customer';
     chooseCustomer.textContent = 'Chọn khách hàng';
     const status = document.createElement('p'); status.className = 'text-muted'; status.setAttribute('role', 'status'); status.id = 'pos-action-status';
-    actions.append(newDraft, chooseCustomer); tabs.after(actions, status);
+    const guest = document.createElement('button'); guest.type = 'button'; guest.className = 'btn btn-outline-secondary'; guest.id = 'pos-guest-customer'; guest.textContent = 'Khách lẻ';
+    guest.addEventListener('click', () => {
+        document.getElementById('id-order').dataset.customerId = '';
+        for (const id of ['fullName','phone','email','addressDetail']) document.getElementById(id).value = id === 'fullName' ? 'Khách lẻ' : '';
+        status.textContent = 'Đã chọn khách lẻ. Lưu đơn chờ để cập nhật.';
+    });
+    actions.append(newDraft, chooseCustomer, guest); tabs.after(actions, status);
     newDraft.addEventListener('click', async () => {
         newDraft.disabled = true;
         try {
@@ -56,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const label = document.createElement('span'); label.textContent = [customer.fullName, customer.phone, customer.email].filter(Boolean).join(' · ');
                 const choose = document.createElement('button'); choose.type = 'button'; choose.className = 'btn btn-outline-primary btn-sm'; choose.textContent = 'Chọn';
                 choose.addEventListener('click', () => {
+                    document.getElementById('id-order').dataset.customerId = String(customer.id);
                     for (const [id, value] of [['fullName',customer.fullName],['phone',customer.phone],['email',customer.email],['addressDetail',customer.address]]) {
                         const input = document.getElementById(id); if (input) { input.value = value || ''; input.dispatchEvent(new Event('input', {bubbles:true})); }
                     }

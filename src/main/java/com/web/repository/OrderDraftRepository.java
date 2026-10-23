@@ -8,6 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface OrderDraftRepository extends JpaRepository<OrderDraft, Long> {
 
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("select o from OrderDraft o where o.id = ?1")
+    java.util.Optional<OrderDraft> findByIdForUpdate(Long id);
+
     @Modifying
     @Transactional
     @Query("update OrderDraft o set o.totalAmount = ?1 where o.id = ?2")

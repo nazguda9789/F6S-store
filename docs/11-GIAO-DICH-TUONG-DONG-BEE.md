@@ -2,6 +2,8 @@
 
 Tiếp nối [đối chiếu video](10-DOI-CHIEU-VIDEO-BEE.md). Mục tiêu là thao tác tương đồng trên nghiệp vụ F6S; không khẳng định đã sao chép đầy đủ mọi quy tắc Bee.
 
+**Cập nhật tiếp theo:** xem [chuyển luồng nghiệp vụ](14-CHUYEN-LUONG-NGHIEP-VU-BEE.md). Bản mới đã lưu customerId riêng và tự đóng đơn chờ trong transaction sau chuyển; mô tả giới hạn bên dưới là hiện trạng của đợt trước. Bản mới cần migration hai cột customer_id trước khi chạy.
+
 ## Thay đổi trong đợt này
 
 ### Bán hàng tại quầy

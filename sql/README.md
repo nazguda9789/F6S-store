@@ -1,5 +1,7 @@
 # Chọn file SQL F6S
 
+Bản chuyển luồng bán hàng bổ sung `order_draft.customer_id` và `invoice.customer_id`, tách khách mua với nhân viên tạo. Đã gộp trong cài mới/nâng cấp/bổ sung; nếu đã nâng bản trước, chạy riêng `cap_nhat_luong_ban_hang_20261023.sql` sau sao lưu và dừng web. Không tự gán khách cho hóa đơn cũ. [Luồng mới và giới hạn](../docs/14-CHUYEN-LUONG-NGHIEP-VU-BEE.md).
+
 Các bản cài mới và bổ sung dữ liệu đã gộp cấu trúc module giày ngày 23/10/2026. Không lấy database đang chạy của người dùng để tạo dump: dữ liệu mẫu cũ được giữ, không kèm đơn/tài khoản kiểm thử hoặc secret mới.
 
 | Tình huống | File |

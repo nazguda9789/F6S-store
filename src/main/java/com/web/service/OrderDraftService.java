@@ -67,6 +67,8 @@ public class OrderDraftService {
     @Autowired
     private UserUtils userUtils;
 
+    @Autowired private UserRepository userRepository;
+
     @Transactional
     public Result<?> create(OrderDraft input){
         if ((input.getDiscount() != null && (!Double.isFinite(input.getDiscount()) || input.getDiscount() < 0))
@@ -75,9 +77,16 @@ public class OrderDraftService {
         OrderDraft orderDraft;
         if (input.getId() == null) orderDraft = new OrderDraft();
         else {
-            orderDraft = orderDraftRepository.findById(input.getId()).orElse(null);
+            orderDraft = orderDraftRepository.findByIdForUpdate(input.getId()).orElse(null);
             if (orderDraft == null) return Result.fail("Đơn chờ không tồn tại. Vui lòng tải lại danh sách.");
         }
+        if (input.getCustomerId() != null) {
+            User customer = userRepository.findById(input.getCustomerId()).orElse(null);
+            if (customer == null || customer.getRole() != com.web.enums.Role.ROLE_USER
+                    || !Boolean.TRUE.equals(customer.getActived()) || Boolean.TRUE.equals(customer.getDeleted())
+                    || !Boolean.TRUE.equals(customer.getActivationStatus())) return Result.fail("Khách hàng không hợp lệ hoặc đã ngừng hoạt động.");
+        }
+        orderDraft.setCustomerId(input.getCustomerId());
         orderDraft.setFullName(input.getFullName() == null || input.getFullName().isBlank() ? "Khách lẻ" : input.getFullName().strip());
         orderDraft.setPhone(input.getPhone()); orderDraft.setEmail(input.getEmail()); orderDraft.setNote(input.getNote());
         orderDraft.setAddressDetail(input.getAddressDetail()); orderDraft.setProvinceCode(input.getProvinceCode());
@@ -99,7 +108,7 @@ public class OrderDraftService {
 
     @Transactional
     public Result<?> addToOrder(Long detailId, Long orderId) {
-        if (!orderDraftRepository.existsById(orderId)) return Result.fail("Đơn chờ không tồn tại.");
+        if (orderDraftRepository.findByIdForUpdate(orderId).isEmpty()) return Result.fail("Đơn chờ không tồn tại hoặc đã thanh toán.");
         ProductDetail selectedVariant = productDetailRepository.findById(detailId).orElse(null);
         if (selectedVariant == null || !Boolean.TRUE.equals(selectedVariant.getActive()) || selectedVariant.getStock() == null || selectedVariant.getStock() < 1)
             return Result.fail("Biến thể không tồn tại, đã ngừng bán hoặc hết hàng.");
@@ -143,12 +152,14 @@ public class OrderDraftService {
         return list;
     }
 
+    @Transactional
     public Result<?> deleteDetail(Long detailId) {
         Optional<OrderDetailDraft> orderDetailDraft = orderDetailDraftRepository.findById(detailId);
         if(orderDetailDraft.isEmpty()){
             return new Result<>(false, null, "Không tìm thấy chi tiết đơn chờ");
         }
         Long orderId = orderDetailDraft.get().getOrderDraft().getId();
+        if (orderDraftRepository.findByIdForUpdate(orderId).isEmpty()) return Result.fail("Đơn chờ không tồn tại hoặc đã thanh toán.");
         orderDetailDraftRepository.deleteById(detailId);
         updateTotalAmount(orderId);
         Double total = orderDraftRepository.getTotalAmount(orderId);
@@ -162,6 +173,8 @@ public class OrderDraftService {
         if(orderDetailDraft.isEmpty()){
             return new Result<>(false, null, "Không tìm thấy chi tiết đơn hàng chờ");
         }
+        if (orderDraftRepository.findByIdForUpdate(orderDetailDraft.get().getOrderDraft().getId()).isEmpty())
+            return Result.fail("Đơn chờ không tồn tại hoặc đã thanh toán.");
         ProductDetail variant = productDetailRepository.findById(orderDetailDraft.get().getIdProductDetail()).orElse(null);
         if (variant == null || !Boolean.TRUE.equals(variant.getActive()) || variant.getStock() == null || quantity > variant.getStock())
             return Result.fail("Biến thể ngừng bán hoặc số lượng vượt tồn kho hiện tại.");
@@ -185,7 +198,9 @@ public class OrderDraftService {
         orderDraftRepository.updateTotalAmount(total, orderId);
     }
 
+    @Transactional
     public Result<?> deleteOrder(Long orderId){
+        if (orderDraftRepository.findByIdForUpdate(orderId).isEmpty()) return Result.fail("Đơn chờ không tồn tại hoặc đã thanh toán.");
         orderDetailDraftRepository.deleteByOrder(orderId);
         orderDraftRepository.deleteById(orderId);
         return new Result<>(true, null, "Xóa đơn tạm thành công");
@@ -193,7 +208,10 @@ public class OrderDraftService {
 
     @Transactional
     public Result<?> changeToInvoice(Long orderId, InvoiceType invoiceType, InvoiceStatus invoiceStatus){
-        Optional<OrderDraft> orderDraftOptional = orderDraftRepository.findById(orderId);
+        if ((invoiceType != InvoiceType.TAI_QUAY && invoiceType != InvoiceType.FACEBOOK)
+                || (invoiceStatus != InvoiceStatus.DANG_CHO_VAN_CHUYEN && invoiceStatus != InvoiceStatus.HOAN_THANH))
+            return Result.fail("Loại giao dịch hoặc trạng thái khởi tạo không hợp lệ.");
+        Optional<OrderDraft> orderDraftOptional = orderDraftRepository.findByIdForUpdate(orderId);
         if(orderDraftOptional.isEmpty()){
             return new Result<>(false, null, "Không tìm thấy đơn hàng chờ nào");
         }
@@ -223,6 +241,8 @@ public class OrderDraftService {
         invoice.setUpdateDate(LocalDateTime.now());
         invoice.setInvoiceType(invoiceType);
         invoice.setInvoiceStatus(invoiceStatus);
+        invoice.setCustomerId(orderDraftOptional.get().getCustomerId());
+        if (invoiceStatus == InvoiceStatus.HOAN_THANH) invoice.setCompletedDate(LocalDateTime.now());
         invoice.setPayType(PayType.COD);
         invoice.setWeight(weight);
         invoice.setShipCost(shipping);
@@ -233,10 +253,15 @@ public class OrderDraftService {
             // Lock row ProductDetail
             ProductDetail product = productDetailRepository.findByIdForUpdate(i.getIdProductDetail())
                     .orElseThrow(() -> new RuntimeException("Không tồn tại sản phẩm: " + i.getProductName()));
-            if (product.getStock() < i.getQuantity()) {
+            Product parent = productRepository.findById(product.getProductId()).orElse(null);
+            if (!Boolean.TRUE.equals(product.getActive()) || parent == null || !Boolean.TRUE.equals(parent.getActive())) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.fail("Sản phẩm hoặc biến thể đã ngừng kinh doanh. Vui lòng kiểm tra lại giỏ.");
+            }
+            if (product.getStock() == null || product.getStock() < i.getQuantity()) {
                 // roleback lại sẽ xóa invoice tạo bên trên
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                if(product.getStock() == 0){
+                if(product.getStock() == null || product.getStock() == 0){
                     return new Result<>(false,null,"Xin lỗi bạn! "+i.getProductName()+" màu: "+i.getColorName()+" - size: "+i.getSizeName()+" đã hết hàng");
                 }
                 else{
@@ -256,6 +281,14 @@ public class OrderDraftService {
         invoice.setCode("INV-" + date + "-" + random + "-" + invoice.getId());
         invoice.setToken(UUID.randomUUID().toString()+"-"+invoice.getId().toString());
         invoiceRepository.save(invoice);
+
+        // Consume the draft in the same transaction as invoice and stock writes.
+        // A concurrent/retried request cannot create a second invoice from it.
+        // Remove managed child entities as entities, not via bulk JPQL; otherwise
+        // Hibernate still sees children referencing a removed draft at flush.
+        orderDetailDraftRepository.deleteAll(orderDetailDrafts);
+        orderDetailDraftRepository.flush();
+        orderDraftRepository.delete(orderDraftOptional.get());
 
         emailInvoice.buildOrderSuccessEmail(invoice, list);
         HistoryInvoiceStatus historyInvoiceStatus = new HistoryInvoiceStatus(null, invoice, invoice.getInvoiceStatus(), LocalDateTime.now(), "",invoice.getUserId(),"","","");

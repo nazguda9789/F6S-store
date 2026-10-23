@@ -24,6 +24,7 @@ const base=process.env.F6S_BASE_URL || 'http://127.0.0.1:18080';
   await page.locator('button.btn-warning[onclick="createDonTam()"]').click();assert.equal((await(await saved).json()).success,true);
   if(await page.locator('.sweet-alert .confirm').isVisible())await page.locator('.sweet-alert .confirm').click();
   const persisted=await(await page.request.post(api+'/find-detail-order?orderId='+id)).json();assert.equal(persisted.data.email,customers[0].email);
+  assert.equal(persisted.data.customerId,customers[0].id,'Selected customer identity must survive reload independently of staff');
   await page.locator('[data-bs-target="#pos-product-picker"]').click();
   const added=page.waitForResponse(r=>r.url().includes('/order-draft/add-to-order?')&&r.request().method()==='POST');
   await page.locator('.variant-row').filter({has:page.locator('.in-stock')}).first().click();

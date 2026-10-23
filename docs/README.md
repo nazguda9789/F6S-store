@@ -2,6 +2,8 @@
 
 [Về trang chính](../README.md)
 
+[Tiến độ chuyển luồng nghiệp vụ theo Bee và phần chưa hoàn tất](14-CHUYEN-LUONG-NGHIEP-VU-BEE.md).
+
 Tài liệu đối chiếu mã nguồn đến ngày **19/10/2026**, dành cho người cài demo, thành viên phát triển và người viết báo cáo. “Có trong code” không đồng nghĩa “đã kiểm thử đầy đủ”.
 
 ## Đọc theo mục đích

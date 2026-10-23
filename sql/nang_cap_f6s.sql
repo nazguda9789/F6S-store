@@ -93,3 +93,17 @@ COMMIT;
 SELECT CASE WHEN @f6s_merge_apply=1 THEN 'APPLIED'
             WHEN EXISTS(SELECT 1 FROM catalog_variant_merge WHERE migration_key='merge-244-245-v1') THEN 'ALREADY_APPLIED'
             ELSE 'SKIPPED_REVIEW_CART_DRAFT_OR_VARIANT_DATA' END AS merge_status;
+
+-- Persist customer identity independently of the staff creator.
+SET @f6s_customer_column = IF(
+  (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='order_draft' AND column_name='customer_id')=0,
+  'ALTER TABLE order_draft ADD COLUMN customer_id BIGINT NULL', 'SELECT 1');
+PREPARE f6s_customer_stmt FROM @f6s_customer_column;
+EXECUTE f6s_customer_stmt;
+DEALLOCATE PREPARE f6s_customer_stmt;
+SET @f6s_customer_column = IF(
+  (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='invoice' AND column_name='customer_id')=0,
+  'ALTER TABLE invoice ADD COLUMN customer_id BIGINT NULL', 'SELECT 1');
+PREPARE f6s_customer_stmt FROM @f6s_customer_column;
+EXECUTE f6s_customer_stmt;
+DEALLOCATE PREPARE f6s_customer_stmt;

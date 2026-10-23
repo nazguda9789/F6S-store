@@ -36,6 +36,8 @@ public class OrderDraft {
 
     private String fullName;
 
+    private Long customerId;
+
     private String phone;
 
     private String email;

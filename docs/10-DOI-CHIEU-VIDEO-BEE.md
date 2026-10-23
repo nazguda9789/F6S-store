@@ -1,5 +1,7 @@
 # Đối chiếu video Bee và module F6S — 23/10/2026
 
+Tiến độ thay **luồng nghiệp vụ**, không chỉ giao diện: [bảng chuyển đổi và các phần chưa hoàn tất](14-CHUYEN-LUONG-NGHIEP-VU-BEE.md).
+
 Nguồn: video người dùng tải lên, thời lượng 14 phút 40,8 giây, 360p. Đã trích khung hình để xem màn hình; không có source Bee và không suy ra được toàn bộ quy tắc nghiệp vụ chỉ từ ảnh. Tên F6S và tông tím than/xanh ngọc được giữ theo xác nhận trước đó.
 
 | Mốc khoảng | Nội dung nhìn thấy | Cách triển khai / hiện trạng F6S |

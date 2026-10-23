@@ -1,5 +1,7 @@
 # F6S — Website quản lý bán giày thể thao
 
+**Tiến độ thay luồng theo Bee:** đã bổ sung liên kết khách/nhân viên riêng và đóng đơn chờ trong transaction khi chuyển giao dịch, chống chuyển trùng. **Chưa hoàn tất toàn bộ nghiệp vụ Bee**; xem [các luồng đã đổi và phần còn thiếu](docs/14-CHUYEN-LUONG-NGHIEP-VU-BEE.md). Bản này cần migration `customer_id` trước khi chạy code mới (đã gộp trong SQL nâng cấp).
+
 F6S là ứng dụng Java Spring Boot phục vụ khách mua giày online và nhân viên bán hàng tại quầy, kèm khu vực quản trị sản phẩm, đơn hàng và doanh thu. Giao diện dùng Thymeleaf, Bootstrap và JavaScript; dữ liệu lưu bằng MySQL/MariaDB.
 
 > Các mục chức năng dưới đây được ghi nhận từ mã nguồn hiện tại, không có nghĩa tất cả đã được kiểm thử hoàn chỉnh. Xem phần trạng thái kiểm chứng ở cuối tài liệu.

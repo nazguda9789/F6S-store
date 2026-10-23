@@ -124,6 +124,7 @@ async function loadDetailOrder() {
         $('.btn-luutam').css('display', 'none');
         var order = result.data;
         $("#id-order").val(order.id)
+        document.getElementById('id-order').dataset.customerId = order.customerId || '';
         $("#fullName").val(order.fullName)
         $("#phone").val(order.phone)
         $("#email").val(order.email)
@@ -304,10 +305,10 @@ async function changeOrderToInvoice() {
     if(con == false){
         return;
     }
+    if (!await createDonTam(true)) return;
     let status = $('input[name="invoiceStatus"]:checked').val();
     let orderType = $('input[name="orderType"]:checked').val();
-    var isDel = document.getElementById("check-delete").checked;
-    const response = await fetch(`/adm-prj/qtht-001/api/order-draft/save-order-to-invoice?orderId=${selectInvoice}&invoiceType=${orderType}&invoiceStatus=${status}&isDelete=${isDel}`, {
+    const response = await fetch(`/adm-prj/qtht-001/api/order-draft/save-order-to-invoice?orderId=${selectInvoice}&invoiceType=${orderType}&invoiceStatus=${status}`, {
         method: 'POST'
     });
     if(response.status > 300){
@@ -315,9 +316,6 @@ async function changeOrderToInvoice() {
     }
     var result = await response.json();
     if(result.success == true){
-        if(isDel == true){
-            deleteOrderFromBE(selectInvoice);
-        }
         swal({
             title: "Thông báo",
             text: result.message,
@@ -339,9 +337,10 @@ async function deleteOrderFromBE(idorder) {
     });
 }
 
-async function createDonTam(){
+async function createDonTam(silent = false){
     var orderDraft = {
         id: $("#id-order").val(),
+        customerId: Number(document.getElementById('id-order').dataset.customerId) || null,
         fullName: document.getElementById("fullName").value == "" ? "Khách lẻ":$("#fullName").val(),
         phone: document.getElementById("phone").value,
         email: document.getElementById("email").value,
@@ -356,7 +355,6 @@ async function createDonTam(){
         voucherCode: document.getElementById("discount-code").value,
         shipCost: parseFloat(document.getElementById("shipcost").value) || 0,
     };
-    console.log(orderDraft)
     const response = await fetch(`/adm-prj/qtht-001/api/order-draft/create`, {
         method: 'POST',
         headers: new Headers({
@@ -369,7 +367,7 @@ async function createDonTam(){
     }
     var result = await response.json();
     if(result.success == true){
-        swal({
+        if (!silent) swal({
             title: "Thông báo",
             text: result.message,
             type: "success"
@@ -388,4 +386,5 @@ async function createDonTam(){
     else{
         toastr.error(result.message)
     }
+    return result.success === true;
 }
