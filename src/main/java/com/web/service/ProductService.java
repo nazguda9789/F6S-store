@@ -22,6 +22,18 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+    void validateCatalogData(ProductCreateRequest request) {
+        if (request.getName() == null || request.getName().isBlank() || request.getName().strip().length() > 255)
+            throw new IllegalArgumentException("Tên giày phải từ 1 đến 255 ký tự.");
+        if (request.getSlug() == null || request.getSlug().isBlank() || request.getSlug().length() > 255)
+            throw new IllegalArgumentException("Vui lòng nhập đường dẫn sản phẩm hợp lệ (tối đa 255 ký tự).");
+        if (request.getPrice() == null || !Double.isFinite(request.getPrice()) || request.getPrice() < 0
+                || (request.getOldPrice() != null && (!Double.isFinite(request.getOldPrice()) || request.getOldPrice() < 0)))
+            throw new IllegalArgumentException("Giá giày phải là số không âm và hữu hạn.");
+        if (request.getWeight() == null || !Float.isFinite(request.getWeight()) || request.getWeight() <= 0)
+            throw new IllegalArgumentException("Cân nặng giày phải lớn hơn 0 kg để tính vận chuyển.");
+        request.setName(request.getName().strip()); request.setSlug(request.getSlug().strip());
+    }
     @Autowired private CatalogCodeService catalogCodes;
     @Autowired private CatalogVariantMergeRepository variantMerges;
 
@@ -88,6 +100,7 @@ public class ProductService {
 
     @Transactional
     public Product createProduct(ProductCreateRequest request) {
+        validateCatalogData(request);
         validateVariants(request, null);
         // Tạo Product
         Product product = new Product();
@@ -171,6 +184,7 @@ public class ProductService {
 
     @Transactional
     public Product updateProduct(ProductCreateRequest request, Long id) {
+        validateCatalogData(request);
         validateVariants(request, id);
         // Tạo Product
         Product product = productRepository.findById(id).get();

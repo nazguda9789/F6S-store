@@ -145,7 +145,7 @@ async function saveProduct() {
         swal({ title: "Thông báo", text: "thêm/sửa sản phẩm thành công", type: "success" },
             function() { window.location.href = 'list' });
     } else {
-        swal({title: "Thông báo",text: "thêm/sửa sản phẩm thất bại",type: "error"},
+        swal({title: "Thông báo",text: result.defaultMessage || result.message || "Thêm/sửa sản phẩm thất bại. Kiểm tra tên, giá, cân nặng và biến thể.",type: "error"},
             function() { document.getElementById("loading").style.display = 'none' });
     }
 }

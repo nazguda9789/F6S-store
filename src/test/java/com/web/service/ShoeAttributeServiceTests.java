@@ -48,6 +48,17 @@ class ShoeAttributeServiceTests {
         when(repository.findById(5L)).thenReturn(Optional.of(attribute(true)));
         when(repository.save(any())).thenAnswer(i -> i.getArgument(0));
         assertFalse(service.save(5L, ShoeAttribute.Kind.BRAND, "Brand", false).isActive());
-        verify(repository, never()).delete(any());
+        verify(repository, never()).delete(any(ShoeAttribute.class));
+    }
+    @Test void generatedCodeAndDescriptionPersistWithoutRenamingCode() {
+        when(repository.save(any(ShoeAttribute.class))).thenAnswer(i->{ShoeAttribute v=i.getArgument(0);if(v.getId()==null)v.setId(12L);return v;});
+        var created=service.save(null,ShoeAttribute.Kind.SOLE,"EVA",true,"  Nhẹ và đàn hồi  ");
+        assertEquals("F6S-DE000012",created.getCode()); assertEquals("Nhẹ và đàn hồi",created.getDescription());
+        when(repository.findById(12L)).thenReturn(Optional.of(created));
+        assertEquals(created.getCode(),service.save(12L,ShoeAttribute.Kind.SOLE,"EVA mới",false,"Mô tả mới").getCode());
+    }
+    @Test void rejectsOverlongDescriptionBeforeSaving() {
+        assertThrows(IllegalArgumentException.class,()->service.save(null,ShoeAttribute.Kind.MATERIAL,"Mesh",true,"x".repeat(501)));
+        verify(repository,never()).save(any(ShoeAttribute.class));
     }
 }

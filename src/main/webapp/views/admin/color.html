@@ -2,6 +2,7 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8" />
+    <script defer src="/admin/js/lookup-table.js"></script>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="Admin Dashboard" />
@@ -17,6 +18,7 @@
         <main>
             <div class="container-fluid">
                 <h1 class="mt-4">Danh sách màu sắc</h1>
+                <p class="text-muted">Tên màu và mã HEX dùng cho biến thể, ảnh theo màu và bộ lọc giày. Màu đang được sử dụng chỉ ngừng xuất hiện trong lựa chọn mới khi xóa, không xóa lịch sử.</p>
 
                 <div class="card mb-4">
                     <div class="card-header">
@@ -25,7 +27,7 @@
                         <button onclick="truyenGT('', '','')" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-plus"></i> Thêm màu sắc</button>
                     </div>
                     <div class="card-body">
-                        <div class="row mb-3 align-items-center">
+                        <div class="row mb-3 align-items-center"><div class="col-md-6"><label for="lookup-search">Tìm thuộc tính</label><input id="lookup-search" type="search" class="form-control" placeholder="Nhập tên hoặc mã..." aria-label="Tìm thuộc tính"></div>
                         </div>
                         <div class="table-responsive">
                             <table id="datatablesSimple" class="table table-bordered table-striped">
@@ -75,11 +77,11 @@
                 <form th:object="${color}" action="save" method="post" id="formadd">
                     <label class="lb-form">Tên màu</label>
                     <input id="idmau" type="hidden" th:field="*{id}">
-                    <input id="tenmau" class="form-control" th:field="*{name}">
+                    <input id="tenmau" class="form-control" th:field="*{name}" required maxlength="100" placeholder="Ví dụ: Xanh navy">
                     <div class="row">
                         <div class="col-sm-4">
                             <label class="lb-form">Mã màu</label>
-                            <input class="form-control" id="mamau" th:field="*{code}">
+                            <input class="form-control" id="mamau" th:field="*{code}" required pattern="#[0-9a-fA-F]{6}" placeholder="#1E3A5F" title="Mã HEX dạng #RRGGBB">
                         </div>
                         <div class="col-sm-4">
                             <label class="lb-form">&ThinSpace;</label>
@@ -100,6 +102,7 @@
 <script>
     window.addEventListener('DOMContentLoaded', event => {
         $(document).ready(function() {
+            if (!window.jQuery?.fn?.DataTable) return;
             $('#datatablesSimple').DataTable({
                 "paging": true,
                 "lengthChange": true,

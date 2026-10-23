@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     form.classList.add('bee-product-builder');
+    const productName = document.getElementById('name'); productName.required = true; productName.maxLength = 255;
+    for(const id of ['giaban','giacu','weight']) {
+        const input = document.getElementById(id); input.type = 'number'; input.step = 'any'; input.min = id === 'weight' ? '0.001' : '0'; input.required = id !== 'giacu';
+    }
     document.title = (new URLSearchParams(location.search).has('id') ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm') + ' · F6S';
     const auxiliary = document.createElement('div'); auxiliary.hidden = true;
     auxiliary.append(...form.childNodes); form.append(auxiliary);

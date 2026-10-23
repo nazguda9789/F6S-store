@@ -24,19 +24,26 @@ public class ShoeModuleController {
     }
     @GetMapping("/shoe-attributes")
     public String attributes(@RequestParam(defaultValue = "BRAND") ShoeAttribute.Kind kind,
-                             @RequestParam(defaultValue = "") String search, Model model) {
+                             @RequestParam(defaultValue = "") String search, @RequestParam(required=false) Boolean active,
+                             @RequestParam(defaultValue="0") int page, Model model) {
+        if (page < 0 || search.length() > 100) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST,"Bộ lọc không hợp lệ");
         model.addAttribute("kind", kind);
         model.addAttribute("label", switch(kind) { case BRAND -> "Thương hiệu"; case SOLE -> "Đế giày"; case MATERIAL -> "Chất liệu"; });
         model.addAttribute("search", search);
-        model.addAttribute("items", attributes.findByKindOrderByNameAsc(kind).stream()
-                .filter(item -> item.getName().toLowerCase(java.util.Locale.ROOT).contains(search.toLowerCase(java.util.Locale.ROOT))).toList());
+        org.springframework.data.jpa.domain.Specification<ShoeAttribute> spec = (root,query,cb) -> {
+            var filter=cb.and(cb.equal(root.get("kind"),kind),cb.or(cb.like(cb.lower(root.get("name")),"%"+search.strip().toLowerCase(java.util.Locale.ROOT)+"%"),cb.like(cb.lower(root.get("code")),"%"+search.strip().toLowerCase(java.util.Locale.ROOT)+"%")));
+            return active == null ? filter : cb.and(filter,cb.equal(root.get("active"),active));
+        };
+        var results=attributes.findAll(spec,PageRequest.of(page,10,Sort.by("name").ascending()));
+        model.addAttribute("items",results.getContent()); model.addAttribute("resultPage",results);model.addAttribute("active",active);
         return "admin/shoe-attributes";
     }
     @PostMapping("/shoe-attributes/save")
     public String save(@RequestParam(required = false) Long id, @RequestParam ShoeAttribute.Kind kind,
                        @RequestParam String name, @RequestParam(defaultValue = "false") boolean active,
+                       @RequestParam(required=false) String description,
                        RedirectAttributes flash) {
-        try { service.save(id, kind, name, active); flash.addFlashAttribute("notice", "Đã lưu thuộc tính giày."); }
+        try { service.save(id, kind, name, active, description); flash.addFlashAttribute("notice", "Đã lưu thuộc tính giày."); }
         catch (IllegalArgumentException e) { flash.addFlashAttribute("errorMessage", e.getMessage()); }
         catch (DataIntegrityViolationException e) { flash.addFlashAttribute("errorMessage", "Tên đã tồn tại. Vui lòng tải lại danh sách."); }
         return "redirect:" + TypeSystem.ADMIN_URL + "/shoe-attributes?kind=" + kind.name();

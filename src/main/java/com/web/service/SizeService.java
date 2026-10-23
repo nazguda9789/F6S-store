@@ -23,10 +23,15 @@ public class SizeService {
 
     public List<Size> findAllList(){
         List<Size> sizes = sizeRepository.findAll();
-        return sizes;
+        return sizes.stream().sorted(java.util.Comparator.comparing((Size s)->s.getName()==null || !s.getName().matches("[0-9]+(\\.[0-9]+)?"))
+                .thenComparingDouble(s->s.getName()!=null && s.getName().matches("[0-9]+(\\.[0-9]+)?") ? Double.parseDouble(s.getName()) : Double.MAX_VALUE)
+                .thenComparing(s->s.getName()==null ? "" : s.getName())).toList();
     }
 
     public Size saveOrUpdate(Size size){
+        String name = size.getName() == null ? "" : size.getName().strip();
+        if(name.isEmpty() || name.length()>20) throw new MessageException("Kích cỡ phải từ 1 đến 20 ký tự, ví dụ 38, 39 hoặc 40.5.");
+        size.setName(name);
         if(size.getId() == null){
             if(sizeRepository.findByName(size.getName()) != null){
                 throw new MessageException("Tên size đã tồn tại");

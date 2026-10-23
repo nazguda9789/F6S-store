@@ -26,6 +26,7 @@ class CatalogCodeTests {
     @Test void productAndVariantNamespacesCannotCollide() { assertNotEquals(codes.productCode(17L), codes.variantCode(17L)); }
     @Test void rejectsDuplicateNewCombinations() {
         ProductCreateRequest request = new ProductCreateRequest();
+        request.setName("Giày mẫu"); request.setSlug("giay-mau"); request.setPrice(100D);request.setWeight(0.3F);
         ProductCreateRequest.ProductDetailRequest line = new ProductCreateRequest.ProductDetailRequest();
         line.setColorId(1L); line.setSizeId(2L); line.setStock(0); line.setPrice(100D);
         request.setDetails(List.of(line,line));
@@ -33,6 +34,7 @@ class CatalogCodeTests {
     }
     @Test void rejectsNegativeStockBeforeWritingProduct() {
         ProductCreateRequest request = new ProductCreateRequest();
+        request.setName("Giày mẫu"); request.setSlug("giay-mau"); request.setPrice(100D);request.setWeight(0.3F);
         ProductCreateRequest.ProductDetailRequest line = new ProductCreateRequest.ProductDetailRequest();
         line.setColorId(1L); line.setSizeId(2L); line.setStock(-1); request.setDetails(List.of(line));
         assertThrows(IllegalArgumentException.class, () -> new ProductService().createProduct(request));
@@ -56,4 +58,10 @@ class CatalogCodeTests {
         ProductDetail input = new ProductDetail(); input.setId(245L); input.setActive(true); input.setStock(20);
         assertThrows(IllegalArgumentException.class, () -> service.updateDetail(input)); verify(repository,never()).save(any());
     }
+    ProductCreateRequest validCatalog() {
+        var r=new ProductCreateRequest();r.setName("Giày mẫu");r.setSlug("giay-mau");r.setPrice(100D);r.setWeight(0.3F);return r;
+    }
+    @Test void rejectsBlankProductName() {var r=validCatalog();r.setName(" ");assertThrows(IllegalArgumentException.class,()->new ProductService().validateCatalogData(r));}
+    @Test void rejectsInvalidBasePrice() {var r=validCatalog();r.setPrice(Double.NaN);assertThrows(IllegalArgumentException.class,()->new ProductService().validateCatalogData(r));}
+    @Test void rejectsMissingOrZeroShippingWeight() {var r=validCatalog();r.setWeight(0F);assertThrows(IllegalArgumentException.class,()->new ProductService().validateCatalogData(r));}
 }

@@ -2,6 +2,7 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8" />
+  <script defer src="/admin/js/lookup-table.js"></script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="Admin Dashboard" />
@@ -17,6 +18,7 @@
     <main>
       <div class="container-fluid">
         <h1 class="mt-4">Danh sách kích cỡ</h1>
+        <p class="text-muted">Dùng kích cỡ giày EU như 38–42 hoặc 40.5. Dữ liệu kích cỡ cũ được giữ để không thay đổi biến thể và lịch sử hóa đơn.</p>
 
         <div class="card mb-4">
           <div class="card-header">
@@ -25,14 +27,14 @@
             <button onclick="truyenGT('', '')" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-plus"></i> Thêm kích cỡ</button>
           </div>
           <div class="card-body">
-            <div class="row mb-3 align-items-center">
+            <div class="row mb-3 align-items-center"><div class="col-md-6"><label for="lookup-search">Tìm thuộc tính</label><input id="lookup-search" type="search" class="form-control" placeholder="Nhập tên hoặc mã..." aria-label="Tìm thuộc tính"></div>
             </div>
             <div class="table-responsive">
               <table id="datatablesSimple" class="table table-bordered table-striped">
                 <thead>
                 <tr>
                   <th>id</th>
-                  <th>Tên size</th>
+                  <th>Kích cỡ / hệ đo</th>
                   <th class="sticky-col">Hành động</th>
                 </tr>
                 </thead>
@@ -41,7 +43,7 @@
                   <td th:text="${c.id}"></td>
                   <td th:text="${c.name}"></td>
                   <td>
-                    <a th:href="@{delete(id=${c.id})}" class="btn btn-outline-danger btn-sm btn-action" onclick="return confirm('Bạn có chắc chắn muốn xóa màu sắc này?');"><i class="fas fa-trash-alt"></i></a>
+                    <a th:href="@{delete(id=${c.id})}" class="btn btn-outline-danger btn-sm btn-action" onclick="return confirm('Xóa kích cỡ khỏi danh sách chọn mới? Biến thể đã dùng kích cỡ này vẫn được giữ.');"><i class="fas fa-trash-alt"></i></a>
                     <button data-bs-toggle="modal" data-bs-target="#exampleModal"
                             th:onclick="truyenGT([[${c.id}]], [[${c.name}]])"
                             class="btn btn-outline-primary btn-sm btn-action"><i class="fas fa-edit"></i></button>
@@ -66,9 +68,9 @@
       </div>
       <div class="modal-body">
         <form th:object="${size}" action="save" method="post" id="formadd">
-          <label class="lb-form">Tên size</label>
+          <label class="lb-form">Kích cỡ giày</label>
           <input id="idmau" type="hidden" th:field="*{id}">
-          <input id="tenmau" class="form-control" th:field="*{name}">
+          <input id="tenmau" class="form-control" th:field="*{name}" required maxlength="20" placeholder="Ví dụ: 38, 39, 40.5">
         </form>
       </div>
       <div class="modal-footer">
@@ -82,7 +84,8 @@
 <script>
   window.addEventListener('DOMContentLoaded', event => {
     $(document).ready(function() {
-      $('#datatablesSimple').DataTable({
+      if (!window.jQuery?.fn?.DataTable) return;
+            $('#datatablesSimple').DataTable({
         "paging": true,
         "lengthChange": true,
         "searching": true,

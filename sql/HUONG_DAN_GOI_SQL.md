@@ -1,25 +1,34 @@
-# Gói SQL F6S — 23/10/2026
+# Gói SQL F6S — 24/10/2026
 
-Gói tổng hợp theo bản code 94fcde0. Chọn MỘT trong hai file, không import cả hai theo thứ tự.
+[Tải ZIP hiện hành](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SQL-20261024.zip) → Download raw. Các ảnh minh họa mẫu nằm trong code mới, cần tải code cùng phiên bản.
 
-## Máy đang có code và database cũ
+## Máy đang có database: giữ dữ liệu
 
-1. Dừng web trong IntelliJ, bật MySQL của XAMPP.
-2. Mở http://localhost/phpmyadmin, chọn database đang dùng → Export để sao lưu.
-3. Vẫn chọn đúng database đó → Import → chọn `nang_cap_f6s.sql` → Go.
-4. Nếu có lỗi, giữ nguyên dữ liệu và gửi thông báo lỗi; không xóa database.
-5. Chạy bản code mới bằng JDK 17, giữ cấu hình database và secret của máy.
+1. Dừng web, bật MySQL trong XAMPP.
+2. phpMyAdmin → chọn đúng database → Export để sao lưu.
+3. Import `nang_cap_f6s.sql` trong gói này: đã gộp các migration cũ và metadata thuộc tính mới.
+4. Nếu muốn thêm bộ demo, import tiếp `du_lieu_mau_catalog_20261024.sql` trên cùng database. Không bắt buộc cho dữ liệu thật.
+5. Chạy code mới bằng JDK 17 và Ctrl+F5. Không cần secret mới.
 
-File nâng cấp gộp bảng OTP, thuộc tính giày, mã sản phẩm/SKU, giữ SKU cũ, audit gộp biến thể và customer_id cho đơn chờ/hóa đơn. Không reset mật khẩu. Bước gộp 245 vào 244 chỉ áp dụng khi đúng dữ liệu và không còn giỏ/đơn chờ tham chiếu nguồn: APPLIED = đã gộp; ALREADY_APPLIED = đã gộp trước; SKIPPED_REVIEW_CART_DRAFT_OR_VARIANT_DATA = chưa gộp, cần kiểm tra, không ép xóa tham chiếu.
+Nếu chỉ nâng cấp, không import `f6s_shop.sql`. SQL mới thêm code/mô tả/ngày tạo/cập nhật cho thuộc tính, bảng theo dõi bộ demo, khóa ngoại thuộc tính hợp lệ; không tự đoán hoặc phân loại lại giày cũ, không reset tài khoản. Phải chạy migration trước code mới. FK có tham chiếu mồ côi sẽ được bỏ qua và báo số lượng để xem xét; không tự xóa giá trị cũ.
 
 ## Cài mới hoàn toàn
 
-Chỉ import `f6s_shop.sql` trên máy không có dữ liệu cần giữ. CẢNH BÁO: file này có DROP DATABASE f6s_shop, xóa database cùng tên trước khi tạo lại. Không dùng để cập nhật database cũ.
+Chỉ import `f6s_shop.sql`. ĐÃ GỘP cấu trúc và bộ demo, không phải import seed thêm. CẢNH BÁO: file có DROP DATABASE f6s_shop, xóa database cùng tên.
 
-Bản mẫu gồm 50 sản phẩm, 13 bài viết, 1 admin và 2 nhân viên nguồn. Admin demo: admin@gmail.com / 123123; đổi mật khẩu trước khi public. Biến thể 244/245 vẫn giữ hai dòng lịch sử, 245 ngừng bán sau gộp đủ điều kiện. Không phải bộ dữ liệu lấy từ Bee hay bản hoàn tất mọi chức năng Bee.
+## Bộ mẫu mới
 
-## Lưu ý
+- 5 thương hiệu, 5 loại đế, 5 chất liệu.
+- 5 danh mục: chạy bộ, tập luyện, đi bộ, bóng rổ, lifestyle.
+- Size EU 38, 39, 40, 41, 42; 5 màu Đen, Trắng, Xám, Xanh navy, Đỏ.
+- 5 sản phẩm có nhãn [DEMO], 25 biến thể (5 size/sản phẩm), 5 liên kết danh mục, 5 ảnh theo màu và 5 ảnh chi tiết. Ảnh SVG minh họa nằm trong code mới, không phải ảnh hàng thật.
+- Nhóm đã có tên tương ứng được tái sử dụng, không tạo lại hoặc đổi trạng thái. Không ghi đè giá/tồn/ảnh/slug sản phẩm demo đã sửa khi chạy lại; không khôi phục biến thể đã chủ động xóa. Không chạy seed đồng thời hoặc khi web đang xử lý đơn.
+- Bản cài mới giữ 50 sản phẩm nguồn + 5 demo = 55 sản phẩm, 176 biến thể nguồn + 25 = 201 biến thể. Không tạo hóa đơn/thanh toán/tài khoản giả. Vẫn giữ các bảng nguồn cũ để bảo toàn lịch sử; Java sử dụng bảng English được mô tả trong tài liệu catalog.
 
-- Không cần chạy từng patch SQL cũ sau hai file tổng hợp này.
-- Gói không chứa MAIL_PASSWORD, Google Client Secret, VNPay HashSecret hoặc token khác. Giữ/cấu hình riêng trên từng máy; SQL không cấu hình được các dịch vụ đó.
-- Đã kiểm tra MySQL 8; chưa kiểm chứng toàn bộ trên XAMPP/MariaDB Windows. Nếu import lỗi, không tiếp tục chạy web hoặc xóa database để thử.
+## Cảnh báo
+
+Đây là dữ liệu minh họa học tập, không phải thông tin sản phẩm được các hãng xác nhận. Thay bằng dữ liệu thật hoặc ngừng bán mẫu trước khi công khai. Admin demo cài mới vẫn admin@gmail.com / 123123, phải đổi trước public; nâng cấp không đổi mật khẩu. Gói không chứa mật khẩu email, Google Client Secret hay VNPay HashSecret.
+
+Không xóa bản ghi catalog_demo_seed để ép nhập lại. Nếu chủ động xóa hẳn sản phẩm demo, liên kết seed được cascade theo sản phẩm; nhập lại seed có thể tạo lại mẫu đã xóa. Hãy ngừng bán nếu muốn giữ mẫu nhưng không kinh doanh.
+
+Đã kiểm tra trên MySQL 8; chưa kiểm chứng XAMPP/MariaDB Windows. MySQL DDL không rollback toàn bộ, hãy giữ bản sao lưu và đọc lỗi nếu import dở dang. Các thay đổi tài chính/hoàn tiền và toàn bộ nghiệp vụ Bee không nằm trong gói catalog này.

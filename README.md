@@ -1,8 +1,12 @@
 # F6S — Website quản lý bán giày thể thao
 
-[Cập nhật theo các ảnh Bee: menu thuộc tính hai cấp, bộ lọc và form biến thể theo màu](docs/16-SAN-PHAM-THEO-ANH-BEE.md). Không cần SQL/secret mới cho đợt giao diện sản phẩm này.
+[Tải gói SQL mới 24/10/2026](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SQL-20261024.zip) → chọn **Download raw**. [Chi tiết model, thuộc tính và dữ liệu mẫu](docs/17-CATALOG-SQL-VA-DU-LIEU-MAU.md).
 
-[Cấu trúc module và nội dung mới theo video Bee](docs/15-MODULE-VA-NOI-DUNG-THEO-BEE.md): menu render dùng chung, Nhân viên/Khách hàng theo vai trò, trạng thái làm việc và cột thương hiệu. Đợt này không thêm SQL/secret; chưa hoàn tất mọi nghiệp vụ Bee.
+**Bản catalog 24/10: bắt buộc nâng SQL trước khi chạy code mới.** Có metadata/mã thuộc tính và bộ 5 giày demo/25 biến thể. Máy cũ: dừng web, sao lưu, import `sql/nang_cap_f6s.sql`; muốn thêm mẫu thì import tiếp `sql/du_lieu_mau_catalog_20261024.sql`. Cài mới dùng `f6s_shop.sql` (có DROP DATABASE). [Hướng dẫn SQL hiện hành](sql/HUONG_DAN_GOI_SQL.md).
+
+[Cập nhật theo các ảnh Bee: menu thuộc tính hai cấp, bộ lọc và form biến thể theo màu](docs/16-SAN-PHAM-THEO-ANH-BEE.md). Lưu ý mô tả “không cần SQL” ở đợt giao diện cũ không áp dụng cho bản catalog 24/10.
+
+[Cấu trúc module và nội dung theo video Bee](docs/15-MODULE-VA-NOI-DUNG-THEO-BEE.md): tài liệu đợt giao diện trước. Khi nâng bản hiện tại phải dùng migration 24/10 ở trên; chưa hoàn tất mọi nghiệp vụ Bee.
 
 **Tiến độ thay luồng theo Bee:** đã bổ sung liên kết khách/nhân viên riêng và đóng đơn chờ trong transaction khi chuyển giao dịch, chống chuyển trùng. **Chưa hoàn tất toàn bộ nghiệp vụ Bee**; xem [các luồng đã đổi và phần còn thiếu](docs/14-CHUYEN-LUONG-NGHIEP-VU-BEE.md). Bản này cần migration `customer_id` trước khi chạy code mới (đã gộp trong SQL nâng cấp).
 

@@ -29,6 +29,10 @@ public class ColorService {
     }
 
     public Color saveOrUpdate(Color color){
+        String name = color.getName() == null ? "" : color.getName().strip().replaceAll("\\s+"," ");
+        if(name.isEmpty() || name.length()>100) throw new MessageException("Tên màu phải từ 1 đến 100 ký tự.");
+        if(color.getCode()==null || !color.getCode().matches("#[0-9a-fA-F]{6}")) throw new MessageException("Mã màu phải đúng định dạng #RRGGBB, ví dụ #111827.");
+        color.setName(name); color.setCode(color.getCode().toUpperCase(java.util.Locale.ROOT));
         if(color.getId() == null){
             if(colorRepository.findByName(color.getName()) != null){
                 throw new MessageException("Tên màu sắc đã tồn tại");

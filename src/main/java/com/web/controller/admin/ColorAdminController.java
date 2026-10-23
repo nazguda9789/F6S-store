@@ -40,8 +40,7 @@ public class ColorAdminController {
             redirectAttributes.addFlashAttribute(TypeSystem.SUCCESS, "Lưu màu sắc thành công");
         } catch (MessageException e) {
             redirectAttributes.addFlashAttribute(TypeSystem.ERROR, e.getDefaultMessage());
-            String referer = request.getHeader("Referer");
-            return "redirect:" + referer;
+            return "redirect:list";
         }
         return "redirect:list";
     }

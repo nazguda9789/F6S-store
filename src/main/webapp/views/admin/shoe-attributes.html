@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head><title th:text="${label} + ' | F6S'">Thuộc tính giày</title><th:block th:replace="~{common/libadmin :: libheaderadmin}"></th:block></head>
-<body class="sb-nav-fixed">
-<div th:replace="~{common/navbarAdmin :: headerAdmin}"></div>
+<head><title th:text="${label} + ' · F6S'">Thuộc tính giày</title><th:block th:replace="~{common/libadmin :: libheaderadmin}"></th:block></head>
+<body class="sb-nav-fixed"><div th:replace="~{common/navbarAdmin :: headerAdmin}"></div>
 <div id="layoutSidenav"><div th:replace="~{common/navbarAdmin :: sidenavAdmin}"></div><div id="layoutSidenav_content"><main>
-<h1 th:text="${label}"></h1><p class="text-muted">Quản lý thuộc tính giày. Ngừng sử dụng không xóa liên kết của sản phẩm cũ.</p>
-<p th:if="${notice}" th:text="${notice}" class="alert alert-success"></p>
-<p th:if="${errorMessage}" th:text="${errorMessage}" class="alert alert-danger"></p>
-<div class="card mb-4"><div class="card-body"><form method="get" class="d-flex gap-2">
-<input type="hidden" name="kind" th:value="${kind}"><input class="form-control" name="search" th:value="${search}" placeholder="Tìm theo tên" aria-label="Tìm theo tên"><button class="btn btn-primary">Tìm kiếm</button>
-</form></div></div>
-<div class="card mb-4"><div class="card-header">Thêm mới</div><form class="card-body d-flex flex-wrap gap-3 align-items-center" method="post" action="/adm-prj/qtht-001/shoe-attributes/save">
-<input type="hidden" name="kind" th:value="${kind}"><input class="form-control" style="max-width:400px" name="name" required maxlength="100" placeholder="Tên thuộc tính" aria-label="Tên thuộc tính">
-<label><input type="checkbox" name="active" value="true" checked> Đang sử dụng</label><button class="btn btn-primary">Thêm</button></form></div>
-<div class="card"><div class="card-header">Danh sách <span th:text="${label}"></span></div><div class="card-body table-responsive">
-<table class="table"><thead><tr><th>Mã</th><th>Tên / cập nhật trạng thái</th></tr></thead><tbody>
-<tr th:each="item : ${items}"><td th:text="${item.id}"></td><td><form class="d-flex flex-wrap gap-3 align-items-center" method="post" action="/adm-prj/qtht-001/shoe-attributes/save">
-<input type="hidden" name="kind" th:value="${kind}"><input type="hidden" name="id" th:value="${item.id}">
-<input class="form-control" style="max-width:400px" name="name" th:value="${item.name}" required maxlength="100" aria-label="Tên thuộc tính">
-<label><input type="checkbox" name="active" value="true" th:checked="${item.active}"> Đang sử dụng</label><button class="btn btn-outline-primary">Lưu</button></form></td></tr>
-<tr th:if="${#lists.isEmpty(items)}"><td colspan="2" class="text-center text-muted">Chưa có thuộc tính phù hợp.</td></tr>
-</tbody></table></div></div>
-</main></div></div></body></html>
+<header class="d-flex flex-wrap justify-content-between align-items-center mb-4"><div><h1 th:text="${label}"></h1><p class="text-muted">Danh mục chuẩn cho giày thể thao. Ngừng sử dụng không xóa lịch sử sản phẩm.</p></div><a class="btn btn-outline-primary" href="/adm-prj/qtht-001/product/save">Thêm sản phẩm</a></header>
+<nav class="d-flex flex-wrap gap-2 mb-4" aria-label="Nhóm thuộc tính"><a class="btn btn-outline-primary" th:each="group : ${T(com.web.entity.ShoeAttribute.Kind).values()}" th:href="@{/adm-prj/qtht-001/shoe-attributes(kind=${group})}" th:classappend="${kind == group} ? 'active' : ''" th:text="${group.name() == 'BRAND' ? 'Thương hiệu' : group.name() == 'SOLE' ? 'Đế giày' : 'Chất liệu'}"></a><a class="btn btn-outline-secondary" href="/adm-prj/qtht-001/size/list">Kích cỡ</a><a class="btn btn-outline-secondary" href="/adm-prj/qtht-001/color/list">Màu sắc</a><a class="btn btn-outline-secondary" href="/adm-prj/qtht-001/category/list">Danh mục giày</a></nav>
+<p th:if="${notice}" th:text="${notice}" class="alert alert-success"></p><p th:if="${errorMessage}" th:text="${errorMessage}" class="alert alert-danger"></p>
+<div class="card mb-4"><div class="card-body"><form method="get" class="row g-3 align-items-end">
+<input type="hidden" name="kind" th:value="${kind}"><div class="col-md-6"><label for="attribute-search">Tên hoặc mã thuộc tính</label><input id="attribute-search" class="form-control" name="search" maxlength="100" th:value="${search}" placeholder="Tìm theo tên hoặc mã F6S..."></div>
+<div class="col-md-3"><label for="attribute-status">Trạng thái</label><select class="form-select" name="active" id="attribute-status"><option value="">Tất cả</option><option value="true" th:selected="${active == true}">Đang sử dụng</option><option value="false" th:selected="${active == false}">Ngừng sử dụng</option></select></div><div class="col-md-3 d-flex gap-2"><button class="btn btn-primary">Tìm kiếm</button><a class="btn btn-outline-secondary" th:href="@{/adm-prj/qtht-001/shoe-attributes(kind=${kind})}">Làm mới</a></div></form></div></div>
+<details class="card mb-4" open><summary class="card-header">Thêm thuộc tính</summary><form class="card-body row g-3 align-items-end" method="post" action="/adm-prj/qtht-001/shoe-attributes/save">
+<input type="hidden" name="kind" th:value="${kind}"><div class="col-md-4"><label for="new-attribute-name">Tên thuộc tính</label><input id="new-attribute-name" class="form-control" name="name" required maxlength="100" placeholder="Nhập tên thuộc tính"></div><div class="col-md-5"><label for="new-attribute-description">Mô tả sử dụng</label><input id="new-attribute-description" class="form-control" name="description" maxlength="500" placeholder="Đặc điểm, mục đích sử dụng..."></div><div class="col-md-3"><label class="d-block mb-2"><input type="checkbox" name="active" value="true" checked> Đang sử dụng</label><button class="btn btn-primary">Thêm</button></div></form></details>
+<div class="card"><div class="card-header d-flex justify-content-between"><span>Danh sách <span th:text="${label}"></span></span><span th:text="'Tổng: ' + ${resultPage.totalElements}"></span></div><div class="card-body table-responsive">
+<table class="table align-middle"><thead><tr><th>Mã thuộc tính</th><th>Tên</th><th>Mô tả</th><th>Trạng thái</th><th>Cập nhật</th><th>Thao tác</th></tr></thead><tbody>
+<tr th:each="item : ${items}"><td><code th:text="${item.code}"></code></td>
+<td><input class="form-control" name="name" th:value="${item.name}" required maxlength="100" aria-label="Tên thuộc tính" th:attr="form='attribute-'+${item.id}"></td>
+<td><input class="form-control" name="description" th:value="${item.description}" maxlength="500" aria-label="Mô tả thuộc tính" th:attr="form='attribute-'+${item.id}"></td>
+<td><label><input type="checkbox" name="active" value="true" th:checked="${item.active}" th:attr="form='attribute-'+${item.id}"> Đang dùng</label></td>
+<td th:text="${item.updatedAt == null ? '—' : #temporals.format(item.updatedAt,'dd/MM/yyyy HH:mm')}"></td>
+<td><form th:id="'attribute-'+${item.id}" method="post" action="/adm-prj/qtht-001/shoe-attributes/save"><input type="hidden" name="kind" th:value="${kind}"><input type="hidden" name="id" th:value="${item.id}"><button class="btn btn-outline-primary" type="submit">Lưu</button></form></td></tr>
+<tr th:if="${#lists.isEmpty(items)}"><td colspan="6" class="text-center text-muted py-5">Không có thuộc tính phù hợp. Hãy đổi bộ lọc hoặc thêm mới.</td></tr></tbody></table>
+<nav class="d-flex justify-content-between align-items-center mt-3" aria-label="Phân trang thuộc tính"><a th:if="${resultPage.hasPrevious()}" th:href="@{/adm-prj/qtht-001/shoe-attributes(kind=${kind},search=${search},active=${active},page=${resultPage.number - 1})}">Trang trước</a><span th:text="'Trang ' + ${resultPage.number + 1} + ' / ' + ${resultPage.totalPages == 0 ? 1 : resultPage.totalPages}"></span><a th:if="${resultPage.hasNext()}" th:href="@{/adm-prj/qtht-001/shoe-attributes(kind=${kind},search=${search},active=${active},page=${resultPage.number + 1})}">Trang sau</a></nav>
+</div></div></main></div></div></body></html>

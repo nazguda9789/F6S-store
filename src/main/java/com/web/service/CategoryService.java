@@ -38,16 +38,31 @@ public class CategoryService {
     }
 
     @CacheEvict(value = "categories", allEntries = true)
+    @org.springframework.transaction.annotation.Transactional
     public Category saveOrUpdate(Category category){
+        String name=category.getName()==null ? "" : category.getName().strip().replaceAll("\\s+"," ");
+        if(name.isEmpty() || name.length()>255) throw new MessageException("Tên danh mục phải từ 1 đến 255 ký tự.");
+        if(category.getSlug()==null || !category.getSlug().matches("[a-z0-9]+(?:-[a-z0-9]+)*")) throw new MessageException("Đường dẫn danh mục chỉ dùng chữ thường không dấu, số và dấu gạch ngang.");
+        if(category.getPosition()!=null && category.getPosition()<0) throw new MessageException("Vị trí hiển thị không được âm.");
+        category.setName(name);
+        if (category.getId()!=null) {
+            Category previous=categoryRepository.findById(category.getId()).orElseThrow(()->new MessageException("Danh mục không tồn tại."));
+            category.setCreatedDate(previous.getCreatedDate());
+            if(category.getImage()==null) category.setImage(previous.getImage());
+            if(!Boolean.TRUE.equals(category.getIsParent()) && previous.getChildren()!=null && !previous.getChildren().isEmpty())
+                throw new MessageException("Chuyển các mục con trước khi đổi nhóm gốc thành mục con.");
+        }
         if (category.getIsParent() != null && category.getIsParent()) {
             category.setCategory(null); // Là cha, không có cha khác
         } else {
             if (category.getParentId() != null) {
                 Category parent = categoryRepository.findById(category.getParentId())
                         .orElseThrow(() -> new MessageException("Danh mục cha không tồn tại"));
+                if (category.getParentId().equals(category.getId()) || !Boolean.TRUE.equals(parent.getIsParent()) || Boolean.TRUE.equals(parent.getDeleted()))
+                    throw new MessageException("Danh mục cha phải là nhóm gốc đang dùng và không được là chính danh mục này.");
                 category.setCategory(parent);
             } else {
-                category.setCategory(null);
+                throw new MessageException("Chọn danh mục cha hoặc đánh dấu đây là danh mục gốc.");
             }
         }
         if(category.getId() == null){
@@ -81,7 +96,10 @@ public class CategoryService {
     }
 
     @CacheEvict(value = "categories", allEntries = true)
+    @org.springframework.transaction.annotation.Transactional
     public void delete(Long id){
+        Category selected=categoryRepository.findById(id).orElseThrow(()->new MessageException("Không tìm thấy danh mục."));
+        if(selected.getChildren()!=null && !selected.getChildren().isEmpty()) throw new MessageException("Danh mục còn mục con. Chuyển hoặc xử lý các mục con trước để tránh xóa dây chuyền.");
         Long idProduct = productRepository.checkProductExistByCategory(id);
         if(idProduct == null){
             categoryRepository.deleteById(id);

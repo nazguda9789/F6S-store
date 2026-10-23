@@ -1,5 +1,7 @@
 # Chọn file SQL F6S
 
+**Mới nhất 24/10:** bắt buộc chạy bản `nang_cap_f6s.sql` hiện tại trước code mới để bổ sung metadata thuộc tính. Bộ mẫu riêng `du_lieu_mau_catalog_20261024.sql` thêm 5 giày/25 biến thể và 5 mẫu mỗi nhóm thuộc tính; không tự thêm mẫu khi chỉ nâng cấu trúc. Cài mới `f6s_shop.sql` đã có 55 giày gồm 50 nguồn + 5 demo. [Hướng dẫn chọn file và cảnh báo đầy đủ](HUONG_DAN_GOI_SQL.md). Các số lượng 50 sản phẩm bên dưới mô tả bộ nguồn cũ.
+
 Bản chuyển luồng bán hàng bổ sung `order_draft.customer_id` và `invoice.customer_id`, tách khách mua với nhân viên tạo. Đã gộp trong cài mới/nâng cấp/bổ sung; nếu đã nâng bản trước, chạy riêng `cap_nhat_luong_ban_hang_20261023.sql` sau sao lưu và dừng web. Không tự gán khách cho hóa đơn cũ. [Luồng mới và giới hạn](../docs/14-CHUYEN-LUONG-NGHIEP-VU-BEE.md).
 
 Các bản cài mới và bổ sung dữ liệu đã gộp cấu trúc module giày ngày 23/10/2026. Không lấy database đang chạy của người dùng để tạo dump: dữ liệu mẫu cũ được giữ, không kèm đơn/tài khoản kiểm thử hoặc secret mới.

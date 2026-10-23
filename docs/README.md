@@ -2,6 +2,8 @@
 
 [Về trang chính](../README.md)
 
+[Catalog SQL 24/10: schema, dữ liệu mẫu và hướng dẫn nâng cấp bắt buộc](17-CATALOG-SQL-VA-DU-LIEU-MAU.md).
+
 [Form và menu sản phẩm theo các ảnh Bee bổ sung](16-SAN-PHAM-THEO-ANH-BEE.md).
 
 [Module, tên màn hình và nội dung theo video Bee](15-MODULE-VA-NOI-DUNG-THEO-BEE.md).
