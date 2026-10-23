@@ -37,14 +37,8 @@ public class UserSpecification implements Specification<User> {
             predicate = cb.and(predicate, searchPredicate);
         }
 
-        if (fromDate != null && toDate != null) {
-            Predicate datePredicate = cb.between(
-                    root.get("createdDate").as(LocalDate.class),
-                    fromDate,
-                    toDate
-            );
-            predicate = cb.and(predicate, datePredicate);
-        }
+        if (fromDate != null) predicate = cb.and(predicate, cb.greaterThanOrEqualTo(root.get("createdDate"), fromDate.atStartOfDay()));
+        if (toDate != null) predicate = cb.and(predicate, cb.lessThan(root.get("createdDate"), toDate.plusDays(1).atStartOfDay()));
 
         return predicate;
     }

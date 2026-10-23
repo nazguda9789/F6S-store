@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="Admin Dashboard" />
-    <meta name="author" content="Your Name" />
+    <meta name="author" content="F6S" />
     <title>Danh sách sản phẩm</title>
     <head th:replace="common/libadmin :: libheaderadmin"></head>
     <!-- noUiSlider CSS -->
@@ -23,12 +23,12 @@
     <div id="layoutSidenav_content">
         <main>
             <div class="container-fluid">
-                <h1 class="mt-4">Quản lý Sản Phẩm</h1>
-                <div class="mb-3"><label for="filterBrand">Thương hiệu</label><select id="filterBrand" class="form-select" style="max-width:320px" onchange="filterProduct(0)"><option value="">Tất cả thương hiệu</option><option th:each="a : ${brands}" th:value="${a.id}" th:text="${a.name}"></option></select></div>
+                <h1 class="mt-4">Danh sách sản phẩm</h1>
 
                 <div class="card mb-4">
                     <div class="card-header-product">
                         <div class="row">
+                            <div class="col-sm-2"><select id="filterBrand" class="form-select" aria-label="Thương hiệu" onchange="filterProduct(0)"><option value="">Tất cả thương hiệu</option><option th:each="a : ${brands}" th:value="${a.id}" th:text="${a.name}"></option></select></div>
                             <div class="col-sm-2">
                                 <select name="category" id="listcategory" class="form-control">
                                     <option value="-1">--- Tất cả danh mục ---</option>
@@ -51,10 +51,10 @@
                                     <label class="btn btn-outline-secondary" for="all">Tất cả</label>
 
                                     <input type="radio" class="btn-check" name="statusFilter" id="active" value="true" autocomplete="off">
-                                    <label class="btn btn-outline-success" for="active">Hoạt động</label>
+                                    <label class="btn btn-outline-success" for="active">Đang bán</label>
 
                                     <input type="radio" class="btn-check" name="statusFilter" id="inactive" value="false" autocomplete="off">
-                                    <label class="btn btn-outline-danger" for="inactive">Khóa</label>
+                                    <label class="btn btn-outline-danger" for="inactive">Ngừng bán</label>
                                 </div>
                             </div>
                             <div class="col-sm-1">
@@ -65,7 +65,7 @@
                     <div class="card-body">
                         <div class="row mb-3 align-items-center">
                             <div class="col-sm-auto d-flex align-items-center">
-                                <label for="showEntries" class="me-2 mb-0">Showing</label>
+                                <label for="showEntries" class="me-2 mb-0">Số dòng</label>
                                 <select class="form-select form-select-sm" id="showEntries">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
@@ -75,7 +75,7 @@
                                 </select>
                             </div>
                             <div class="col-sm-auto d-flex align-items-center">
-                                <label for="showEntries" class="me-2 mb-0">Sort</label>
+                                <label for="showEntries" class="me-2 mb-0">Sắp xếp</label>
                                 <select class="form-select form-select-sm" id="sortby">
                                     <option value="id,desc">Mới nhất</option>
                                     <option value="id,asc">Cũ nhất</option>
@@ -101,16 +101,12 @@
                                 <thead class="thead-tablefix">
                                 <tr>
                                     <th>STT</th>
-                                    <th>Id</th>
-                                    <th>Ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Số lượng</th>
                                     <th>Danh mục</th>
-                                    <th>Tên</th>
-                                    <th>Giá</th>
-                                    <th>Ngày tạo</th>
-                                    <th>Số lượng còn</th>
-                                    <th>Số lượng bán</th>
+                                    <th>Thương hiệu</th>
                                     <th>Trạng thái</th>
-                                    <th class="sticky-col">Hành động</th>
+                                    <th class="sticky-col">Thao tác</th>
                                 </tr>
                                 </thead>
                                 <tbody id="listproduct">
@@ -140,7 +136,7 @@
                     <thead>
                     <tr>
                         <th>Màu</th>
-                        <th>Sizes</th>
+                        <th>Kích cỡ</th>
                     </tr>
                     </thead>
                     <tbody id="productTable"></tbody>

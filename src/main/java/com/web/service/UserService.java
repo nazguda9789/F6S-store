@@ -280,8 +280,14 @@ public class UserService {
     }
 
     public Page<User> getAllUser(Role role, LocalDate from, LocalDate to, String search, Pageable pageable) {
+        return getAllUser(role, from, to, search, null, pageable);
+    }
+
+    public Page<User> getAllUser(Role role, LocalDate from, LocalDate to, String search, Boolean active, Pageable pageable) {
         UserSpecification userSpecification = new UserSpecification(role, from, to, search);
-        Page<User> page = userRepository.findAll(userSpecification, pageable);
+        org.springframework.data.jpa.domain.Specification<User> spec = userSpecification;
+        if (active != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("actived"), active));
+        Page<User> page = userRepository.findAll(spec, pageable);
         return page;
     }
 
@@ -290,7 +296,7 @@ public class UserService {
         if (msg != null) return Result.fail(msg);
 
         user.setCreatedDate(LocalDateTime.now());
-        user.setActived(true);
+        user.setActived(user.getActived() == null || user.getActived());
         user.setDeleted(false);
         user.setActivationStatus(true);
         user.setIsGoogleUser(false);
@@ -315,12 +321,21 @@ public class UserService {
         String msg = validateUser(updatedUser, checkDuplicateEmail);
         if (msg != null) return Result.fail(msg);
 
+        if (updatedUser.getRole() == null) return Result.fail("Vui lòng chọn vai trò tài khoản.");
+        if (existing.getRole() == Role.ROLE_ADMIN) {
+            User actor = userUtils.getUserWithAuthority();
+            if (actor != null && id.equals(actor.getId()) && (updatedUser.getRole() != Role.ROLE_ADMIN
+                    || Boolean.FALSE.equals(updatedUser.getActived()) || !updatedUser.isAccountNonLocked()))
+                return Result.fail("Không thể tự ngừng hoạt động, khóa hoặc bỏ quyền quản trị của tài khoản đang đăng nhập.");
+        }
+
         existing.setFullName(updatedUser.getFullName());
         existing.setPhone(updatedUser.getPhone());
         existing.setAddress(updatedUser.getAddress());
         existing.setRole(updatedUser.getRole());
-        existing.setAvatar(updatedUser.getAvatar());
+        if (updatedUser.getAvatar() != null) existing.setAvatar(updatedUser.getAvatar());
         existing.setAccountNonLocked(updatedUser.isAccountNonLocked());
+        if (updatedUser.getActived() != null) existing.setActived(updatedUser.getActived());
 
         // ✅ Nếu người dùng nhập mật khẩu mới thì mã hóa và cập nhật
         if (StringUtils.hasText(updatedUser.getPassword())) {

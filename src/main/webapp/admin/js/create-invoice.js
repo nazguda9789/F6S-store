@@ -51,7 +51,7 @@ function displayProducts(products) {
                     row.innerHTML = `
                             <td rowspan="${totalVariants}" style="vertical-align: middle;"><img src="${product.productView.image}" alt="${product.productView.name}" class="product-item"></td>
                             <td rowspan="${totalVariants}" style="vertical-align: middle;">${product.productView.name}</td>
-                            <td rowspan="${totalVariants}" style="vertical-align: middle;">Cái</td>
+                            <td rowspan="${totalVariants}" style="vertical-align: middle;">Đôi</td>
                             <td>${detail.color.name}</td>
                             <td>${detail.size.name}</td>
                             <td><span class="stock-info ${stockClass}">${detail.stock}</span></td>

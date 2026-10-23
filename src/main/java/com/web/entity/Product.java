@@ -26,6 +26,8 @@ public class Product {
     @Column(length = 32)
     private String code;
     private Long brandId;
+    @Transient
+    private String brandName;
     private Long soleId;
     private Long materialId;
 

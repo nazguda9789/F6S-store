@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="Admin Dashboard" />
-    <meta name="author" content="Your Name" />
+    <meta name="author" content="F6S" />
     <title>Danh sách bài viết</title>
     <head th:include="common/libadmin :: libheaderadmin"></head>
     <!-- noUiSlider CSS -->
@@ -45,7 +45,7 @@
                     <div class="card-body">
                         <div class="row mb-3 align-items-center">
                             <div class="col-sm-auto d-flex align-items-center">
-                                <label for="showEntries" class="me-2 mb-0">Showing</label>
+                                <label for="showEntries" class="me-2 mb-0">Số dòng</label>
                                 <select class="form-select form-select-sm" id="showEntries">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
@@ -55,7 +55,7 @@
                                 </select>
                             </div>
                             <div class="col-sm-auto d-flex align-items-center">
-                                <label for="showEntries" class="me-2 mb-0">Sort</label>
+                                <label for="showEntries" class="me-2 mb-0">Sắp xếp</label>
                                 <select class="form-select form-select-sm" id="sortby">
                                     <option value="id,desc">Mới nhất</option>
                                     <option value="id,asc">Cũ nhất</option>

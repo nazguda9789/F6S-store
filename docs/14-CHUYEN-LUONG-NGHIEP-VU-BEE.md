@@ -1,5 +1,7 @@
 # Chuyển luồng nghiệp vụ theo Bee
 
+Đợt tiếp theo về menu/tên mục và xử lý tài khoản: [chi tiết nội dung mới](15-MODULE-VA-NOI-DUNG-THEO-BEE.md). Không dùng việc hoàn tất menu để kết luận các luồng còn thiếu bên dưới đã xong.
+
 Yêu cầu: giữ tên F6S, thay chức năng và cách thao tác theo video Bee, không chỉ đổi màu/menu. Video thể hiện hành vi giao diện, không cung cấp source hoặc đầy đủ quy tắc hoàn tiền, bảo mật và xử lý tranh chấp. Không tuyên bố tương đương 100% khi chưa đối chiếu và kiểm thử từng luồng.
 
 ## Đã đổi trong đợt này

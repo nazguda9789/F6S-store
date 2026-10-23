@@ -5,9 +5,9 @@
 <body>
 
 <nav th:fragment="headerAdmin" class="sb-topnav navbar navbar-expand navbar-light bg-light">
-    <a class="navbar-brand ps-3" href="/emp-prj/qtht-001/invoice/list">F6S STAFF</a>
+    <a class="navbar-brand ps-3" href="/emp-prj/qtht-001/invoice/list">F6S</a>
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
-    <div class="div-content-header">
+    <div class="div-content-header visually-hidden">
         <span>Đang truy cập <strong id="dangtruycap" class="text-green" th:text="${onlineUsers}"></strong></span>
     </div>
     <div class="d-flex d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
@@ -23,99 +23,20 @@
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="#!">Settings</a></li>
+                <li><a class="dropdown-item" href="/">Xem cửa hàng</a></li>
                 <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
             </ul>
         </li>
     </ul>
 
-    <div id="new-orders-widget" class="draggable" th:if="${isInvoicePage == null}">
-        <div class="widget-header">
-        <span class="widget-title">
-            <i class="bi bi-box-seam"></i>
-            Đơn hàng mới
-        </span>
-            <button id="close-widget" class="close-btn">&times;</button>
-        </div>
-        <div class="widget-content">
-            <span class="order-count new-order-count" th:text="${donHangMoi}"></span>
-            <div><button class="btn btn-primary btn-sm">Làm mới</button></div>
-        </div>
-    </div>
+    <a class="workspace-order-bell" href="/emp-prj/qtht-001/invoice/list" aria-label="Xem giao dịch chờ xử lý"><i class="fas fa-bell" aria-hidden="true"></i><span class="badge rounded-pill bg-danger new-order-count" th:text="${donHangMoi}">0</span></a>
 </nav>
 
 
 
 <div th:fragment="sidenavAdmin" id="layoutSidenav_nav">
-    <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
-        <div class="sb-sidenav-menu">
-            <div class="nav">
-                <a class="nav-link" href="/">
-                    <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
-                    Trang chủ
-                </a>
-
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseCustomers" aria-expanded="false" aria-controls="collapseCustomers">
-                    <div class="sb-nav-link-icon"><i class="fas fa-user-friends"
-                    data-urls='["/emp-prj/qtht-001/customer/list" ]'
-                    ></i></div>
-                    Khách hàng
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseCustomers" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="navchild" href="/emp-prj/qtht-001/customer/list">Tất cả khách hàng</a>
-                    </nav>
-                </div>
-
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseProducts" aria-expanded="false" aria-controls="collapseProducts"
-                   data-urls='["/emp-prj/qtht-001/category/list", "/emp-prj/qtht-001/category/save",
-                   "/emp-prj/qtht-001/color/list", "/emp-prj/qtht-001/product/save","/emp-prj/qtht-001/product/list"]'>
-                    <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
-                    Sản phẩm
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseProducts" aria-labelledby="headingThree" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="navchild" href="/emp-prj/qtht-001/product/list">Tất cả sản phẩm</a>
-                    </nav>
-                </div>
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseInvoice" aria-expanded="false" aria-controls="collapseInvoice"
-                   data-urls='["/emp-prj/qtht-001/invoice/list", "/emp-prj/qtht-001/invoice/create","/emp-prj/qtht-001/invoice/detail"]'>
-                    <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
-                    Đơn hàng <span th:text="${donHangMoi}" class="number-counter-navbar new-order-count"></span>
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseInvoice" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="navchild" href="/emp-prj/qtht-001/invoice/list">Tất cả đơn hàng</a>
-                        <a class="navchild" href="/emp-prj/qtht-001/invoice/create">Đơn chờ</a>
-                    </nav>
-                </div>
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseBlog" aria-expanded="false" aria-controls="collapseVendors"
-                   data-urls='["/emp-prj/qtht-001/blog/list", "/emp-prj/qtht-001/blog/save"]'>
-                    <div class="sb-nav-link-icon"><i class="fa fa-newspaper"></i></div>
-                    Bài viết
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseBlog" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="navchild" href="/emp-prj/qtht-001/blog/list">Tất cả bài viết</a>
-                        <a class="navchild" href="/emp-prj/qtht-001/blog/save">Thêm bài viết mới</a>
-                    </nav>
-                </div>
-                <a data-urls='["/emp-prj/qtht-001/contact/list"]' class="nav-link" href="/emp-prj/qtht-001/contact/list">
-                    <div class="sb-nav-link-icon"><i class="fas fa-envelope"></i></div>
-                    Liên hệ <span th:text="${numberNewContact}" class="number-counter-navbar counter-contact"></span>
-                </a>
-                <a data-urls='["/emp-prj/qtht-001/chat/list"]' class="nav-link" href="/emp-prj/qtht-001/chat/list">
-                    <div class="sb-nav-link-icon"><i class="fas fa-envelope"></i></div>
-                    Tin Nhắn
-                </a>
-            </div>
-        </div>
-    </nav>
+    <nav th:replace="~{common/workspace-sidebar :: sidebar('/emp-prj/qtht-001', false)}"></nav>
 
     <div id="order-notification-container"></div>
     <script>
@@ -258,120 +179,7 @@
         });
     </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const widget = document.getElementById('new-orders-widget');
-            const closeBtn = document.getElementById('close-widget');
-            if (!widget || !closeBtn) return;
 
-            let isDragging = false;
-            let offsetX, offsetY;
-
-            // Lấy kích thước cửa sổ để giới hạn vị trí
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-
-            // --- Hàm xử lý lưu và khôi phục vị trí ---
-            const savePosition = (x, y) => {
-                const position = { x, y };
-                localStorage.setItem('widgetPosition', JSON.stringify(position));
-            };
-
-            const loadPosition = () => {
-                const savedPosition = localStorage.getItem('widgetPosition');
-                if (savedPosition) {
-                    const position = JSON.parse(savedPosition);
-                    // Chỉ áp dụng vị trí đã lưu nếu là desktop (min-width: 768px)
-                    if (windowWidth >= 768) {
-                        widget.style.top = `${position.y}px`;
-                        widget.style.left = `${position.x}px`;
-                        widget.style.bottom = 'auto';
-                        widget.style.right = 'auto';
-                        widget.style.transform = 'none';
-                    }
-                }
-            };
-
-            // Tải vị trí đã lưu khi trang được tải
-            loadPosition();
-
-            // Hàm chung để xử lý kéo
-            const handleDrag = (clientX, clientY) => {
-                let x = clientX - offsetX;
-                let y = clientY - offsetY;
-
-                const widgetWidth = widget.offsetWidth;
-                if (x < 0) x = 0;
-                if (x + widgetWidth > windowWidth) x = windowWidth - widgetWidth;
-
-                const widgetHeight = widget.offsetHeight;
-                if (y < 0) y = 0;
-                if (y + widgetHeight > windowHeight) y = windowHeight - widgetHeight;
-
-                widget.style.left = `${x}px`;
-                widget.style.top = `${y}px`;
-
-                widget.style.bottom = 'auto';
-                widget.style.right = 'auto';
-                widget.style.transform = 'none';
-            };
-
-            // --- Sự kiện trên MÁY TÍNH (Chuột) ---
-            widget.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                widget.classList.add('dragging');
-                offsetX = e.clientX - widget.getBoundingClientRect().left;
-                offsetY = e.clientY - widget.getBoundingClientRect().top;
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                handleDrag(e.clientX, e.clientY);
-            });
-
-            document.addEventListener('mouseup', (e) => {
-                isDragging = false;
-                widget.classList.remove('dragging');
-                // Lưu vị trí cuối cùng sau khi kéo
-                savePosition(widget.getBoundingClientRect().left, widget.getBoundingClientRect().top);
-            });
-
-            // --- Sự kiện trên ĐIỆN THOẠI (Cảm ứng) ---
-            widget.addEventListener('touchstart', (e) => {
-                if (e.target.closest('#close-widget')) {
-                    return;
-                }
-
-                isDragging = true;
-                widget.classList.add('dragging');
-                const touch = e.touches[0];
-                offsetX = touch.clientX - widget.getBoundingClientRect().left;
-                offsetY = touch.clientY - widget.getBoundingClientRect().top;
-                e.preventDefault();
-            });
-
-            document.addEventListener('touchmove', (e) => {
-                if (!isDragging) return;
-                const touch = e.touches[0];
-                handleDrag(touch.clientX, touch.clientY);
-            });
-
-            document.addEventListener('touchend', (e) => {
-                isDragging = false;
-                widget.classList.remove('dragging');
-                // Lưu vị trí cuối cùng sau khi kéo
-                savePosition(widget.getBoundingClientRect().left, widget.getBoundingClientRect().top);
-            });
-
-            // --- Xử lý sự kiện đóng widget ---
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                widget.style.display = 'none';
-            });
-        });
-
-
-    </script>
 
 
     <script>

@@ -48,6 +48,8 @@ public class ProductService {
     @Autowired
     private ShoeAttributeService shoeAttributes;
 
+    @Autowired private ShoeAttributeRepository shoeAttributeRepository;
+
     private void applyShoeAttributes(Product product, ProductCreateRequest request) {
         product.setBrandId(shoeAttributes.validate(request.getBrandId(), ShoeAttribute.Kind.BRAND, product.getBrandId()));
         product.setSoleId(shoeAttributes.validate(request.getSoleId(), ShoeAttribute.Kind.SOLE, product.getSoleId()));
@@ -260,10 +262,12 @@ public class ProductService {
         List<Long> productIds = page.getContent().stream().map(Product::getId).toList();
         List<ProductStatisticProjection> list = productRepository.getProductStatistics(productIds);
         List<Product> products = page.getContent();
-        // làm tiếp
+        Map<Long, String> brands = shoeAttributeRepository.findAllById(products.stream().map(Product::getBrandId).filter(Objects::nonNull).distinct().toList())
+                .stream().filter(a -> a.getKind() == ShoeAttribute.Kind.BRAND).collect(Collectors.toMap(ShoeAttribute::getId, ShoeAttribute::getName));
         Map<Long, ProductStatisticProjection> statMap = list.stream()
                 .collect(Collectors.toMap(ProductStatisticProjection::getProductId, Function.identity()));
         for (Product product : products) {
+            product.setBrandName(brands.get(product.getBrandId()));
             ProductStatisticProjection stat = statMap.get(product.getId());
             if (stat != null) {
                 product.setStock(stat.getTotalStock());

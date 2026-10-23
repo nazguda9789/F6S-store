@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"><body>
+<nav th:fragment="sidebar(prefix, isAdmin)" class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+ <div class="sb-sidenav-menu">
+  <a class="workspace-brand" th:href="${prefix + '/invoice/list'}"><strong>F6S</strong><span>SHOES STORE</span></a>
+  <div class="nav" data-navigation="bee">
+   <a th:if="${isAdmin}" class="nav-link" th:href="${prefix + '/thong-ke/doanh-thu'}"><span class="sb-nav-link-icon"><i class="fas fa-chart-line"></i></span>Tổng quan</a>
+   <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseInvoice" aria-expanded="false" aria-controls="collapseInvoice"><span class="sb-nav-link-icon"><i class="fas fa-receipt"></i></span>Quản lý giao dịch<span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span></a>
+   <div class="collapse" id="collapseInvoice" data-bs-parent="#sidenavAccordion"><nav class="sb-sidenav-menu-nested nav">
+    <a class="navchild" th:href="${prefix + '/invoice/list'}">Danh sách giao dịch</a>
+    <a class="navchild" th:href="${prefix + '/invoice/create'}">Tạo giao dịch</a>
+   </nav></div>
+   <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseProducts" aria-expanded="false" aria-controls="collapseProducts"><span class="sb-nav-link-icon"><i class="fas fa-shoe-prints"></i></span>Quản lý sản phẩm<span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span></a>
+   <div class="collapse" id="collapseProducts" data-bs-parent="#sidenavAccordion"><nav class="sb-sidenav-menu-nested nav">
+    <a class="navchild" th:href="${prefix + '/product/list'}">Danh sách sản phẩm</a>
+    <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/product/save'}">Thêm sản phẩm</a>
+    <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/category/list'}">Danh mục</a>
+    <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/shoe-attributes?kind=BRAND'}">Thương hiệu</a>
+    <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/shoe-attributes?kind=SOLE'}">Đế giày</a>
+    <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/shoe-attributes?kind=MATERIAL'}">Chất liệu</a>
+    <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/color/list'}">Màu sắc</a>
+    <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/size/list'}">Kích cỡ</a>
+   </nav></div>
+   <a th:if="${isAdmin}" class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseVendors" aria-expanded="false" aria-controls="collapseVendors"><span class="sb-nav-link-icon"><i class="fas fa-users"></i></span>Quản lý tài khoản<span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span></a>
+   <div th:if="${isAdmin}" class="collapse" id="collapseVendors" data-bs-parent="#sidenavAccordion"><nav class="sb-sidenav-menu-nested nav">
+    <a class="navchild" th:href="${prefix + '/user/list?role=ROLE_EMPLOYEE'}">Nhân viên</a>
+    <a class="navchild" th:href="${prefix + '/user/list?role=ROLE_USER'}">Khách hàng</a>
+   </nav></div>
+   <a th:if="${isAdmin}" class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseVoucher" aria-expanded="false" aria-controls="collapseVoucher"><span class="sb-nav-link-icon"><i class="fas fa-tags"></i></span>Giảm giá<span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span></a>
+   <div th:if="${isAdmin}" class="collapse" id="collapseVoucher" data-bs-parent="#sidenavAccordion"><nav class="sb-sidenav-menu-nested nav">
+    <a class="navchild" th:href="${prefix + '/discount-product/list'}">Đợt giảm giá</a>
+    <a class="navchild" th:href="${prefix + '/voucher/list'}">Phiếu giảm giá</a>
+   </nav></div>
+   <a th:if="${!isAdmin}" class="nav-link" th:href="${prefix + '/customer/list'}"><span class="sb-nav-link-icon"><i class="fas fa-user-friends"></i></span>Khách hàng</a>
+   <a th:if="${isAdmin}" class="nav-link" th:href="${prefix + '/image-library'}"><span class="sb-nav-link-icon"><i class="fas fa-images"></i></span>Thư viện hình ảnh</a>
+  </div>
+ </div>
+</nav>
+</body></html>

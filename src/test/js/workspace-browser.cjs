@@ -20,11 +20,18 @@ const base = process.env.F6S_BASE_URL || 'http://127.0.0.1:18080';
             assert.equal(response.status(), 200, route);
             await page.waitForSelector('.workspace-heading');
             assert.equal(await page.locator('.workspace-brand strong').innerText(), 'F6S');
-            assert.equal(await page.locator('#collapseVendors a[href$="/customer/list"]').count(), 1);
-            assert.equal(await page.locator('#collapseBlog a[href$="/banner/list"]').count(), 1);
-            assert.equal(await page.locator('#collapseBlog a[href$="/contact/list"]').count(), 1);
+            assert.equal(await page.locator('#collapseVendors a[href$="role=ROLE_USER"]').count(), 1);
+            assert.equal(await page.locator('#collapseVendors a[href$="role=ROLE_EMPLOYEE"]').count(), 1);
+            assert.equal(await page.locator('#collapseSupport').count(), 0);
             assert.equal(await page.locator('#collapseHeThong a[href*="/banner/"]').count(), 0);
-            if (['banner/list', 'contact/list'].includes(route)) assert.equal(await page.locator('#collapseBlog').evaluate(e => e.classList.contains('show')), true);
+            assert.equal(await page.locator('[data-navigation="bee"]').count(), 1);
+            assert.equal(await page.locator('.workspace-brand').count(), 1);
+            assert.equal(await page.locator('#new-orders-widget').count(), 0);
+            assert.equal(await page.locator('.workspace-order-bell[href$="/invoice/list"]').count(), 1);
+            assert.equal(await page.locator('#collapseVoucher a').allTextContents().then(v=>v.join('|')), 'Đợt giảm giá|Phiếu giảm giá');
+            if (route === 'product/list') {
+                assert.deepEqual((await page.locator('main table').first().locator('thead th').allTextContents()).map(t=>t.trim()), ['STT','Tên sản phẩm','Số lượng','Danh mục','Thương hiệu','Trạng thái','Thao tác']);
+            }
             if (route === 'invoice/create') {
                 assert.equal(await page.locator('.pos-draft-tabs').count(), 1);
                 await page.locator('[data-bs-target="#pos-product-picker"]').click();

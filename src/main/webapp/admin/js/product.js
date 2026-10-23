@@ -1,5 +1,7 @@
 var listFile = [];
 var exceptionCode = 417;
+const productViewPrefix = location.pathname.startsWith('/emp-prj/') ? '/emp-prj/qtht-001' : '/adm-prj/qtht-001';
+function productText(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 async function filterProduct(page) {
     var productsearch = {
         "brandId": document.getElementById('filterBrand')?.value || null,
@@ -27,28 +29,28 @@ async function filterProduct(page) {
     for (i = 0; i < list.length; i++) {
         var listdm = '<div class="listtag">'
         for (j = 0; j < list[i].productCategories.length; j++) {
-            listdm += `<a href="" class="tagcauhoi">.${list[i].productCategories[j].category.name}</a>`;
+            listdm += `<span class="tagcauhoi">${productText(list[i].productCategories[j].category.name)}</span>`;
         }
         listdm += '</div>';
         main += `<tr class="${list[i].active == true?'':'tr-locked'}">
                     <td>${page * size + i + 1}</td>
-                    <td>${list[i].code || '#' + list[i].id}</td>
-                    <td><img src="${list[i].image}" style="width: 100px;"></td>
+                    <td><div class="workspace-catalog-product"><img src="${productText(list[i].image || '/image/f6s-placeholder.svg')}" alt="${productText(list[i].name)}" loading="lazy"><div><strong>${productText(list[i].name)}</strong><small>${productText(list[i].code || '#' + list[i].id)}</small></div></div></td>
+                    <td>${list[i].stock}</td>
                     <td>${listdm}</td>
-                    <td>${list[i].name}</td>
-                    <td>${formatmoney(list[i].price)}</td>
-                     <td>${list[i].createdAt}</td>
-                     <td>${list[i].stock}</td>
-                     <td>${list[i].sold}</td>
-                     <td><span class="badge ${list[i].active == true?'bg-success':'bg-danger'}">${list[i].active == true?`Đang hoạt động`:`Đã khóa`}</span></td>
+                    <td>${productText(list[i].brandName || 'Chưa phân loại')}</td>
+                     <td><span class="badge ${list[i].active == true?'bg-success':'bg-danger'}">${list[i].active == true?`Đang bán`:`Ngừng bán`}</span></td>
                       <td class="sticky-col d-flex">
                         <button onclick="viewDetailPro(${list[i].id})" class="btn btn-outline-secondary btn-sm"><i class="fa fa-eye"></i></button>
-                        <a href="/adm-prj/qtht-001/product/save?id=${list[i].id}" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>
+                        <a href="${productViewPrefix}/product/save?id=${list[i].id}" class="btn btn-sm btn-primary" title="Chỉnh sửa sản phẩm"><i class="fa fa-edit"></i></a>
                         <button onclick="deleteProduct(${list[i].id})" class="btn btn-outline-danger btn-sm"><i class="fa fa-trash-alt"></i></button>
                     </td>
                 </tr>`
     }
     document.getElementById("listproduct").innerHTML = main
+    document.querySelectorAll('#listproduct img').forEach(image => {
+        image.onerror = () => { image.onerror = null; image.src = '/image/f6s-placeholder.svg'; };
+        if (image.complete && image.naturalWidth === 0) image.src = '/image/f6s-placeholder.svg';
+    });
 
     renderPagination(page, totalPage);
 }

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="Admin Dashboard" />
-    <meta name="author" content="Your Name" />
-    <title th:text="'Đơn hàng - '+${invoice.code}"></title>
+    <meta name="author" content="F6S" />
+    <title th:text="'Chi tiết giao dịch - '+${invoice.code}"></title>
     <head th:replace="common/libadmin :: libheaderadmin"></head>
     <link rel="stylesheet" type="text/css" href="/admin/css/invoice.css">
 </head>
@@ -20,12 +20,12 @@
                 <div class="container py-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3 class="mb-0">
-                            <span class="text-primary">Đơn hàng <span th:text="${invoice.code}"></span></span>
+                            <span class="text-primary">Giao dịch <span th:text="${invoice.code}"></span></span>
                             <span class="badge bg-danger ms-2" th:text="${invoice.labelStatus}"></span>
                         </h3>
                         <div class="d-flex gap-2">
                             <button onclick="printShippingLabel()" class="btn btn-outline-secondary"><i class="fa fa-print"></i></button>
-                            <button class="btn btn-primary">Tạo Đơn Hàng Mới</button>
+                            <a class="btn btn-primary" href="/emp-prj/qtht-001/invoice/create">Tạo giao dịch</a>
                         </div>
                     </div>
 

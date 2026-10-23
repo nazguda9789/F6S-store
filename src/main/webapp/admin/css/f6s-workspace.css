@@ -1,6 +1,8 @@
 /* F6S workspace: adapted from the supplied administration reference screens.
    Scoped to the back office; semantic warning/success/danger colors are retained. */
 :root{--workspace-accent:#107c70;--workspace-soft:#e4f5f0;--workspace-ink:#253044;--workspace-line:#e8ebf1}
+.workspace-order-bell{display:inline-flex;align-items:center;gap:5px;margin-right:20px;padding:8px;color:#253044;text-decoration:none}.workspace-order-bell .badge{font-size:10px}
+.workspace-catalog-product{display:flex;gap:12px;align-items:center;min-width:230px;max-width:360px}.workspace-catalog-product img{width:54px;height:54px;object-fit:contain;border:1px solid #e8ebf1;border-radius:8px;background:#fff}.workspace-catalog-product strong{display:block;font-weight:600;line-height:1.5}.workspace-catalog-product small{display:block;color:#758197;margin-top:4px;white-space:nowrap}
 body.sb-nav-fixed{background:#f7f8fb;color:var(--workspace-ink);font-size:14px}
 .sb-topnav.navbar{background:#fff!important;border-bottom:1px solid var(--workspace-line);box-shadow:none;min-height:56px}
 .sb-topnav.navbar-light .navbar-brand,.sb-topnav.navbar-light .navbar-nav .nav-link,.sb-topnav .div-content-header,.sb-topnav #sidebarToggle{color:var(--workspace-ink)!important}

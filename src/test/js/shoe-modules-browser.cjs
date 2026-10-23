@@ -39,6 +39,7 @@ const base = process.env.F6S_BASE_URL || 'http://127.0.0.1:18080';
   assert.equal(await page.locator('#brandId').inputValue(),String(id));
   const filtered=await (await page.request.post(base+'/adm-prj/qtht-001/api/product/filter?page=0&size=5',{data:{brandId:id}})).json();
   assert.ok(filtered.content.some(p=>p.id===productId));
+  assert.equal(filtered.content.find(p=>p.id===productId).brandName,name);
   await page.goto(base+'/adm-prj/qtht-001/image-library?search='+encodeURIComponent(name));
   assert.equal(await page.locator('img[alt="'+name+'"]').count(),1);
   await page.request.post(base+'/adm-prj/qtht-001/shoe-attributes/save',{form:{id,kind:'BRAND',name,active:'false'}});

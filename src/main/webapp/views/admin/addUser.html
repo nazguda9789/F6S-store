@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="Admin Dashboard" />
-  <meta name="author" content="Your Name" />
-  <title>Admin Dashboard</title>
+  <meta name="author" content="F6S" />
+  <title>Quản trị cửa hàng · F6S</title>
   <head th:replace="common/libadmin :: libheaderadmin"></head>
 </head>
 <body class="sb-nav-fixed">
@@ -16,7 +16,7 @@
   <div id="layoutSidenav_content">
     <main>
       <div class="container-fluid">
-        <h1 class="mt-4">Quản lý Tài Khoản</h1>
+        <h1 class="mt-4" th:text="${user.role != null and user.role.name() == 'ROLE_EMPLOYEE' ? 'Thông tin nhân viên' : user.role != null and user.role.name() == 'ROLE_USER' ? 'Thông tin khách hàng' : 'Thông tin tài khoản'}">Thông tin tài khoản</h1>
 
         <div class="card mb-4">
           <div class="card-header">
@@ -48,7 +48,7 @@
 
                     <div class="mb-3">
                       <label class="form-label" th:text="${user.id == null ? 'Mật khẩu' : 'Mật khẩu mới (bỏ trống nếu không đổi)'}"></label>
-                      <input type="password" class="form-control" th:field="*{password}" placeholder="••••••••">
+                      <input type="password" class="form-control" name="password" id="password" value="" autocomplete="new-password" placeholder="••••••••">
                     </div>
 
                     <div class="mb-3">
@@ -69,13 +69,18 @@
                     <div class="mb-3">
                       <label class="form-label">Vai trò</label>
                       <select class="form-select" th:field="*{role}">
-                        <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+                        <option th:each="r : ${roles}" th:value="${r}" th:text="${r.name() == 'ROLE_ADMIN' ? 'Quản trị viên' : r.name() == 'ROLE_EMPLOYEE' ? 'Nhân viên' : 'Khách hàng'}"></option>
                       </select>
                     </div>
 
                     <div class="form-check mb-3">
+                      <input type="checkbox" class="form-check-input" th:field="*{actived}">
+                      <label class="form-check-label" th:text="${user.role != null and user.role.name() == 'ROLE_EMPLOYEE' ? 'Đang làm việc' : 'Đang hoạt động'}">Đang hoạt động</label>
+                    </div>
+
+                    <div class="form-check mb-3">
                       <input type="checkbox" class="form-check-input" th:field="*{accountNonLocked}">
-                      <label class="form-check-label">Kích hoạt tài khoản</label>
+                      <label class="form-check-label">Cho phép đăng nhập (khóa bảo mật)</label>
                     </div>
 
                     <div class="text-center">
