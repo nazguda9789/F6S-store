@@ -69,7 +69,7 @@ $(function () {
 });
 
 async function searchProductModal(page, search){
-    var url = `/api/v1/products/search-by-param?page=${page}&size=5&search=${search}`;
+    var url = `/api/v1/products/search-by-param?page=${page}&size=5&search=${encodeURIComponent(search || '')}`;
     const response = await fetch(url, {
         method: 'GET'
     });

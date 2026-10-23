@@ -5,10 +5,16 @@
 </head>
 <body>
 <div id="menu-main" th:fragment="headerUser">
+    <div class="bee-service-strip">F6S SPORT STORE <span>Chọn giày đúng phong cách · Đặt hàng và theo dõi trực tuyến</span></div>
     <section class="container">
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid container-fuild-menu">
                 <a class="f6s-wordmark" href="/" aria-label="F6S — Trang chủ">F6S<span>SPORT STORE</span></a>
+                <form class="bee-header-search" role="search" aria-label="Tìm giày thể thao">
+                    <label class="visually-hidden" for="bee-search-input">Tên hoặc mã sản phẩm</label>
+                    <input id="bee-search-input" type="search" maxlength="150" placeholder="Bạn đang tìm đôi giày nào?" autocomplete="off">
+                    <button type="submit">Tìm kiếm</button>
+                </form>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Mở menu điều hướng"><span class="navbar-toggler-icon" aria-hidden="true"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">

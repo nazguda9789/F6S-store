@@ -19,6 +19,7 @@ Tài liệu đối chiếu mã nguồn đến ngày **19/10/2026**, dành cho ng
 | Bộ khung quản trị theo ảnh tham khảo và phạm vi đã đổi | [09 — Giao diện Workspace](09-GIAO-DIEN-WORKSPACE.md) |
 | Đối chiếu video Bee, thuộc tính giày và thư viện ảnh | [10 — Module theo video Bee](10-DOI-CHIEU-VIDEO-BEE.md) |
 | Tạo đơn nhanh, chọn khách và lọc giao dịch | [11 — Giao dịch tương đồng Bee](11-GIAO-DICH-TUONG-DONG-BEE.md) |
+| Giao diện cửa hàng, auth và workspace đồng bộ | [12 — UI đồng bộ Bee](12-UI-DONG-BO-BEE.md) |
 
 ## Tài liệu bổ trợ
 
