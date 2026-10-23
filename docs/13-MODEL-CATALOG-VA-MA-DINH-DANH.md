@@ -25,23 +25,25 @@
 
 Không tuyên bố toàn bộ model đã thay, không xóa các bảng tiếng Việt nguồn hoặc thay nghiệp vụ đang chạy chỉ để đổi tên lớp. Video không phải đặc tả đầy đủ cho tiền/tồn kho/hoàn trả.
 
-## Điểm dữ liệu cần quyết định
+## Gộp biến thể đã được duyệt
 
-Nguồn mẫu có hai biến thể **244 và 245**, cùng sản phẩm 31, màu 9, size 12. SKU mới của hai dòng khác nhau nhưng tổ hợp vẫn trùng. Migration chỉ báo cáo, không cộng tồn, xóa, đổi khóa tham chiếu hoặc tự chọn dòng giữ lại. Muốn ràng buộc unique tổ hợp phải quyết định giữ riêng hay gộp tồn và ngừng bán dòng dư, sau khi kiểm tra đơn/giỏ liên quan.
+Nguồn mẫu có hai biến thể **244 và 245**, cùng sản phẩm 31, màu 9, size 12. Theo lựa chọn đã duyệt: giữ 244, cộng tồn của 245 vào 244, đưa tồn 245 về 0 và ngừng bán. Với dữ liệu mẫu, tồn 244 thành 40. Không xóa dòng 245, không đổi tham chiếu hoặc snapshot hóa đơn lịch sử.
+
+`sql/gop_bien_the_244_245.sql` chỉ áp dụng khi đúng sản phẩm/màu/size, giá bằng nhau, tồn hợp lệ và 245 không còn trong giỏ hoặc hóa đơn chờ. Nếu báo `SKIPPED_REVIEW_CART_DRAFT_OR_VARIANT_DATA`, cần kiểm tra dữ liệu trước; không ép chạy hoặc xóa giỏ khách. Bảng `catalog_variant_merge` ghi tồn trước gộp, chống cộng lại khi chạy lần hai. Không xóa bản ghi audit để chạy lại. API chặn sửa/kích hoạt lại biến thể nguồn đã gộp.
 
 ## SQL và cập nhật
 
-- **Dừng web, sao lưu**, chạy `sql/nang_cap_f6s.sql` (đã gộp) trên schema đang dùng rồi chạy code mới. Nếu đã ở bản thuộc tính giày 23/10, có thể chỉ chạy `sql/cap_nhat_ma_san_pham_20261023.sql`.
+- **Dừng web, sao lưu**, chạy `sql/nang_cap_f6s.sql` (đã gộp) trên schema đang dùng rồi chạy code mới. Nếu đã chạy migration mã sản phẩm, chạy thêm `sql/gop_bien_the_244_245.sql` để tạo bảng audit và xử lý gộp có điều kiện.
 - Cài mới dùng duy nhất `f6s_shop.sql`, đã chứa cấu trúc và backfill mã.
 - Seed bổ sung ghi mã nguồn vào `legacy_sku`, để server/script cấp SKU chính thức; tránh mất dòng khi database đã có unique SKU.
-- Script không đổi ID, không đổi tồn hoặc mã snapshot trong hóa đơn, không reset mật khẩu. Có thể chạy lại; không chạy dump đầy đủ lên database có dữ liệu cần giữ.
+- Script không đổi ID hoặc mã snapshot trong hóa đơn, không reset mật khẩu. Riêng bước gộp được duyệt chuyển tồn 245 sang 244 đúng một lần. Có thể chạy lại; không chạy dump đầy đủ lên database có dữ liệu cần giữ.
 - Không cần secret mới. Nếu khởi động code mới trước migration, Hibernate có thể gặp SKU trùng khi tạo unique index: dừng web và chạy migration trước, không xóa dữ liệu để né lỗi.
 
 ## Kiểm chứng
 
-- MySQL 8: cài mới + bổ sung hai lần + nâng cấp hai lần; giữ 50 sản phẩm, 176 biến thể; có 50 mã mẫu và 176 SKU riêng, giữ 176 mã cũ. Vẫn báo đúng tổ hợp trùng thay vì âm thầm xóa.
+- MySQL 8: cài mới + bổ sung + nâng cấp giữ 176 biến thể và 176 SKU riêng. Gộp mẫu cho tồn 244=40, 245=0/ngừng bán, audit=1; chạy lại không cộng thêm tồn. Giỏ tham chiếu 245 khiến bước gộp bỏ qua, tồn giữ nguyên 20/20. Báo cáo tổ hợp vẫn liệt kê dòng lưu trữ vì không xóa lịch sử.
 - Kiểm thử mã cho padding, namespace, ID lớn, ID không hợp lệ, chống trùng tổ hợp và giả mạo mã/sản phẩm cha.
 - Trình duyệt/API kiểm tra tạo hai biến thể, đổi tên không đổi mã, sửa tồn không đổi SKU, tìm mã, readonly trong form và chặn tổ hợp trùng. Chỉ chạy script `src/test/js/catalog-codes-browser.cjs` trên database demo riêng.
 - Chưa kiểm chứng MariaDB/XAMPP hoặc chuyển đổi toàn bộ domain; không chứng nhận đầy đủ bảo mật/hiệu năng production.
 
-Lượt kiểm tra cuối: 61 unit test Java chọn lọc, 12 test JavaScript; kiểm tra trình duyệt catalog, 9 trang quản trị, luồng POS và 14 trang storefront/7 trang mobile. App chạy trên SQL cài mới với `ddl-auto=validate` và kịch bản catalog đạt, không dựa vào Hibernate tự bổ sung cột. Đây không phải toàn bộ test Java hoặc mọi trạng thái nghiệp vụ.
+Lượt kiểm tra mã sản phẩm trước bước gộp: 61 unit test Java chọn lọc, 12 test JavaScript; kiểm tra trình duyệt catalog, 9 trang quản trị, luồng POS và 14 trang storefront/7 trang mobile; app trên SQL cài mới với `ddl-auto=validate`. Bước gộp bổ sung: chạy lại nhóm Java (62 test, gồm chặn kích hoạt nguồn) và các kịch bản SQL nêu trên; chưa chạy lại trình duyệt cho bước gộp. Đây không phải toàn bộ test Java hoặc mọi trạng thái nghiệp vụ; chưa kiểm chứng XAMPP thực tế của thành viên.

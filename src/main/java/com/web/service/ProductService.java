@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class ProductService {
     @Autowired private CatalogCodeService catalogCodes;
+    @Autowired private CatalogVariantMergeRepository variantMerges;
 
     private void validateVariants(ProductCreateRequest request, Long existingProductId) {
         if (request.getDetails() == null) throw new IllegalArgumentException("Thiếu danh sách biến thể.");
@@ -291,6 +292,7 @@ public class ProductService {
     @Transactional
     public ProductDetail updateDetail(ProductDetail input) {
         ProductDetail saved = productDetailRepository.findById(input.getId()).orElseThrow(() -> new IllegalArgumentException("Biến thể không tồn tại."));
+        if (variantMerges.existsBySourceVariantId(saved.getId())) throw new IllegalArgumentException("Biến thể đã gộp tồn và được lưu trữ; hãy dùng biến thể đích.");
         if (input.getStock() == null || input.getStock() < 0 || input.getPrice() == null || !Double.isFinite(input.getPrice()) || input.getPrice() < 0)
             throw new IllegalArgumentException("Tồn kho và giá biến thể không hợp lệ.");
         if (input.getColorId() == null || input.getSizeId() == null || input.getColorId() < 1 || input.getSizeId() < 1)

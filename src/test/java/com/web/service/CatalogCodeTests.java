@@ -3,6 +3,7 @@ package com.web.service;
 import com.web.dto.ProductCreateRequest;
 import com.web.entity.ProductDetail;
 import com.web.repository.ProductDetailRepository;
+import com.web.repository.CatalogVariantMergeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
@@ -39,10 +40,20 @@ class CatalogCodeTests {
     @Test void editingVariantKeepsParentAndCodeAndArchivesOldSku() {
         ProductService service = new ProductService(); ProductDetailRepository repository = mock(ProductDetailRepository.class);
         ReflectionTestUtils.setField(service,"productDetailRepository",repository); ReflectionTestUtils.setField(service,"catalogCodes",codes);
+        ReflectionTestUtils.setField(service,"variantMerges",mock(CatalogVariantMergeRepository.class));
         ProductDetail saved = new ProductDetail(); saved.setId(17L); saved.setProductId(5L); saved.setSku("OLD-SKU"); saved.setColorId(1L); saved.setSizeId(2L);
         when(repository.findById(17L)).thenReturn(Optional.of(saved)); when(repository.save(any())).thenAnswer(i -> i.getArgument(0));
         ProductDetail input = new ProductDetail(); input.setId(17L); input.setProductId(999L); input.setSku("FORGED"); input.setColorId(1L); input.setSizeId(2L); input.setStock(4); input.setPrice(500D);
         ProductDetail result = service.updateDetail(input);
         assertEquals(5L,result.getProductId()); assertEquals("F6S-SKU000017",result.getSku()); assertEquals("OLD-SKU",result.getLegacySku());
+    }
+    @Test void archivedMergedVariantCannotBeReactivated() {
+        ProductService service = new ProductService(); ProductDetailRepository repository = mock(ProductDetailRepository.class);
+        CatalogVariantMergeRepository merges = mock(CatalogVariantMergeRepository.class);
+        ReflectionTestUtils.setField(service,"productDetailRepository",repository); ReflectionTestUtils.setField(service,"variantMerges",merges);
+        ProductDetail saved = new ProductDetail(); saved.setId(245L);
+        when(repository.findById(245L)).thenReturn(Optional.of(saved)); when(merges.existsBySourceVariantId(245L)).thenReturn(true);
+        ProductDetail input = new ProductDetail(); input.setId(245L); input.setActive(true); input.setStock(20);
+        assertThrows(IllegalArgumentException.class, () -> service.updateDetail(input)); verify(repository,never()).save(any());
     }
 }

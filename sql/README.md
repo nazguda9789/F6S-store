@@ -10,7 +10,7 @@ Các bản cài mới và bổ sung dữ liệu đã gộp cấu trúc module gi
 
 ## Bản đầy đủ hiện có
 
-Đợt mã sản phẩm mới đã gộp: `product.code` (unique), `product_detail.legacy_sku`, chuẩn hóa SKU từ ID và unique SKU. **Dừng web và chạy migration trước khi chạy code mới** vì nguồn cũ có SKU trùng. Các tổ hợp màu/size trùng chỉ được báo cáo, không tự gộp/xóa. [Chi tiết model/mã](../docs/13-MODEL-CATALOG-VA-MA-DINH-DANH.md).
+Đợt mã sản phẩm mới đã gộp: `product.code` (unique), `product_detail.legacy_sku`, chuẩn hóa SKU từ ID và unique SKU. **Dừng web, sao lưu và chạy migration trước khi chạy code mới**. Theo quyết định đã duyệt, bước `gop_bien_the_244_245.sql` chuyển tồn 245 sang 244 một lần, ngừng bán 245 và giữ lịch sử. Nếu còn giỏ/hóa đơn chờ tham chiếu 245 hoặc dữ liệu khác dự kiến, script bỏ qua để kiểm tra; không tự xóa tham chiếu. Bảng audit `catalog_variant_merge` phải có trước khi chạy code mới. [Chi tiết model/mã](../docs/13-MODEL-CATALOG-VA-MA-DINH-DANH.md).
 
 - Giữ 50 sản phẩm, 13 bài viết, 1 admin và 2 nhân viên nguồn; giữ bảng tiếng Việt để bảo toàn nguồn, không đồng bộ tự động với bảng Java.
 - Bảng `pending_registration` cho đăng ký chờ OTP.
