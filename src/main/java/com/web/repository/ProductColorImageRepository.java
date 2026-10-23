@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface ProductColorImageRepository extends JpaRepository<ProductColorImage, Long> {
+    @Transactional
+    void deleteByProductId(Long productId);
 
     @Query(value = "select pc.id, pc.image, pc.product_id as productId, pc.color_id as colorId ,\n" +
             "c.code as code, c.name as colorName\n" +

@@ -56,7 +56,8 @@
 
         <div class="col-md-6">
             <h1 class="fw-bold product-name-dt" th:text="${product.name}"></h1>
-            <p>Mã sản phẩm  <span class="product-code" id="product-code"></span></p>
+            <p>Mã sản phẩm: <strong th:text="${product.code}"></strong></p>
+            <p>SKU biến thể: <span class="product-code" id="product-code"></span></p>
             <p class="quantity-sold">Đã bán  <span><strong th:text="${product.sold}"></strong> sản phẩm</span></p>
             <div class="d-flex">
                 <p class="text-danger h4 fw-bold" id="price-product">[[${#numbers.formatDecimal(product.price, 0, 'POINT', 0, 'POINT')}]] đ</p>

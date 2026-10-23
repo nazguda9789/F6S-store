@@ -5,10 +5,12 @@ Các bản cài mới và bổ sung dữ liệu đã gộp cấu trúc module gi
 | Tình huống | File |
 |---|---|
 | Cài mới, chấp nhận tạo lại schema `f6s_shop` | [`../f6s_shop.sql`](../f6s_shop.sql) — **có DROP DATABASE**, chỉ cần import một file |
-| Đã có dữ liệu, chỉ nâng cấu trúc OTP và thuộc tính giày | [`nang_cap_f6s.sql`](nang_cap_f6s.sql) — chọn đúng schema trước khi import, không xóa dữ liệu |
+| Đã có dữ liệu, nâng cấu trúc và chuẩn hóa mã | [`nang_cap_f6s.sql`](nang_cap_f6s.sql) — dừng web, chọn đúng schema trước khi import; đổi SKU hiện hành và giữ mã cũ, không xóa dữ liệu |
 | Cần thêm bộ dữ liệu sản phẩm/bài viết nguồn | [`bo_sung_du_lieu.sql`](bo_sung_du_lieu.sql) — có seed, không phải lựa chọn mặc định khi chỉ nâng version; đã gộp cấu trúc mới |
 
 ## Bản đầy đủ hiện có
+
+Đợt mã sản phẩm mới đã gộp: `product.code` (unique), `product_detail.legacy_sku`, chuẩn hóa SKU từ ID và unique SKU. **Dừng web và chạy migration trước khi chạy code mới** vì nguồn cũ có SKU trùng. Các tổ hợp màu/size trùng chỉ được báo cáo, không tự gộp/xóa. [Chi tiết model/mã](../docs/13-MODEL-CATALOG-VA-MA-DINH-DANH.md).
 
 - Giữ 50 sản phẩm, 13 bài viết, 1 admin và 2 nhân viên nguồn; giữ bảng tiếng Việt để bảo toàn nguồn, không đồng bộ tự động với bảng Java.
 - Bảng `pending_registration` cho đăng ký chờ OTP.

@@ -20,6 +20,7 @@ Tài liệu đối chiếu mã nguồn đến ngày **19/10/2026**, dành cho ng
 | Đối chiếu video Bee, thuộc tính giày và thư viện ảnh | [10 — Module theo video Bee](10-DOI-CHIEU-VIDEO-BEE.md) |
 | Tạo đơn nhanh, chọn khách và lọc giao dịch | [11 — Giao dịch tương đồng Bee](11-GIAO-DICH-TUONG-DONG-BEE.md) |
 | Giao diện cửa hàng, auth và workspace đồng bộ | [12 — UI đồng bộ Bee](12-UI-DONG-BO-BEE.md) |
+| Model catalog, mã mẫu giày / SKU và giới hạn chuyển đổi | [13 — Model và mã định danh](13-MODEL-CATALOG-VA-MA-DINH-DANH.md) |
 
 ## Tài liệu bổ trợ
 

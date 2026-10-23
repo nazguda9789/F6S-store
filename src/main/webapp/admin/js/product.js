@@ -32,7 +32,7 @@ async function filterProduct(page) {
         listdm += '</div>';
         main += `<tr class="${list[i].active == true?'':'tr-locked'}">
                     <td>${page * size + i + 1}</td>
-                    <td>#${list[i].id}</td>
+                    <td>${list[i].code || '#' + list[i].id}</td>
                     <td><img src="${list[i].image}" style="width: 100px;"></td>
                     <td>${listdm}</td>
                     <td>${list[i].name}</td>
@@ -204,7 +204,7 @@ function getProductDetailsFromUI() {
             active: activeCheckbox.checked
         };
 
-        if(detail.sku != '' && detail.sku != null && detail.stock != '' && detail.stock != null){
+        if(detail.stock !== '' && detail.stock != null){
             details.push(detail);
         }
     });

@@ -22,6 +22,28 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+    @Autowired private CatalogCodeService catalogCodes;
+
+    private void validateVariants(ProductCreateRequest request, Long existingProductId) {
+        if (request.getDetails() == null) throw new IllegalArgumentException("Thiếu danh sách biến thể.");
+        Set<String> combinations = new HashSet<>();
+        for (ProductCreateRequest.ProductDetailRequest detail : request.getDetails()) {
+            if (detail.getColorId() == null || detail.getSizeId() == null || detail.getColorId() < 1 || detail.getSizeId() < 1)
+                throw new IllegalArgumentException("Chọn màu và kích cỡ hợp lệ.");
+            if (!combinations.add(detail.getColorId() + ":" + detail.getSizeId()) &&
+                    (existingProductId == null || !checkExistDetail(detail.getColorId(), detail.getSizeId(), existingProductId)))
+                throw new IllegalArgumentException("Không thêm trùng tổ hợp màu / kích cỡ.");
+            if (detail.getStock() == null || detail.getStock() < 0)
+                throw new IllegalArgumentException("Tồn kho không được âm.");
+            if (detail.getPrice() != null && (!Double.isFinite(detail.getPrice()) || detail.getPrice() < 0))
+                throw new IllegalArgumentException("Giá biến thể không hợp lệ.");
+        }
+    }
+
+    private void assignVariantCodes(List<ProductDetail> details) {
+        for (ProductDetail detail : details) detail.setSku(catalogCodes.variantCode(detail.getId()));
+        productDetailRepository.saveAll(details);
+    }
     @Autowired
     private ShoeAttributeService shoeAttributes;
 
@@ -63,6 +85,7 @@ public class ProductService {
 
     @Transactional
     public Product createProduct(ProductCreateRequest request) {
+        validateVariants(request, null);
         // Tạo Product
         Product product = new Product();
         applyShoeAttributes(product, request);
@@ -80,6 +103,7 @@ public class ProductService {
         product.setWeight(request.getWeight());
 
         product = productRepository.save(product);
+        product.setCode(catalogCodes.productCode(product.getId()));
 
         // Thêm ProductDetails
         List<ProductDetail> details = new ArrayList<>();
@@ -98,13 +122,14 @@ public class ProductService {
             detail.setSize(size);
             detail.setStock(detailRequest.getStock());
             detail.setPrice(detailRequest.getPrice());
-            detail.setSku(detailRequest.getSku());
+            detail.setSku(null); // server assigns a stable code after ID allocation
             detail.setOldPrice(detailRequest.getOldPrice());
             detail.setActive(true);
             details.add(detail);
             colorIds.add(detailRequest.getColorId());
         }
         productDetailRepository.saveAll(details);
+        assignVariantCodes(details);
 
         // Thêm ProductImages
         List<ProductImage> images = new ArrayList<>();
@@ -143,8 +168,10 @@ public class ProductService {
 
     @Transactional
     public Product updateProduct(ProductCreateRequest request, Long id) {
+        validateVariants(request, id);
         // Tạo Product
         Product product = productRepository.findById(id).get();
+        if (product.getCode() == null) product.setCode(catalogCodes.productCode(product.getId()));
         applyShoeAttributes(product, request);
         product.setName(request.getName());
         product.setSlug(request.getSlug());
@@ -178,13 +205,14 @@ public class ProductService {
                 detail.setSize(size);
                 detail.setStock(detailRequest.getStock());
                 detail.setPrice(detailRequest.getPrice());
-                detail.setSku(detailRequest.getSku());
+                detail.setSku(null);
                 detail.setActive(true);
                 details.add(detail);
                 colorIds.add(detailRequest.getColorId());
             }
         }
         productDetailRepository.saveAll(details);
+        assignVariantCodes(details);
 
         // Thêm ProductImages
         List<ProductImage> images = new ArrayList<>();
@@ -260,9 +288,23 @@ public class ProductService {
         }
     }
 
-    public ProductDetail updateDetail(ProductDetail productDetail) {
-        productDetailRepository.save(productDetail);
-        return productDetail;
+    @Transactional
+    public ProductDetail updateDetail(ProductDetail input) {
+        ProductDetail saved = productDetailRepository.findById(input.getId()).orElseThrow(() -> new IllegalArgumentException("Biến thể không tồn tại."));
+        if (input.getStock() == null || input.getStock() < 0 || input.getPrice() == null || !Double.isFinite(input.getPrice()) || input.getPrice() < 0)
+            throw new IllegalArgumentException("Tồn kho và giá biến thể không hợp lệ.");
+        if (input.getColorId() == null || input.getSizeId() == null || input.getColorId() < 1 || input.getSizeId() < 1)
+            throw new IllegalArgumentException("Chọn màu và kích cỡ hợp lệ.");
+        boolean changed = !Objects.equals(saved.getColorId(), input.getColorId()) || !Objects.equals(saved.getSizeId(), input.getSizeId());
+        if (changed && productDetailRepository.existsByProductIdAndColorIdAndSizeIdAndIdNot(saved.getProductId(), input.getColorId(), input.getSizeId(), saved.getId()))
+            throw new IllegalArgumentException("Đã tồn tại biến thể màu / kích cỡ này.");
+        String code = catalogCodes.variantCode(saved.getId());
+        if (saved.getLegacySku() == null && saved.getSku() != null && !code.equals(saved.getSku())) saved.setLegacySku(saved.getSku());
+        saved.setSku(code); saved.setStock(input.getStock()); saved.setPrice(input.getPrice()); saved.setOldPrice(input.getOldPrice());
+        saved.setActive(input.getActive()); saved.setColorId(input.getColorId()); saved.setSizeId(input.getSizeId());
+        Color color = new Color(); color.setId(input.getColorId()); saved.setColor(color);
+        Size size = new Size(); size.setId(input.getSizeId()); saved.setSize(size);
+        return productDetailRepository.save(saved);
     }
 
     public String deleteDetail(Long id) {
@@ -295,6 +337,7 @@ public class ProductService {
         discountProductRepository.deleteByProductId(id);
         productDetailRepository.deleteByProduct(id);
         productCategoryRepository.deleteByProduct(id);
+        productColorImageRepository.deleteByProductId(id);
         productRepository.deleteById(id);
     }
 

@@ -35,9 +35,15 @@ public class ProductSpecification implements Specification<Product> {
 
         if (search != null && !search.trim().isEmpty()) {
             String pattern = "%" + search.trim().toLowerCase() + "%";
+            Subquery<Long> codes = query.subquery(Long.class);
+            Root<com.web.entity.ProductDetail> variant = codes.from(com.web.entity.ProductDetail.class);
+            codes.select(variant.get("productId")).where(cb.equal(variant.get("productId"), root.get("id")),
+                    cb.or(cb.like(cb.lower(variant.get("sku")), pattern), cb.like(cb.lower(variant.get("legacySku")), pattern)));
 
             Predicate searchPredicate = cb.or(
                     cb.like(cb.lower(root.get("name")), pattern),
+                    cb.like(cb.lower(root.get("code")), pattern),
+                    cb.exists(codes),
                     cb.like(cb.lower(root.get("description")), pattern)
             );
             predicate = cb.and(predicate, searchPredicate);

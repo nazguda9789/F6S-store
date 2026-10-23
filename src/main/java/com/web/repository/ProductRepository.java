@@ -226,13 +226,13 @@ LEFT JOIN discount_product d
     AND NOW() BETWEEN d.start_date AND d.end_date
 
 WHERE p.active = true
-AND p.name LIKE ?1
+AND (p.name LIKE ?1 OR p.code LIKE ?1 OR EXISTS (SELECT 1 FROM product_detail pd WHERE pd.product_id=p.id AND pd.active=true AND (pd.sku LIKE ?1 OR pd.legacy_sku LIKE ?1)))
 """,
             countQuery = """
 SELECT COUNT(p.id)
 FROM product p
 WHERE p.active = true
-AND p.name LIKE ?1
+AND (p.name LIKE ?1 OR p.code LIKE ?1 OR EXISTS (SELECT 1 FROM product_detail pd WHERE pd.product_id=p.id AND pd.active=true AND (pd.sku LIKE ?1 OR pd.legacy_sku LIKE ?1)))
 """,
             nativeQuery = true)
     Page<ProductView> getProductByParam(String search, Pageable pageable);

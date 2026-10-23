@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductDetailRepository extends JpaRepository<ProductDetail, Long> {
+    boolean existsByProductIdAndColorIdAndSizeIdAndIdNot(Long productId, Long colorId, Long sizeId, Long id);
 
     @Query("select p.id from ProductDetail p where p.colorId = ?1")
     Long findByColor(Long colorId);

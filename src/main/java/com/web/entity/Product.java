@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "product")
+@Table(name = "product", uniqueConstraints = @UniqueConstraint(name = "uk_f6s_product_code", columnNames = "code"))
 @Getter
 @Setter
 @EntityListeners(AuditingEntityListener.class)
@@ -23,6 +23,8 @@ public class Product {
     private Long id;
 
     private String name;
+    @Column(length = 32)
+    private String code;
     private Long brandId;
     private Long soleId;
     private Long materialId;

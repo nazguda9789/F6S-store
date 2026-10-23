@@ -37,6 +37,8 @@
             </div>
             <div class="col-sm-3">
                 <div class="lb-form">Thông tin sản phẩm</div>
+                <label class="form-label">Mã sản phẩm (server cấp)</label>
+                <input class="form-control form-control-sm" th:value="${product.code}" readonly placeholder="Tự sinh sau khi lưu">
                 <label class="form-label">Tên sản phẩm</label>
                 <input th:value="${product.name}" class="form-control form-control-sm" id="name" onkeyup="createSlug(this.value)">
                 <label class="form-label" for="brandId">Thương hiệu</label>
@@ -158,7 +160,7 @@
                 <div class="tab-content" id="ex1-content">
                     <div class="tab-pane fade show active" id="ex1-tabs-1" role="tabpanel" aria-labelledby="ex1-tab-1" >
                         <div class="lb-form">Chi tiết sản phẩm</div>
-                        <span style="color: darkred">Lưu ý: (SKU hoặc số lượng bỏ trống thì sẽ không được lưu, nhập 0 nếu bỏ trống số lượng)</span>
+                        <span class="text-muted">SKU do server cấp sau khi lưu. Nhập tồn kho từ 0; mỗi tổ hợp màu / kích cỡ chỉ thêm một lần.</span>
                         <br><div th:class="row">
                             <div class="col-lg-4 col-md-4 col-sm-12 col-12">
                                 <label  class="form-label">Chọn màu sắc</label>
@@ -214,7 +216,7 @@
                                         </select>
                                     </td>
                                     <td><input th:id="'stock'+${dt.id}" th:value="${dt.stock}" class="form-control-sm stock-detail"></td>
-                                    <td><input th:id="'sku'+${dt.id}" th:value="${dt.sku}" class="form-control-sm sku-detail"><button type="button" onclick="setSku(this)" class="btn btn-outline-primary"><i class="fa fa-check"></i></button></td>
+                                    <td><input th:id="'sku'+${dt.id}" th:value="${dt.sku}" class="form-control-sm sku-detail" readonly><small class="text-muted" th:if="${dt.legacySku}" th:text="'Mã cũ: ' + ${dt.legacySku}"></small></td>
                                     <td><input class="form-control-sm price-detail" th:id="'price-detail'+${dt.id}" th:value="${dt.price}"></td>
                                     <td><input class="form-control-sm old-price-detail" th:id="'old-price-detail'+${dt.id}" th:value="${dt.oldPrice}"></td>
                                     <td><label class="checkbox-custom">Active
@@ -313,36 +315,11 @@
 
 <script>
 
-    function setSku(selectElement) {
-        // Lấy tên sản phẩm từ input bên ngoài
-        const productName = document.getElementById("name").value;
-        console.log(productName)
-
-        // Tìm dòng <tr> chứa select đang thay đổi
-        const tr = selectElement.closest("tr");
-
-        // Lấy select size và color trong cùng <tr>
-        const sizeSelect = tr.querySelector(".select-size");
-        const colorSelect = tr.querySelector(".select-color");
-
-        // Lấy option được chọn
-        const sizeOption = sizeSelect.options[sizeSelect.selectedIndex];
-        const colorOption = colorSelect.options[colorSelect.selectedIndex];
-
-        // Lấy tên size và màu từ attribute data-
-        const sizeName = sizeOption.getAttribute("data-sizeName") || "";
-        const colorName = colorOption.getAttribute("data-colorName") || "";
-        console.log(sizeName)
-        console.log(colorName)
-
-        // Gọi hàm sinh SKU
-        const sku = generateSKU(productName, sizeName, colorName);
-
-        // Gán vào input SKU trong cùng dòng
-        const skuInput = tr.querySelector(".sku-detail");
-        if (skuInput) {
-            skuInput.value = sku;
-        }
+    function setSku(element) {
+        const input = element.closest('tr')?.querySelector('.sku-detail');
+        if (!input) return;
+        input.readOnly = true;
+        if (!input.id) { input.value = ''; input.placeholder = 'Server cấp sau khi lưu'; }
     }
     function addChiTietSanPham() {
         const templateRowHTML = document.getElementById("blockaddctsp").querySelector('tbody').innerHTML;
@@ -427,31 +404,6 @@
     });
 </script>
 <script>
-    function generateSKU(productName, sizeName, colorName) {
-        // Lấy chữ cái đầu mỗi từ, nhưng giữ nguyên từ nếu nó là số
-        function getAbbreviationWithNumbers(str) {
-            return str
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // bỏ dấu
-                .split(/\s+/)
-                .filter(word => word.trim() !== "")
-                .map(word => /^\d+$/.test(word) ? word : word[0].toUpperCase())
-                .join('');
-        }
-
-        // Loại bỏ dấu, ký tự đặc biệt, giữ lại chữ và số, viết hoa
-        function normalize(str) {
-            return str
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-zA-Z0-9]/g, "")
-                .toUpperCase();
-        }
-
-        const productCode = getAbbreviationWithNumbers(productName); // ATLN2025
-        const size = normalize(sizeName);                            // 30
-        const color = normalize(colorName);                          // XANH
-
-        return `${productCode}-${size}-${color}`;
-    }
 
     function setPriceInput(e){
         $('.price-detail').val(e.value)

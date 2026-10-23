@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "product_detail")
+@Table(name = "product_detail", uniqueConstraints = @UniqueConstraint(name = "uk_f6s_variant_sku", columnNames = "sku"))
 @Getter
 @Setter
 public class ProductDetail {
@@ -37,6 +37,7 @@ public class ProductDetail {
     private Double oldPrice;
 
     private String sku;
+    private String legacySku;
 
     private Boolean active = true;
 }
