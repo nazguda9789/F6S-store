@@ -21,7 +21,7 @@ Nguồn: video người dùng tải lên, thời lượng 14 phút 40,8 giây, 3
 ## Cập nhật máy thành viên
 
 1. Pull code, dùng JDK 17, Reload Maven và khởi động lại web.
-2. Database hiện có: sao lưu rồi chạy riêng `sql/cap_nhat_module_giay_20261023.sql` trên đúng schema. Script chỉ thêm bảng/cột, có thể chạy lại. Profile dev với Hibernate `ddl-auto=update` cũng tự bổ sung nhưng không thay thế sao lưu.
+2. Database hiện có: sao lưu rồi chạy `sql/nang_cap_f6s.sql` trên đúng schema, đã gộp cấu trúc OTP và thuộc tính giày. Cài mới chỉ cần `f6s_shop.sql`, không phải chạy thêm các patch cũ. Các script lịch sử vẫn giữ cho đối chiếu. Profile dev với Hibernate `ddl-auto=update` cũng tự bổ sung nhưng không thay thế sao lưu.
 3. **Không import lại SQL đầy đủ có DROP DATABASE**. Không thay mật khẩu/tài khoản admin hoặc secret trong đợt này.
 4. Mở quản trị → Quản lý sản phẩm → thêm thuộc tính → sửa từng giày để phân loại.
 

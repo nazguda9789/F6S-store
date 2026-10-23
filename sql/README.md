@@ -1,0 +1,31 @@
+# Chọn file SQL F6S
+
+Các bản cài mới và bổ sung dữ liệu đã gộp cấu trúc module giày ngày 23/10/2026. Không lấy database đang chạy của người dùng để tạo dump: dữ liệu mẫu cũ được giữ, không kèm đơn/tài khoản kiểm thử hoặc secret mới.
+
+| Tình huống | File |
+|---|---|
+| Cài mới, chấp nhận tạo lại schema `f6s_shop` | [`../f6s_shop.sql`](../f6s_shop.sql) — **có DROP DATABASE**, chỉ cần import một file |
+| Đã có dữ liệu, chỉ nâng cấu trúc OTP và thuộc tính giày | [`nang_cap_f6s.sql`](nang_cap_f6s.sql) — chọn đúng schema trước khi import, không xóa dữ liệu |
+| Cần thêm bộ dữ liệu sản phẩm/bài viết nguồn | [`bo_sung_du_lieu.sql`](bo_sung_du_lieu.sql) — có seed, không phải lựa chọn mặc định khi chỉ nâng version; đã gộp cấu trúc mới |
+
+## Bản đầy đủ hiện có
+
+- Giữ 50 sản phẩm, 13 bài viết, 1 admin và 2 nhân viên nguồn; giữ bảng tiếng Việt để bảo toàn nguồn, không đồng bộ tự động với bảng Java.
+- Bảng `pending_registration` cho đăng ký chờ OTP.
+- Bảng `shoe_attribute` cho thương hiệu / đế giày / chất liệu; 3 cột `product.brand_id`, `sole_id`, `material_id`.
+- Không tự đoán thương hiệu/chất liệu/đế giày: dữ liệu cũ để NULL, quản trị viên phân loại sau.
+- Admin demo giữ `admin@gmail.com` / `123123` trong bản cài mới; bản nâng cấp không đặt lại mật khẩu. Không dùng mật khẩu demo khi public.
+
+## Script lịch sử và bảo trì
+
+`cap_nhat_noi_dung_20261019.sql`, `cap_nhat_xac_thuc_20261019.sql`, `cap_nhat_module_giay_20261023.sql` được giữ để đối chiếu hoặc nâng từng phần. Cài mới không phải chạy thêm. `dat_lai_admin_demo.sql` chỉ dùng khi chủ động muốn reset admin demo, không chạy như bước nâng cấp.
+
+Sao lưu trước khi import. Không chạy dump đầy đủ lên database có đơn hàng cần giữ. Các lệnh thêm cấu trúc có thể chạy lại nhưng DDL MySQL không rollback nguyên khối: nếu lỗi hãy đọc thông báo rồi chạy lại sau khi sửa, không xóa database để thử.
+
+## Kiểm chứng
+
+Đã import bản đầy đủ vào schema MySQL 8 demo riêng, chạy bản bổ sung và nâng cấp hai lần; số sản phẩm/bài viết/tài khoản không tăng, có đủ bảng/cột mới. Chưa kiểm chứng trực tiếp XAMPP/MariaDB trên Windows.
+
+Đã nâng cấp riêng một schema được import từ SQL cũ (commit `61b5371`): từ 0 lên đủ 3 cột thuộc tính, giữ 50 sản phẩm / 13 bài viết / 3 tài khoản. Web khởi động trên bản cài mới bằng `ddl-auto=validate` (không tự tạo cột), đăng nhập admin và mở 9 trang quản trị đạt; kiểm tra đóng/mở menu desktop/điện thoại đạt. Tiến trình kiểm thử được tách file bot để không khóa file của web đang chạy.
+
+Lệnh seed `product` đã ghi rõ danh sách cột để chạy được cả trước và sau khi thêm 3 cột mới, thay vì `INSERT ... VALUES` phụ thuộc thứ tự/toàn bộ cột.

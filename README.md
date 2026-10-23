@@ -6,7 +6,7 @@ F6S là ứng dụng Java Spring Boot phục vụ khách mua giày online và nh
 
 ## Bộ hướng dẫn đầy đủ
 
-**Cập nhật module theo video Bee (23/10):** thêm thuộc tính thương hiệu/đế giày/chất liệu, lọc thương hiệu và thư viện ảnh. Máy đang có database: sao lưu rồi chạy riêng [SQL bổ sung](sql/cap_nhat_module_giay_20261023.sql), không import lại dump đầy đủ. Xem [phạm vi đã làm và còn thiếu](docs/10-DOI-CHIEU-VIDEO-BEE.md). Không cần secret mới.
+**SQL đã gộp module mới (23/10):** cài mới chỉ import [f6s_shop.sql](f6s_shop.sql), đã có bảng OTP và thuộc tính thương hiệu/đế giày/chất liệu. Máy đang có database: sao lưu rồi chạy [sql/nang_cap_f6s.sql](sql/nang_cap_f6s.sql), không import lại dump đầy đủ. [Chọn đúng file SQL](sql/README.md) · [Phạm vi module](docs/10-DOI-CHIEU-VIDEO-BEE.md). Không cần secret mới.
 
 | Mục | Nội dung |
 |---|---|
@@ -77,6 +77,7 @@ Không cần cài Node.js/npm cho cấu trúc project hiện tại. Maven đã c
 | Tình huống | File cần import |
 |---|---|
 | Cài mới, chấp nhận tạo lại database | `f6s_shop.sql` |
+| Đã có database, chỉ nâng cấu trúc OTP / module giày | Chọn database đang dùng, import `sql/nang_cap_f6s.sql` |
 | Đã có database, cần thêm dữ liệu nguồn | Chọn database `f6s_shop`, import `sql/bo_sung_du_lieu.sql` |
 
 **File đầy đủ có `DROP DATABASE IF EXISTS f6s_shop`, sẽ xóa database cùng tên. Sao lưu trước khi import nếu đã có dữ liệu.** Không import cả hai file chỉ để cài mới; file đầy đủ đã bao gồm dữ liệu bổ sung.

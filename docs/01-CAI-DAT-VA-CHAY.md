@@ -36,9 +36,11 @@ Thư mục đúng phải chứa trực tiếp `pom.xml`, `mvnw.cmd`, `src` và `
 1. Mở XAMPP Control Panel, Start MySQL. Start Apache nếu dùng phpMyAdmin.
 2. Vào `http://localhost/phpmyadmin` (nếu Apache dùng cổng khác, sửa URL theo cổng đó).
 3. **Sao lưu database cũ trước khi import**: chọn database → Export → SQL.
-4. Cài mới: import [f6s_shop.sql](../f6s_shop.sql). File có `DROP DATABASE IF EXISTS f6s_shop`, sẽ xóa database cùng tên.
+4. Cài mới: chỉ import [f6s_shop.sql](../f6s_shop.sql), đã gộp bảng OTP và thuộc tính giày mới. File có `DROP DATABASE IF EXISTS f6s_shop`, sẽ xóa database cùng tên.
 5. Đã có database và chỉ cần bổ sung dữ liệu: đọc [danh sách bổ sung](../DANH_SACH_BO_SUNG.md), chọn database `f6s_shop` rồi import [sql/bo_sung_du_lieu.sql](../sql/bo_sung_du_lieu.sql). Không chạy file đầy đủ để cập nhật giao diện.
 6. Kiểm tra có các bảng `users`, `product`, `product_detail`, `invoice`… Không import cả hai file chỉ vì cài mới; bản đầy đủ đã gồm dữ liệu bổ sung.
+
+**Database đang chạy chỉ cần nâng cấu trúc:** chọn đúng schema, chạy [sql/nang_cap_f6s.sql](../sql/nang_cap_f6s.sql). File không xóa dữ liệu, không reset tài khoản, không nhập lại sản phẩm mẫu và có thể chạy lại. Xem [mục lục SQL](../sql/README.md). Không cần đặt lại secret khi đổi cấu trúc này.
 
 Nếu đã có dữ liệu và chỉ cập nhật banner/danh mục ngày 19/10, dùng [sql/cap_nhat_noi_dung_20261019.sql](../sql/cap_nhat_noi_dung_20261019.sql), không import lại SQL đầy đủ. Bản cài mới đã có 5 banner, 50 sản phẩm, 13 bài viết; 12 danh mục có ít nhất 3 sản phẩm đang bật. Đăng ký gửi mail cần [cấu hình SMTP/App Password](07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md), không tự hoạt động chỉ nhờ import SQL.
 
