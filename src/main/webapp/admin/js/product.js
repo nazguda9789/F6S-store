@@ -122,7 +122,7 @@ async function saveProduct() {
         "image": linkbanner,
         "price": document.getElementById("giaban").value,
         "oldPrice": document.getElementById("giacu").value,
-        "description": tinyMCE.get('editor').getContent(),
+        "description": window.tinymce?.get('editor')?.getContent() ?? document.getElementById('editor').value,
         "metaTitle": document.getElementById("metaTitle").value,
         "metaDescription": document.getElementById("metaDescription").value,
         "weight": document.getElementById("weight").value,
@@ -151,6 +151,7 @@ async function saveProduct() {
 }
 
 async function uploadMultipleFileNotResp() {
+    if (!listFile.length) return [];
     const formData = new FormData()
     for (i = 0; i < listFile.length; i++) {
         formData.append("file", listFile[i])
@@ -169,6 +170,7 @@ async function uploadMultipleFileNotResp() {
 
 
 async function uploadFile(filePath) {
+    if (!filePath?.files?.length) return;
     const formData = new FormData()
     formData.append("file", filePath.files[0])
     var urlUpload = '/adm-prj/qtht-001/api/upload/upload-file';
@@ -184,7 +186,7 @@ async function uploadFile(filePath) {
 
 
 function getProductDetailsFromUI() {
-    const detailRows = document.querySelectorAll(".tr-chitietsanpham");
+    const detailRows = document.querySelectorAll("#ctnctsp .tr-chitietsanpham");
     const details = [];
 
     detailRows.forEach(row => {
@@ -443,18 +445,21 @@ async function deleteProduct(id, btn) {
 }
 
 function setToHop() {
-    var listColorSelect = $("#colorList").val(); // mảng ID màu đã chọn
-    var listSizeSelect = $("#sizeList").val();   // mảng ID size đã chọn
+    var listColorSelect = $("#colorList").val() || [];
+    var listSizeSelect = $("#sizeList").val() || [];
     var soLuong = $("#soluongtohop").val();   // mảng ID size đã chọn
 
     const templateRowHTML = document.getElementById("blockaddctsp").querySelector('tr').outerHTML;
     const targetTbody = document.getElementById("ctnctsp");
-
-    // Xóa các dòng cũ nếu muốn reset
-    // targetTbody.innerHTML = "";
+    if (!listColorSelect.length || !listSizeSelect.length) { toastr.error('Chọn ít nhất một màu và một kích cỡ.'); return; }
+    if (soLuong === '' || !Number.isInteger(Number(soLuong)) || Number(soLuong) < 0) { toastr.error('Số lượng phải là số nguyên không âm.'); return; }
+    const pairs = new Set([...targetTbody.querySelectorAll('tr')].filter(r=>r.querySelector('.select-size')).map(r=>r.querySelector('.select-color').value + ':' + r.querySelector('.select-size').value));
 
     for (let i = 0; i < listColorSelect.length; i++) {
         for (let j = 0; j < listSizeSelect.length; j++) {
+            const key = listColorSelect[i] + ':' + listSizeSelect[j];
+            if (pairs.has(key)) continue;
+            pairs.add(key);
             // Clone 1 row từ template
             const tempTbody = document.createElement('tbody');
             tempTbody.innerHTML = templateRowHTML;
@@ -474,6 +479,8 @@ function setToHop() {
             if (stockInput) {
                 stockInput.value = soLuong;
             }
+            newRow.querySelector('.price-detail').value = document.getElementById('giaban').value;
+            newRow.querySelector('.old-price-detail').value = document.getElementById('giacu').value;
 
             // ✅ Gọi luôn setSku để sinh SKU mặc định
             setSku(selectSize);

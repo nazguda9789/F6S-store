@@ -10,17 +10,21 @@
     <a class="navchild" th:href="${prefix + '/invoice/list'}">Danh sách giao dịch</a>
     <a class="navchild" th:href="${prefix + '/invoice/create'}">Tạo giao dịch</a>
    </nav></div>
+   <div class="bee-product-nav-group">
    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseProducts" aria-expanded="false" aria-controls="collapseProducts"><span class="sb-nav-link-icon"><i class="fas fa-shoe-prints"></i></span>Quản lý sản phẩm<span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span></a>
    <div class="collapse" id="collapseProducts" data-bs-parent="#sidenavAccordion"><nav class="sb-sidenav-menu-nested nav">
-    <a class="navchild" th:href="${prefix + '/product/list'}">Danh sách sản phẩm</a>
-    <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/product/save'}">Thêm sản phẩm</a>
-    <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/category/list'}">Danh mục</a>
+    <a class="navchild" th:href="${prefix + '/product/list'}">Sản phẩm</a>
+    <a th:if="${isAdmin}" class="navchild" href="#" data-bs-toggle="collapse" data-bs-target="#collapseProductAttributes" aria-expanded="false" aria-controls="collapseProductAttributes">Thuộc tính sản phẩm <i class="fas fa-angle-down" aria-hidden="true"></i></a>
+    <div th:if="${isAdmin}" class="collapse bee-attribute-menu" id="collapseProductAttributes"><nav class="sb-sidenav-menu-nested nav">
+    <a class="navchild" th:href="${prefix + '/category/list'}">Danh mục</a>
     <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/shoe-attributes?kind=BRAND'}">Thương hiệu</a>
     <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/shoe-attributes?kind=SOLE'}">Đế giày</a>
     <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/shoe-attributes?kind=MATERIAL'}">Chất liệu</a>
     <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/color/list'}">Màu sắc</a>
     <a th:if="${isAdmin}" class="navchild" th:href="${prefix + '/size/list'}">Kích cỡ</a>
+    </nav></div>
    </nav></div>
+   </div>
    <a th:if="${isAdmin}" class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseVendors" aria-expanded="false" aria-controls="collapseVendors"><span class="sb-nav-link-icon"><i class="fas fa-users"></i></span>Quản lý tài khoản<span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span></a>
    <div th:if="${isAdmin}" class="collapse" id="collapseVendors" data-bs-parent="#sidenavAccordion"><nav class="sb-sidenav-menu-nested nav">
     <a class="navchild" th:href="${prefix + '/user/list?role=ROLE_EMPLOYEE'}">Nhân viên</a>

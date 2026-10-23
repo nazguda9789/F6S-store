@@ -20,12 +20,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const roleMatches = !target.pathname.endsWith('/user/list') || target.searchParams.get('role') === params.get('role');
         if (target.pathname === location.pathname && kindMatches && roleMatches) {
             current = link; link.classList.add('active'); link.setAttribute('aria-current', 'page');
-            const panel = link.closest('.collapse');
-            if (panel) {
+            let panel = link.closest('.collapse');
+            while (panel) {
                 panel.classList.add('show');
                 const toggle = sidebar.querySelector('[data-bs-target="#' + panel.id + '"]');
                 toggle?.classList.remove('collapsed'); toggle?.classList.add('workspace-current-group');
                 toggle?.setAttribute('aria-expanded', 'true');
+                panel = panel.parentElement.closest('.collapse');
             }
         }
     });
@@ -35,6 +36,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const label = document.createElement('span'); label.textContent = current ? current.textContent.trim() : document.title;
     breadcrumb.append(home, document.createTextNode(' / '), label); main.prepend(breadcrumb);
     main.classList.toggle('workspace-sale', location.pathname.endsWith('/invoice/create'));
+    const productGroup = sidebar.querySelector('.bee-product-nav-group');
+    const productToggle = productGroup?.querySelector('[data-bs-target="#collapseProducts"]');
+    if (productGroup) {
+        const syncFlyout = () => {
+            if (!matchMedia('(min-width: 992px)').matches) return;
+            productGroup.style.setProperty('--bee-menu-top', Math.max(70, Math.min(productGroup.getBoundingClientRect().top, innerHeight - 300)) + 'px');
+            productToggle.setAttribute('aria-expanded', String(productGroup.matches(':hover') || productGroup.contains(document.activeElement)));
+        };
+        for (const event of ['mouseenter','mouseleave','focusin']) productGroup.addEventListener(event,syncFlyout);
+        productGroup.addEventListener('focusout',()=>setTimeout(syncFlyout,0));
+        window.addEventListener('resize',syncFlyout);syncFlyout();
+    }
     const toggle = document.querySelector('#sidebarToggle');
     if (toggle) {
         toggle.setAttribute('aria-label', 'Đóng hoặc mở menu quản trị'); toggle.setAttribute('aria-controls', 'layoutSidenav_nav');

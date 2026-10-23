@@ -2,6 +2,8 @@
 
 [Về trang chính](../README.md)
 
+[Form và menu sản phẩm theo các ảnh Bee bổ sung](16-SAN-PHAM-THEO-ANH-BEE.md).
+
 [Module, tên màn hình và nội dung theo video Bee](15-MODULE-VA-NOI-DUNG-THEO-BEE.md).
 
 [Tiến độ chuyển luồng nghiệp vụ theo Bee và phần chưa hoàn tất](14-CHUYEN-LUONG-NGHIEP-VU-BEE.md).

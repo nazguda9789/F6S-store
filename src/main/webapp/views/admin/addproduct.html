@@ -2,6 +2,7 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8" />
+    <script defer src="/admin/js/product-builder.js"></script>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="Admin Dashboard" />
@@ -23,7 +24,7 @@
         <div class="card-header">
             <span th:text="${param.id == null?'Thêm sản phẩm':'Cập nhật sản phẩm'}"></span>
             <a href="list" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-list"></i> Danh sách sản phẩm</a>
-            <button form="formadd" class="btn btn-primary btn-add-vendor float-end"><i class="fas fa-list"></i> Cập nhật sản phẩm</button>
+            <button form="formadd" class="btn btn-primary btn-add-vendor float-end" th:text="${product.id == null ? 'Lưu sản phẩm' : 'Cập nhật sản phẩm'}">Lưu sản phẩm</button>
         </div>
         <form th:object="${product}" id="formadd" action="javascript:saveProduct()" class="card-body row">
             <div class="col-sm-2">
@@ -192,7 +193,7 @@
                         <table class="table table-bordered table-responsive">
                             <thead>
                             <tr>
-                                <th>Size</th>
+                                <th>Kích cỡ</th>
                                 <th>Màu sắc</th>
                                 <th>Số lượng</th>
                                 <th>SKU</th>
@@ -243,7 +244,7 @@
                                     </select>
                                 </td>
                                 <td><input class="form-control-sm stock-detail" value="0"></td>
-                                <td><input class="form-control-sm sku-detail"><button type="button" onclick="setSku(this)" class="btn btn-outline-primary"><i class="fa fa-check"></i></button></td>
+                                <td><input class="form-control-sm sku-detail" readonly placeholder="Server cấp sau khi lưu"></td>
                                 <td><input class="form-control-sm price-detail"></td>
                                 <td><input class="form-control-sm old-price-detail"></td>
                                 <td><label class="checkbox-custom">Active
@@ -374,7 +375,7 @@
     }
 </script>
 <script>
-    tinymce.init({
+    if (window.tinymce) tinymce.init({
         selector: 'textarea#editor', // Chọn textarea có id là 'editor'
         // Tăng cường các plugin để hỗ trợ nhiều chức năng hơn
         plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak ' +

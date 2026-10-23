@@ -1,5 +1,7 @@
 # F6S — Website quản lý bán giày thể thao
 
+[Cập nhật theo các ảnh Bee: menu thuộc tính hai cấp, bộ lọc và form biến thể theo màu](docs/16-SAN-PHAM-THEO-ANH-BEE.md). Không cần SQL/secret mới cho đợt giao diện sản phẩm này.
+
 [Cấu trúc module và nội dung mới theo video Bee](docs/15-MODULE-VA-NOI-DUNG-THEO-BEE.md): menu render dùng chung, Nhân viên/Khách hàng theo vai trò, trạng thái làm việc và cột thương hiệu. Đợt này không thêm SQL/secret; chưa hoàn tất mọi nghiệp vụ Bee.
 
 **Tiến độ thay luồng theo Bee:** đã bổ sung liên kết khách/nhân viên riêng và đóng đơn chờ trong transaction khi chuyển giao dịch, chống chuyển trùng. **Chưa hoàn tất toàn bộ nghiệp vụ Bee**; xem [các luồng đã đổi và phần còn thiếu](docs/14-CHUYEN-LUONG-NGHIEP-VU-BEE.md). Bản này cần migration `customer_id` trước khi chạy code mới (đã gộp trong SQL nâng cấp).
