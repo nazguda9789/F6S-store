@@ -1,5 +1,7 @@
 # F6S — Website quản lý bán giày thể thao
 
+[Thêm nhanh thuộc tính theo Bee, giữ nguyên OTP/VNPAY](docs/19-THUOC-TINH-BEE-GIU-OTP-VNPAY.md): thêm danh mục/hãng/đế/chất liệu/màu/size ngay trong form giày, không mất dữ liệu đang nhập. Bản này không cần SQL/secret mới nếu đã nâng catalog 24/10.
+
 **Bộ demo các module:** [tải SQL demo riêng](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-DEMO-ALL-MODULES-20261024.zip) → Download raw. Có 5 nhân viên, 5 khách hàng, 5 mẫu giày và dữ liệu giỏ/đơn/giảm giá/nội dung. [Danh sách, cách import và các bảng không nên chèn giả](docs/18-DU-LIEU-MAU-TAT-CA-MODULE.md). Chỉ dùng database `_demo`, không trộn hóa đơn mẫu vào dữ liệu thật.
 
 [Tải gói SQL mới 24/10/2026](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SQL-20261024.zip) → chọn **Download raw**. [Chi tiết model, thuộc tính và dữ liệu mẫu](docs/17-CATALOG-SQL-VA-DU-LIEU-MAU.md).

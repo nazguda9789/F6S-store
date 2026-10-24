@@ -31,6 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     form.classList.add('bee-product-builder');
     const productName = document.getElementById('name'); productName.required = true; productName.maxLength = 255;
+    // Paste/mobile input must generate a slug too; renaming an existing shoe must not change its URL.
+    const productSlug=document.getElementById('slug');
+    let customSlug=new URLSearchParams(location.search).has('id') || Boolean(productSlug.value);
+    productName.removeAttribute('onkeyup');
+    productSlug.addEventListener('input',()=>{customSlug=true;});
+    productName.addEventListener('input',()=>{
+        if(!customSlug)productSlug.value=productName.value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    });
     for(const id of ['giaban','giacu','weight']) {
         const input = document.getElementById(id); input.type = 'number'; input.step = 'any'; input.min = id === 'weight' ? '0.001' : '0'; input.required = id !== 'giacu';
     }

@@ -2,6 +2,8 @@
 
 [Về trang chính](../README.md)
 
+[19 — Thêm nhanh thuộc tính theo Bee, giữ OTP và VNPAY hiện tại](19-THUOC-TINH-BEE-GIU-OTP-VNPAY.md).
+
 [18 — Dữ liệu mẫu nhân viên, khách hàng, giỏ, đơn, giảm giá và nội dung](18-DU-LIEU-MAU-TAT-CA-MODULE.md). Chỉ dùng database demo riêng.
 
 [Catalog SQL 24/10: schema, dữ liệu mẫu và hướng dẫn nâng cấp bắt buộc](17-CATALOG-SQL-VA-DU-LIEU-MAU.md).

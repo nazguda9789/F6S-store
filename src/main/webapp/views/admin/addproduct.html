@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <script defer src="/admin/js/product-builder.js"></script>
+    <script defer src="/admin/js/catalog-quick-create.js"></script>
+    <link rel="stylesheet" href="/admin/css/catalog-quick-create.css">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="Admin Dashboard" />
@@ -52,7 +54,7 @@
                 <input th:value="${product.slug}" class="form-control form-control-sm" id="slug">
                 <label class="form-label">Danh mục</label>
                 <select class="form-control form-control-sm selectpicker" multiple id="categoryIds" data-live-search="true">
-                    <option th:each="c : ${listCategory}"
+                    <option th:each="c : ${listCategory}" th:data-root="${c.isParent}"
                             th:value="${c.id}"
                             th:text="${c.name}"
                             th:selected="${product.categoryIds.contains(c.id)}">
