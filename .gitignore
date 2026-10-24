@@ -1,4 +1,11 @@
 HELP.md
+**/node_modules/
+**/dist/
+**/test-results/
+**/playwright-report/
+**/.vite/
+.env.*
+!.env.example
 shoptthieu_bot*
 .env
 target/

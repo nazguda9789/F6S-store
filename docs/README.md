@@ -1,5 +1,13 @@
 # Tài liệu hiện hành
 
+## Bản Vue 3 / SQL Server (phát triển chính)
+
+[Cài đặt và chạy](VUE-SQLSERVER.md) · [API, matrix, QR/POS, khuyến mãi và dashboard](API-RETAIL.md).
+
+## Bản Thymeleaf / MySQL cũ (đối chiếu, rollback)
+
+Các mục bên dưới chỉ áp dụng source `src/` và SQL MySQL cũ, không áp dụng backend/frontend mới.
+
 [Về README](../README.md)
 
 1. [Cài đặt và chạy tối thiểu](01-CAI-DAT-VA-CHAY.md).
