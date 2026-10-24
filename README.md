@@ -1,11 +1,5 @@
 # F6S Sports
 
-## Bản Spring Boot + Vue 3 + SQL Server
-
-Kiến trúc mới nằm riêng tại [f6s-store-project](f6s-store-project/README.md). Xem hướng dẫn tại đó nếu chạy Vue/SQL Server. Phần hướng dẫn bên dưới dành cho bản Java/Thymeleaf/MySQL cũ; không trộn hai bộ database hoặc cấu hình.
-
-## Bản Java/Thymeleaf/MySQL hiện có
-
 Website giày thể thao: cửa hàng online, bán tại quầy và quản trị. Java Spring Boot + Thymeleaf + MySQL. Giữ OTP, Google và VNPAY qua cấu hình riêng, không lưu secret trong SQL mẫu.
 
 ## Chạy tối thiểu
