@@ -28,7 +28,7 @@ Thiếu dịch vụ tùy chọn không có nghĩa phải cài tất cả để x
 
 | Biến | Mục đích |
 |---|---|
-| `SPRING_DATASOURCE_URL` | Ví dụ `jdbc:mysql://localhost:3306/f6s_shop` |
+| `SPRING_DATASOURCE_URL` | Demo mới: `jdbc:mysql://localhost:3306/f6s_shop_clean_demo`; database thật đang dùng giữ nguyên URL |
 | `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` | Tài khoản DB, không phải tài khoản admin website |
 | `SERVER_PORT` | Cổng HTTP ứng dụng, mặc định 8080 |
 | `SHIPPING_PROVIDER` | `local` hoặc `ghn` |
@@ -39,7 +39,7 @@ Các property `shipping.cost`, `amount.freeShipping` cấu hình phí local và 
 
 ## 4. Email
 
-- Đợt sửa 19/10: đăng ký và gửi lại mã dùng gửi đồng bộ, báo lỗi/rollback khi SMTP không chấp nhận thư; xem [hướng dẫn mới](07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md). Không có tài khoản SMTP hoặc App Password dùng chung trong Git.
+- Đăng ký và gửi lại mã dùng gửi đồng bộ, báo lỗi/rollback khi SMTP không chấp nhận thư. Không có tài khoản SMTP hoặc App Password dùng chung trong Git; SQL mẫu không tự cấu hình được mail.
 - Biến: `MAIL_USERNAME`, `MAIL_PASSWORD`; mật khẩu dùng App Password phù hợp tài khoản SMTP, không ghi vào repository.
 - Cấu hình hiện tại dùng SMTP Gmail cổng 587 và STARTTLS. Tài khoản cần hỗ trợ/phê duyệt cơ chế đăng nhập đó.
 - Kiểm tra `support.url`, `datlaimatkhau.url` nếu host/cổng thay đổi để link gửi email trỏ đúng web đang chạy.

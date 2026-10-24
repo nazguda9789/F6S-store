@@ -1,52 +1,14 @@
-# Tài liệu F6S-store
+# Tài liệu hiện hành
 
-[Về trang chính](../README.md)
+[Về README](../README.md)
 
-[21 — F6S Sports: catalog mới hoàn toàn, cài sạch/chuyển dữ liệu/khôi phục](21-CATALOG-THE-THAO-MOI.md). Đây là hướng dẫn hiện hành; các tài liệu đợt trước giữ để tra cứu.
+1. [Cài đặt và chạy tối thiểu](01-CAI-DAT-VA-CHAY.md).
+2. [Kiến trúc và model](02-KIEN-TRUC-VA-MODEL.md).
+3. [Chức năng và phân quyền](03-CHUC-NANG-VA-PHAN-QUYEN.md).
+4. [Luồng nghiệp vụ](04-LUONG-NGHIEP-VU.md).
+5. [Cấu hình dịch vụ: mail/OAuth/VNPAY/vận chuyển](05-CAU-HINH-VA-TICH-HOP.md).
+6. [Kiểm thử và xử lý lỗi](06-KIEM-THU-VA-XU-LY-LOI.md).
+7. [Catalog, demo và bảo toàn dữ liệu cũ](07-CATALOG-VA-DU-LIEU.md).
+8. [Google OAuth và xác thực tài khoản](08-DANG-NHAP-GOOGLE-VA-XAC-THUC.md).
 
-[20 — Luồng POS theo Bee: SKU, voucher server, tiền mặt, lịch sử và in hóa đơn](20-LUONG-POS-THEO-BEE.md). Có migration SQL mới.
-
-[19 — Thêm nhanh thuộc tính theo Bee, giữ OTP và VNPAY hiện tại](19-THUOC-TINH-BEE-GIU-OTP-VNPAY.md).
-
-[18 — Dữ liệu mẫu nhân viên, khách hàng, giỏ, đơn, giảm giá và nội dung](18-DU-LIEU-MAU-TAT-CA-MODULE.md). Chỉ dùng database demo riêng.
-
-[Catalog SQL 24/10: schema, dữ liệu mẫu và hướng dẫn nâng cấp bắt buộc](17-CATALOG-SQL-VA-DU-LIEU-MAU.md).
-
-[Form và menu sản phẩm theo các ảnh Bee bổ sung](16-SAN-PHAM-THEO-ANH-BEE.md).
-
-[Module, tên màn hình và nội dung theo video Bee](15-MODULE-VA-NOI-DUNG-THEO-BEE.md).
-
-[Tiến độ chuyển luồng nghiệp vụ theo Bee và phần chưa hoàn tất](14-CHUYEN-LUONG-NGHIEP-VU-BEE.md).
-
-Tài liệu đối chiếu mã nguồn đến ngày **19/10/2026**, dành cho người cài demo, thành viên phát triển và người viết báo cáo. “Có trong code” không đồng nghĩa “đã kiểm thử đầy đủ”.
-
-## Đọc theo mục đích
-
-| Bạn cần làm gì? | Tài liệu |
-|---|---|
-| Cài lần đầu, biết cần tải gì, chạy IntelliJ + XAMPP | [01 — Cài đặt và chạy](01-CAI-DAT-VA-CHAY.md) |
-| Hiểu MVC, các lớp, model/entity, bảng và quan hệ | [02 — Kiến trúc và model](02-KIEN-TRUC-VA-MODEL.md) |
-| Biết từng vai trò được dùng màn nào, chức năng gì | [03 — Chức năng và phân quyền](03-CHUC-NANG-VA-PHAN-QUYEN.md) |
-| Hiểu luồng mua hàng, tại quầy, thanh toán, đơn hàng | [04 — Luồng nghiệp vụ](04-LUONG-NGHIEP-VU.md) |
-| Cấu hình email, VNPay, GHN, upload và dịch vụ khác | [05 — Cấu hình và tích hợp](05-CAU-HINH-VA-TICH-HOP.md) |
-| Chạy kiểm thử, tìm lỗi và biết giới hạn hiện tại | [06 — Kiểm thử và xử lý lỗi](06-KIEM-THU-VA-XU-LY-LOI.md) |
-| Sửa gửi mã đăng ký, lấy banner cũ, cập nhật danh mục đủ sản phẩm | [07 — Email và nội dung 19/10](07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md) |
-| Google, tài khoản chờ OTP và điều hướng sau đăng nhập | [08 — Google và xác thực tài khoản](08-DANG-NHAP-GOOGLE-VA-XAC-THUC.md) |
-| Bộ khung quản trị theo ảnh tham khảo và phạm vi đã đổi | [09 — Giao diện Workspace](09-GIAO-DIEN-WORKSPACE.md) |
-| Đối chiếu video Bee, thuộc tính giày và thư viện ảnh | [10 — Module theo video Bee](10-DOI-CHIEU-VIDEO-BEE.md) |
-| Tạo đơn nhanh, chọn khách và lọc giao dịch | [11 — Giao dịch tương đồng Bee](11-GIAO-DICH-TUONG-DONG-BEE.md) |
-| Giao diện cửa hàng, auth và workspace đồng bộ | [12 — UI đồng bộ Bee](12-UI-DONG-BO-BEE.md) |
-| Model catalog, mã mẫu giày / SKU và giới hạn chuyển đổi | [13 — Model và mã định danh](13-MODEL-CATALOG-VA-MA-DINH-DANH.md) |
-
-## Tài liệu bổ trợ
-
-- [Hướng dẫn VNPay Sandbox](../VNPAY_SANDBOX.md).
-- [Danh sách dữ liệu SQL đã bổ sung](../DANH_SACH_BO_SUNG.md).
-- [Lịch sử sửa lỗi và giao diện](../CAP_NHAT_UI_VA_LOI.md).
-- [Nguồn và giới hạn danh mục địa chỉ](../src/main/webapp/data/README.md).
-
-## Lộ trình đề xuất
-
-Người chạy demo: **01 → 05 (nếu dùng dịch vụ ngoài) → 06**. Người nhận code/phân công nhóm: **02 → 03 → 04 → 06**. Người viết tài liệu: dùng nội dung hiện trạng làm cơ sở, bổ sung ảnh chụp và kết quả kiểm thử của chính nhóm; không trình bày phần chưa xác minh như chức năng hoàn chỉnh.
-
-Tài liệu trong thư mục này là Markdown, đọc trực tiếp trên GitHub; không yêu cầu bật GitHub Wiki hoặc GitHub Pages. Khi thay đổi nghiệp vụ, cập nhật mục tương ứng cùng commit sửa code.
+SQL hiện hành: [cài mới phpMyAdmin](../sql/install/README.md) hoặc [maintenance giữ dữ liệu](../sql/README.md). Không nhập cả hai bộ vào cùng một database. Tài liệu/ảnh/changelog của các đợt trước đã gỡ khỏi cây hiện hành, tra cứu ở Git history khi cần.

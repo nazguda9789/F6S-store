@@ -4,7 +4,7 @@
 
 ## 1. Vai trò và phạm vi
 
-**Bổ sung 23/10:** admin có `/shoe-attributes?kind=BRAND|SOLE|MATERIAL` (tạo/sửa/bật/tắt), `/image-library` (xem/tìm/phân trang ảnh) dưới prefix `/adm-prj/qtht-001`. Admin/nhân viên chọn thuộc tính trên form sản phẩm và lọc thương hiệu qua API sản phẩm hiện có. Nhân viên không có quyền sửa danh mục thuộc tính hoặc truy cập thư viện admin. Xem [đối chiếu video Bee](10-DOI-CHIEU-VIDEO-BEE.md) để phân biệt phần đã làm và chưa thay thế.
+Admin có `/shoe-attributes?kind=BRAND|SOLE|MATERIAL` (tạo/sửa/bật/tắt), `/image-library` (xem/tìm/phân trang ảnh) dưới prefix `/adm-prj/qtht-001`. Admin/nhân viên chọn thuộc tính trên form sản phẩm và lọc thương hiệu qua API sản phẩm hiện có. Nhân viên không có quyền sửa danh mục thuộc tính hoặc truy cập thư viện admin. Xem [luồng hiện hành và giới hạn](04-LUONG-NGHIEP-VU.md).
 
 | Vai trò | Khu vực chính | Công việc |
 |---|---|---|

@@ -1,108 +1,38 @@
-# 06 — Kiểm thử, xử lý lỗi và giới hạn
+# Kiểm thử và xử lý lỗi
 
-[Mục lục](README.md) · [Cài đặt](01-CAI-DAT-VA-CHAY.md) · [Luồng nghiệp vụ](04-LUONG-NGHIEP-VU.md)
+## Import #2014 / FOREIGN_KEY_CHECKS
 
-## 1. Các kiểm thử đã có
+MySQL thử nghiệm chấp nhận `SET FOREIGN_KEY_CHECKS=ON`. Cảnh báo parser phpMyAdmin về ON và lỗi driver `#2014 Commands out of sync` không phải cùng một bằng chứng lỗi cú pháp. File gộp cũ có CALL trả result set; kết nối chưa xử lý hết có thể lỗi ở câu lệnh sau.
 
-| Nhóm | Nội dung | Số test đã chạy đạt gần nhất |
-|---|---|---|
-| `DataInitializerTests` | Tạo/reset admin và bảo vệ role | 4 |
-| `GhnClientTests` | Cấu hình, phản hồi và lỗi nhà cung cấp | 5 |
-| `CloudinaryServiceTests` | Lựa chọn cấu hình và xử lý upload | 4 |
-| `ChatRealtimeApiTests` | Kiểm tra API hội thoại liên quan quyền | 2 |
-| `ShippingPolicyTests` | Phí local/GHN, ngưỡng miễn phí, dữ liệu sai | 5 |
-| `VNPayServiceTests` | Thiếu cấu hình, URL/chữ ký, tiền, múi giờ, thời hạn | 2 |
-| `MailServiceTests` | From cấu hình, gửi đồng bộ, lỗi SMTP/mất cấu hình, mail tùy chọn | 4 |
-| `RegistrationTests` | Yêu cầu chờ, không tạo user trước OTP, lỗi mail, gửi lại, tài khoản cũ và mã hết hạn | 10 |
-| `BannerServiceTests` | Trang chủ không khớp banner mọi trang, giữ quy ước trang khác | 2 |
-| `OAuthAccountServiceTests` | Google email xác minh, role, liên kết, mật khẩu chờ và tài khoản khóa/xóa | 11 |
-| `AuthFlowTests` | Redirect, trạng thái tài khoản, principal email và cấu hình OAuth | 13 |
-| JavaScript checkout | Danh sách địa chỉ rỗng, lỗi provider, phí và miễn phí | 4 |
-| JavaScript địa chỉ local | Phường trùng tên, tự điền/reset, tìm không dấu, nhập mới, lỗi dữ liệu, tính toàn vẹn danh mục | 5 |
-| JavaScript presence | Không gửi trước khi socket mở, dừng khi rời trang, kết nối lại khi khôi phục trang | 3 |
+Bộ mới: [sql/install](../sql/install/README.md), không CALL/routine, chỉ FK_CHECKS=0/1. Làm mới kết nối phpMyAdmin; nếu còn lỗi trên kết nối mới, restart Apache trong XAMPP. Dùng database mới `f6s_shop_clean_demo`, import 01 rồi 02; 03 tùy chọn. Không xóa database cũ có dữ liệu hoặc tiếp tục bỏ qua lỗi import.
 
-Tổng lượt kiểm chứng gần nhất: **62 test Java chọn lọc, 12 test JavaScript**. Đây không phải coverage toàn bộ ứng dụng. VNPay dùng khóa giả, SMTP dùng sink, Google dùng provider giả lập cục bộ cho vòng authorization/code/token/userinfo/callback. Chưa chứng minh Google Client thật hoạt động hoặc thư tới Inbox.
+## Lỗi chạy thường gặp
 
-## 2. Lệnh chạy lại
+| Triệu chứng | Kiểm tra |
+| --- | --- |
+| Unsupported class version / javac | JDK 17 của terminal, Maven, Project SDK và Run JRE |
+| Illegal char ? trong đường dẫn | Chuyển source sang đường dẫn không dấu như C:\projects\F6S-store, mở lại project |
+| Unknown database / Access denied | Datasource/cổng/user/password MySQL; không dùng mật khẩu website thay mật khẩu MySQL |
+| Unknown column archived/cash_received | Schema chưa ở bản hiện hành; cài mới đúng 01/02 hoặc dùng upgrade giữ dữ liệu |
+| Không gửi được OTP | Cấu hình SMTP/App Password; không kết luận Gmail thật hoạt động từ test SMTP giả |
+| Google chưa bật/redirect mismatch | Client ID/Secret, test user và redirect URI đúng host/port |
+| VNPAY không tìm thấy website/chữ ký sai | TMN/Hash Secret đúng môi trường sandbox, URL cổng/callback và tham số ký |
+| Cổng 8080 bận | Dừng tiến trình trùng hoặc đổi SERVER_PORT và callback tương ứng |
 
-PowerShell tại thư mục có `pom.xml`, JDK 17:
+## Test tự động
 
-```powershell
-.\mvnw.cmd "-Dtest=DataInitializerTests,GhnClientTests,CloudinaryServiceTests,ChatRealtimeApiTests,ShippingPolicyTests,VNPayServiceTests,MailServiceTests,RegistrationTests,BannerServiceTests,OAuthAccountServiceTests,AuthFlowTests" test
-```
+Các test Java trong `src/test/java`; test JS checkout/địa chỉ/presence và các smoke Playwright trong `src/test/js`. 115 test Java chọn lọc và 12 test JS đã đạt trong đợt catalog trước; đây không phải toàn bộ suite hoặc chứng nhận production. Đợt tách installer bổ sung test chạy ba file SQL bằng các kết nối riêng, kiểm tra số lượng và không có routine/result set trả trạng thái.
 
-JavaScript cần Node.js nhưng không cần `npm install` vì các test hiện dùng thư viện chuẩn:
+Đợt tách installer cũng chạy lại 115 test Java/12 test JS; import thành công trên MySQL 8.4.11 và MariaDB 10.4.34. Smoke trình duyệt trên MySQL mở 9 màn quản trị và menu desktop/mobile sau riêng 01 + 02 (25 giày, 1 admin, 0 hóa đơn), xác nhận 03 thật sự tùy chọn. Chưa tái hiện môi trường phpMyAdmin Windows cụ thể của người dùng.
 
-```powershell
+Nhóm JS unit (chỉ người phát triển cần Node):
+
+```bash
 node --test src/test/js/checkout.test.cjs src/test/js/local-address.test.cjs src/test/js/online-presence.test.cjs
 ```
 
-Chạy toàn bộ test bằng `.\mvnw.cmd test`; test context như `ShopgiaythethaoApplicationTests` có thể yêu cầu cấu hình/database. Chạy trên database thử, không dùng reset admin hoặc test tích hợp không rõ tác động với dữ liệu thật. Đọc `target/surefire-reports`: phân biệt tests run, failures, errors, skipped; build thành công với 0 test không chứng minh chức năng đúng.
+Smoke Playwright cần Node, Playwright và Chromium; không phải dependency để người dùng chạy website. `sports-catalog-browser.cjs`, `product-builder-browser.cjs`, `catalog-quick-create-browser.cjs`, `workspace-browser.cjs` kiểm tra giao diện/catalog; `pos-cash-browser.cjs` **ghi hóa đơn và thay tồn**, chỉ chạy database demo riêng. Đọc header/env trong từng test trước khi chạy.
 
-Build: `.\mvnw.cmd clean compile`; đóng gói: `.\mvnw.cmd package` (mặc định có chạy test). Không dùng bỏ qua test để mô tả rằng bản phát hành đã được kiểm chứng.
+`minimal-install-sql.cjs` kiểm tra bộ install không routine trên database mới, không đụng database thật. `sports-catalog-sql.cjs` kiểm tra maintenance/rollback bằng fixture cũ lấy từ Git history. Không xóa Git history hoặc trộn test fixture với dữ liệu cửa hàng.
 
-## 3. Kiểm tra thủ công theo luồng
-
-| Luồng | Tình huống tối thiểu | Kết quả mong đợi để xác minh |
-|---|---|---|
-| Cài mới | Import DB thử, kết nối, trang chủ | Có dữ liệu, không lỗi template/SQL |
-| Đăng nhập | Đúng/sai mật khẩu, sai nhiều lần, role khác | Redirect/khóa/quyền phù hợp; không truy cập nội bộ trái quyền |
-| Sản phẩm | Size/màu, giá riêng, hết tồn, ảnh lỗi | Biến thể/giá/ảnh phù hợp; không mua vượt tồn |
-| Giỏ | Khách vãng lai và user; số lượng 0/âm/lớn | Validate; tổng và dữ liệu đúng nhánh lưu trữ |
-| Địa chỉ local | Đổi tỉnh, phường trùng tên, gõ không dấu, địa chỉ mới, dữ liệu tải lỗi | Không giữ quận/phường cũ; vẫn nhập tay được |
-| COD | Địa chỉ thiếu/đủ, điện thoại sai, voucher, ngưỡng 500.000đ | Lỗi rõ ràng hoặc tạo mã đơn; DB lưu địa chỉ/phí/tồn chính xác |
-| Tồn đồng thời | Hai khách mua số cuối | Không âm tồn, không tạo đơn dở dang; kiểm tra riêng COD/quầy/VNPay |
-| Tại quầy | Đơn chờ rỗng, thêm/sửa/xóa dòng, chốt lặp | Không chốt sai/nhân đôi; tổng, tồn và trạng thái đúng |
-| VNPay | Thành công/hủy/sai chữ ký/lặp callback/mất session/hết tồn sau trả tiền | Không ghi đơn/thanh toán sai; ghi nhận hạn chế chưa xử lý và đối soát |
-| Trạng thái | Từng cạnh hợp lệ/không hợp lệ, đổi sau hạn, vòng đổi–hoàn thành | Đúng map, lịch sử, tồn, số bán và báo cáo |
-| Báo cáo | Tập đơn biết trước ngày, kênh, payment, voucher, ship, đổi/hủy | Đối soát từng truy vấn với tập dữ liệu kỳ vọng |
-| Tích hợp | Timeout, sai khóa, quota, phản hồi không hợp lệ | Không rò secret, không giả thành công |
-| UI | Desktop/mobile, bàn phím, form lỗi, màu chữ | Dễ đọc và thao tác; không nút bị che/khóa vô lý |
-
-Các dòng trên là checklist thiết kế, **không phải báo cáo tất cả đã thực thi** hoặc bộ 250 testcase. Nếu làm tài liệu kiểm thử, tách Test Plan/Test Design/Test Case/Test Report; chỉ ghi pass sau khi chạy và có bằng chứng.
-
-## 4. Bằng chứng đã kiểm chứng trong môi trường phát triển
-
-- JDK 17, Spring Boot chạy với MySQL 8; SQL đầy đủ import được, dữ liệu bổ sung được kiểm tra tính lặp và liên kết chính.
-- Trình duyệt mở trang chính, thêm giỏ, đặt COD local, mở trang xác nhận; đã kiểm tra lưu địa chỉ/phí, đăng nhập admin và tương phản header.
-- Địa chỉ tìm kiếm: đã kiểm tra chọn danh mục, tên gửi về form, tự điền quận, đổi tỉnh xóa giá trị cũ, nhập địa chỉ mới, đặt COD; giả lập tải danh mục trả 503 vẫn nhập được và không có lỗi JavaScript không được bắt trong lượt đó.
-- Chưa kiểm chứng đầy đủ XAMPP/MariaDB trên Windows, mọi CRUD, giao dịch merchant VNPay, GHN/SMTP/OAuth/Cloudinary bằng credential thật hoặc tải/đồng thời lớn.
-
-Không suy ra mọi chức năng đã hoạt động chỉ từ log Hibernate SELECT hoặc console `Started...`. Kiểm chứng trên cloud không thay thế kiểm thử lại trên máy nhóm.
-
-## 5. Bảng xử lý lỗi
-
-| Dấu hiệu | Kiểm tra / hành động |
-|---|---|
-| `InvalidPathException`, tên thư mục có `?` | Chuyển project sang đường dẫn không dấu, ví dụ `C:\Projects\F6S-store`, đóng/mở lại đúng thư mục |
-| Không thấy main/ClassNotFound | Mở thư mục có pom.xml, chọn JDK 17, reload Maven, clean compile; sửa lỗi build đầu tiên |
-| Maven không tải được | Kiểm tra Internet/proxy, Offline mode; không tắt TLS/chứng thực để bỏ qua lỗi |
-| `Communications link failure` | Bật MySQL, kiểm tra host/cổng thực tế và datasource |
-| `Access denied for user` | Sửa user/password DB, không sửa mật khẩu website để giải quyết |
-| `Unknown database/table/column` | Đúng database/schema và file SQL chưa? Java đọc bảng tiếng Anh; không import lại file phá DB nếu chưa backup |
-| Port 8080 bị chiếm | Stop app cũ hoặc đổi `SERVER_PORT`; cập nhật URL/callback/ngrok theo cổng mới |
-| Template `user/index` không tìm thấy | Reload Maven, clean compile; kiểm tra resources trong pom và prefix classpath templates |
-| Không chọn được địa chỉ | Xác định local hay GHN; local cần `/data/addresses-legacy.json`/JS mới, GHN cần khóa/shop; Ctrl+F5 sau cập nhật |
-| Không thấy địa chỉ mới trong danh mục | Dữ liệu 3 cấp là địa chỉ cũ; gõ tên mới → “Dùng địa chỉ”, để trống quận/huyện nếu không có |
-| VNPay báo thiếu cấu hình | Đặt đúng tên biến, đúng Run Configuration, restart; không viết `getenv` bằng giá trị secret |
-| VNPay “Không tìm thấy website” | Kiểm tra TmnCode/môi trường/kích hoạt merchant; liên hệ VNPay bằng mã tra cứu, không gửi secret |
-| VNPay về web nhưng mất đơn | Cùng trình duyệt/domain/phiên chưa? App có restart không? Đọc giới hạn session/IPN ở tài liệu luồng |
-| `tokenUri cannot be empty` | Không để biến endpoint OAuth rỗng ghi đè giá trị mặc định |
-| Telegram báo token/username rỗng | Dùng bản có kiểm tra thiếu cấu hình; chỉ bật bot khi có dữ liệu hợp lệ |
-| OTP/mail không tới | Kiểm tra SMTP/App Password, spam, quota và log; không mặc định đăng ký đã hoàn tất |
-| Upload/ảnh lỗi | Phân biệt URL ảnh ngoài với upload Cloudinary; cấu hình chính, Internet, file và quota |
-| `Disconnected, online: 0` | Thường là phiên WebSocket rời; cần log lỗi khác mới kết luận nguyên nhân lỗi mua/thanh toán |
-| Hibernate in nhiều SELECT | Do show-sql; riêng SELECT không phải exception; xem stack trace và kết quả HTTP/nghiệp vụ |
-
-Khi nhờ hỗ trợ: gửi thao tác tái hiện, URL/path, vai trò, thời gian, lỗi đầu tiên và phần `Caused by` liên quan; che mật khẩu/token/secret, email/điện thoại thật và chuỗi kết nối có credential. Không chỉ gửi phần cuối log đã cắt mất nguyên nhân.
-
-## 6. Các hạng mục cần rà soát trước dùng thật
-
-1. Quyền API ngoài prefix bảo vệ, quyền trên từng tài nguyên, tra cứu đơn/chat, CSRF và session.
-2. VNPay: IPN, đối chiếu amount/merchant/order, idempotency, log đối soát, rollback và tồn kho khi callback tới muộn.
-3. Hoàn/hủy/đổi: hoàn tồn, hoàn tiền, số lượng bán và vòng chuyển trạng thái tránh đếm lặp.
-4. Quầy: chống chốt lại đơn chờ, phân biệt payment tiền mặt/chuyển khoản và ngày hoàn thành.
-5. Báo cáo: thống nhất ngày ghi nhận, tổng tiền/ship/giảm, kênh bán và payment; cảnh báo tồn thấp, xuất báo cáo nếu đề yêu cầu.
-6. Bảo mật credential, HTTPS/proxy đáng tin, migration/backup, logging dữ liệu nhạy cảm, giám sát và kiểm thử tải.
-
-Đây là danh sách giới hạn/rủi ro đọc từ source, không phải các lỗi đã được sửa trong lần cập nhật tài liệu này. Khi phát hiện sai lệch, tạo issue kèm điều kiện tái hiện và tiêu chí chấp nhận trước khi giao sửa.
+Không xác nhận mail Gmail, thanh toán thật hay mọi phiên bản XAMPP/phpMyAdmin chỉ từ unit test. Kiểm thử tích hợp thực phải dùng thông tin sandbox của chính nhóm và đối soát kết quả.

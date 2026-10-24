@@ -1,5 +1,5 @@
 /* Builds a new disposable upgrade fixture from a fixed previous revision. No existing DB is dropped. */
-const fs=require('node:fs'),{execFileSync,spawnSync}=require('node:child_process'),assert=require('node:assert/strict'),crypto=require('node:crypto');
+const fs=require('node:fs'),{execFileSync}=require('node:child_process'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const db='f6s_sports_regression_'+Date.now()+'_demo';
 const sql=s=>execFileSync('docker',['exec','-i','f6s-mysql-review','mysql','-uroot','-N',db],{input:s,encoding:'utf8'}).trim();
 let previous=execFileSync('git',['show','0ee8281:f6s_shop.sql'],{encoding:'utf8'});
@@ -14,9 +14,9 @@ const checksum=()=>{
 const protectedBefore=checksum(),stock=sql('SELECT id,stock FROM product_detail ORDER BY id'),cartCount=Number(sql('SELECT COUNT(*) FROM carts'));
 const oldIds=sql('SELECT id FROM product ORDER BY id').split('\n').map(Number);assert.equal(oldIds.length,55);assert.ok(cartCount>0);
 const visibility=sql('SELECT id,CAST(active AS UNSIGNED) FROM product ORDER BY id');
-const apply=()=>sql(fs.readFileSync('sql/thay_catalog_the_thao_20261024.sql','utf8'));
+const apply=()=>sql(fs.readFileSync('sql/maintenance/02_replace_catalog.sql','utf8'));
 apply();assert.equal(checksum(),protectedBefore);
-const blocked=spawnSync('docker',['exec','-i','f6s-mysql-review','mysql','-uroot',db],{input:fs.readFileSync('sql/du_lieu_mau_catalog_20261024.sql'),encoding:'utf8'});assert.notEqual(blocked.status,0);assert.match(blocked.stderr,/Old catalog seed disabled/);
+assert.equal(fs.existsSync('sql/bo_sung_du_lieu.sql'),false,'Old seeder must not be available as a current installer');
 assert.equal(Number(sql("SELECT COUNT(*) FROM product WHERE active=b'1'")),25);
 assert.equal(Number(sql("SELECT COUNT(*) FROM product_detail WHERE active=b'1'")),250);
 assert.equal(Number(sql('SELECT COUNT(*) FROM product WHERE id IN ('+oldIds.join(',')+')')),55);
@@ -25,7 +25,7 @@ assert.equal(Number(sql('SELECT COUNT(*) FROM carts')),0);assert.equal(Number(sq
 for(const [table,where,n] of [['category','deleted=0',5],['size','deleted=0',5],['color','deleted=0',5],['shoe_attribute','active=1',15],['banner','active=1',5],['blog','archived=0',5]])assert.equal(Number(sql(`SELECT COUNT(*) FROM ${table} WHERE ${where}`)),n,table);
 const first=Number(sql("SELECT MIN(record_id) FROM catalog_release_item WHERE kind='PRODUCT'"));sql(`UPDATE product SET name='Edited sample',slug='edited-sample' WHERE id=${first}; UPDATE product_detail SET stock=7 WHERE product_id=${first};`);
 const rows=sql('SELECT COUNT(*) FROM product');assert.match(apply(),/ALREADY_APPLIED_NO_CHANGES/);assert.equal(sql('SELECT COUNT(*) FROM product'),rows);assert.equal(Number(sql('SELECT MIN(stock) FROM product_detail WHERE product_id='+first)),7);assert.equal(sql('SELECT slug FROM product WHERE id='+first),'edited-sample');
-const rollback=fs.readFileSync('sql/khoi_phuc_catalog_truoc_sports_20261024.sql','utf8');sql(rollback);
+const rollback=fs.readFileSync('sql/maintenance/03_restore_previous_catalog.sql','utf8');sql(rollback);
 assert.equal(sql('SELECT id,CAST(active AS UNSIGNED) FROM product WHERE id IN ('+oldIds.join(',')+') ORDER BY id'),visibility);
 assert.equal(checksum(),protectedBefore);assert.equal(Number(sql('SELECT COUNT(*) FROM carts')),cartCount);assert.equal(Number(sql('SELECT CAST(active AS UNSIGNED) FROM product WHERE id='+first)),0);
 assert.match(sql(rollback),/NOT_APPLIED_OR_ALREADY_REVERTED/);

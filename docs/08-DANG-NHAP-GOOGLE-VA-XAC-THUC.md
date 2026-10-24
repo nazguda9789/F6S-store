@@ -1,6 +1,6 @@
 # 08 — Đăng nhập Google và hoàn tất đăng ký
 
-[Mục lục](README.md) · [Cấu hình email](07-CAP-NHAT-EMAIL-VA-NOI-DUNG.md)
+[Mục lục](README.md) · [Cấu hình email](05-CAU-HINH-VA-TICH-HOP.md)
 
 ## 1. Những lỗi đã sửa ngày 19/10/2026
 
@@ -79,7 +79,7 @@ Nếu dùng `127.0.0.1`, cổng khác hoặc HTTPS ngrok, phải khai báo **đ�
 ## 5. Cập nhật project/database
 
 - Pull/tải toàn bộ code mới, không chỉ chép SQL. Stop/Run lại app và Ctrl+F5.
-- Mặc định dev dùng `ddl-auto=update`, Hibernate sẽ tạo bảng `pending_registration` khi chạy. Nếu không dùng tự cập nhật schema, chọn đúng database rồi import [sql/cap_nhat_xac_thuc_20261019.sql](../sql/cap_nhat_xac_thuc_20261019.sql).
+- Bộ [SQL cài mới](../sql/install/README.md) đã có `pending_registration`. Với database đang dùng, backup và xem [maintenance](../sql/README.md); không import lại installer để chỉ sửa OAuth/OTP. Không dùng ddl-auto thay cho kế hoạch nâng schema.
 - Script chỉ tạo bảng còn thiếu, không DROP database, không xóa/bật tài khoản, không thay mật khẩu hay đơn hàng. Sao lưu DB trước cập nhật.
 - Bản SQL đầy đủ và bổ sung đã gồm schema mới. Không import lại dump đầy đủ chỉ để sửa đăng nhập, vì dump đầy đủ có DROP DATABASE.
 - Không sửa `activation_status=1` cho mọi người hoặc xóa tài khoản chờ để né xác thực. Dùng luồng OTP/Google hợp lệ.

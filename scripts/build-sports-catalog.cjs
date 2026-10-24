@@ -9,7 +9,7 @@ if(process.argv[2]==='extract'){
  const db=process.argv[3];if(!/^[a-zA-Z0-9_]+_demo$/.test(db))throw Error('Use a disposable _demo schema only');
  let schema=execFileSync('docker',['exec','f6s-mysql-review','mysqldump','-uroot','--no-data','--no-tablespaces','--skip-comments','--skip-add-drop-table',db,...tables],{encoding:'utf8'});
  schema=schema.replace(/ AUTO_INCREMENT=\d+/g,'');
- fs.writeFileSync(file('sql/schema_f6s_sports_20261024.sql'),'-- Generated schema only; no user, token, key, transaction or old product data.\n'+schema.trimEnd()+'\n');
+ fs.writeFileSync(file('scripts/sql-templates/schema.sql'),'-- Generated schema only; no user, token, key, transaction or old product data.\n'+schema.trimEnd()+'\n');
  console.log('Extracted schema only: '+tables.length+' application tables');process.exit(0);
 }
 if(process.argv[2]!=='build')throw Error('Use extract or build');
@@ -76,26 +76,11 @@ END$$
 CALL apply_sports_catalog()$$
 DROP PROCEDURE apply_sports_catalog$$
 DELIMITER ;`);
-fs.writeFileSync(file('sql/thay_catalog_the_thao_20261024.sql'),sql.join('\n')+'\n');
-const schema=fs.readFileSync(file('sql/schema_f6s_sports_20261024.sql'),'utf8');
-const admin="INSERT INTO users(email,full_name,password,role,user_type,actived,deleted,activation_status,account_non_locked,failed_attempts,is_google_user,created_date) VALUES('admin@gmail.com','Quản trị F6S','$2a$10$.VIihhdGDaZOJY9xzjwzVeepgVxwx2EkZaoMrCVoWtBIbltUJouWa','ROLE_ADMIN','NORMAL',b'1',b'0',b'1',b'1',0,b'0',NOW(6));";
-const full=`-- GENERATED CLEAN INSTALLER. No old shoes, Vietnamese legacy tables, keys or OTP fixtures.\n-- Creates a NEW f6s_shop database; fails if it exists. No DROP DATABASE.\nSET NAMES utf8mb4;\nCREATE DATABASE f6s_shop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\nUSE f6s_shop;\n${schema}\n${admin}\n${sql.join('\n')}\n`;
-fs.writeFileSync(file('f6s_shop.sql'),full);
-// Adapt the existing isolated business fixtures to the new release IDs; no old shoes are read.
-let business=fs.readFileSync(file('sql/du_lieu_mau_toan_bo_20261024.sql'),'utf8')
- .replaceAll('all-modules-20261024','all-modules-sports-20261024')
- // Admin-provisioned fixtures, not public OTP registration: still inactive and without passwords.
- .replaceAll("'NORMAL',b'0',b'0',b'0',b'1',0,b'0',NOW(6)","'NORMAL',b'0',b'0',b'1',b'1',0,b'0',NOW(6)")
- .replace("(SELECT COUNT(*) FROM catalog_demo_seed WHERE seed_key IN ('catalog-demo-1','catalog-demo-2','catalog-demo-3','catalog-demo-4','catalog-demo-5')) <> 5","(SELECT COUNT(*) FROM catalog_release_item WHERE release_key='sports-20261024' AND kind='PRODUCT') <> 25")
- .replace("JOIN catalog_demo_seed ds ON ds.seed_key=CONCAT('catalog-demo-',r.n)","JOIN catalog_release_item ds ON ds.release_key='sports-20261024' AND ds.kind='PRODUCT' AND ds.ordinal=r.n")
- .replace('JOIN product p ON p.id=ds.product_id','JOIN product p ON p.id=ds.record_id')
- .replace(/  INSERT INTO banner\([\s\S]*?FROM f6s_seed_links l;\n/,'')
- .replace(/  INSERT INTO blog\([\s\S]*?FROM f6s_seed_links;\n/,'');
-fs.writeFileSync(file('sql/du_lieu_mau_sports_nghiep_vu_20261024.sql'),'-- SPORTS RELEASE BUSINESS DEMO: no old catalog prerequisites.\n'+business);
+fs.writeFileSync(file('sql/maintenance/02_replace_catalog.sql'),sql.join('\n')+'\n');
 const undo=[`-- Restore prior visibility flags only. Stop web, back up first; no inventory/history is deleted.\nDELIMITER $$\nDROP PROCEDURE IF EXISTS revert_sports_catalog$$\nCREATE PROCEDURE revert_sports_catalog()\nmain: BEGIN\nDECLARE release_state VARCHAR(20);\nDECLARE EXIT HANDLER FOR SQLEXCEPTION BEGIN ROLLBACK; RESIGNAL; END;\nSTART TRANSACTION;\nSELECT state INTO release_state FROM catalog_release WHERE release_key='${release}' FOR UPDATE;\nIF release_state IS NULL OR release_state<>'APPLIED' THEN COMMIT; SELECT 'NOT_APPLIED_OR_ALREADY_REVERTED' AS result; LEAVE main; END IF;`];
 for(const [t,c] of flags)undo.push(`UPDATE ${t} t JOIN catalog_release_backup b ON b.record_id=t.id AND b.table_name='${t}' AND b.release_key='${release}' SET t.${c}=b.old_flag;`);
 const mappings=[['PRODUCT','product','active',0],['CATEGORY','category','deleted',1],['COLOR','color','deleted',1],['SIZE','size','deleted',1],['BANNER','banner','active',0],['BLOG','blog','archived',1],['BRAND','shoe_attribute','active',0],['SOLE','shoe_attribute','active',0],['MATERIAL','shoe_attribute','active',0]];
 for(const [kind,t,c,hidden] of mappings)undo.push(`UPDATE ${t} t JOIN catalog_release_item r ON r.record_id=t.id AND r.kind='${kind}' AND r.release_key='${release}' SET t.${c}=b'${hidden}' WHERE NOT EXISTS(SELECT 1 FROM catalog_release_backup b WHERE b.release_key='${release}' AND b.table_name='${t}' AND b.record_id=t.id);`);
 undo.push(`UPDATE product_detail d JOIN catalog_release_item r ON r.record_id=d.product_id AND r.kind='PRODUCT' AND r.release_key='${release}' SET d.active=b'0' WHERE NOT EXISTS(SELECT 1 FROM catalog_release_backup b WHERE b.release_key='${release}' AND b.table_name='product_detail' AND b.record_id=d.id);\nINSERT IGNORE INTO carts SELECT * FROM catalog_release_cart_archive;\nUPDATE catalog_release SET state='ROLLED_BACK' WHERE release_key='${release}';\nCOMMIT;\nEND$$\nCALL revert_sports_catalog()$$\nDROP PROCEDURE revert_sports_catalog$$\nDELIMITER ;`);
-fs.writeFileSync(file('sql/khoi_phuc_catalog_truoc_sports_20261024.sql'),undo.join('\n')+'\n');
-console.log('Built clean installer, replacement catalog and five new illustrative assets');
+fs.writeFileSync(file('sql/maintenance/03_restore_previous_catalog.sql'),undo.join('\n')+'\n');
+console.log('Built catalog maintenance scripts and five illustrative assets; build-minimal-sql.cjs generates the installer');
