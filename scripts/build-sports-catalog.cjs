@@ -9,7 +9,7 @@ if(process.argv[2]==='extract'){
  const db=process.argv[3];if(!/^[a-zA-Z0-9_]+_demo$/.test(db))throw Error('Use a disposable _demo schema only');
  let schema=execFileSync('docker',['exec','f6s-mysql-review','mysqldump','-uroot','--no-data','--no-tablespaces','--skip-comments','--skip-add-drop-table',db,...tables],{encoding:'utf8'});
  schema=schema.replace(/ AUTO_INCREMENT=\d+/g,'');
- fs.writeFileSync(file('sql/schema_f6s_sports_20261024.sql'),'-- Generated schema only; no user, token, key, transaction or old product data.\n'+schema);
+ fs.writeFileSync(file('sql/schema_f6s_sports_20261024.sql'),'-- Generated schema only; no user, token, key, transaction or old product data.\n'+schema.trimEnd()+'\n');
  console.log('Extracted schema only: '+tables.length+' application tables');process.exit(0);
 }
 if(process.argv[2]!=='build')throw Error('Use extract or build');

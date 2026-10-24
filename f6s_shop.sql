@@ -555,7 +555,6 @@ CREATE TABLE `wards` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-
 INSERT INTO users(email,full_name,password,role,user_type,actived,deleted,activation_status,account_non_locked,failed_attempts,is_google_user,created_date) VALUES('admin@gmail.com','Quản trị F6S','$2a$10$.VIihhdGDaZOJY9xzjwzVeepgVxwx2EkZaoMrCVoWtBIbltUJouWa','ROLE_ADMIN','NORMAL',b'1',b'0',b'1',b'1',0,b'0',NOW(6));
 -- REPLACES THE CURRENT CATALOG. Stop web and back up first. Does NOT delete products, history, OTP, keys or users.
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
