@@ -491,13 +491,15 @@ public class InvoiceService {
 
     @Transactional
     public Result<?> changeStatus(Long id, InvoiceStatus newStatus) {
-        Optional<Invoice> invoiceOpt = invoiceRepository.findById(id);
+        Optional<Invoice> invoiceOpt = invoiceRepository.findByIdForUpdate(id);
         if (invoiceOpt.isEmpty()) {
             return new Result<>(false, null, "Không tìm thấy đơn hàng");
         }
 
         Invoice invoice = invoiceOpt.get();
         InvoiceStatus currentStatus = invoice.getInvoiceStatus();
+
+        if(currentStatus==null||newStatus==null)return Result.fail("Trạng thái giao dịch chưa hợp lệ. Kiểm tra dữ liệu trước khi cập nhật.");
 
         Map<InvoiceStatus, List<InvoiceStatus>> available = StatusAvailable.available;
         List<InvoiceStatus> nextStatuses = available.getOrDefault(currentStatus, List.of());
@@ -509,16 +511,13 @@ public class InvoiceService {
             return new Result<>(false, invoice,
                     "Không thể cập nhật từ " + currentStatus.name() + " sang " + newStatus.name() + ". " + allowed);
         }
-        if(newStatus.equals(InvoiceStatus.HOAN_THANH)){
+        if(newStatus.equals(InvoiceStatus.HOAN_THANH) && invoice.getCompletedDate()==null){
             invoice.setCompletedDate(LocalDateTime.now());
             List<InvoiceDetail> invoiceDetails = invoiceDetailRepository.findByInvoiceId(id);
-            List<Product> products = new ArrayList<>();
             for(InvoiceDetail iv : invoiceDetails){
                 Product product = productDetailRepository.findProductById(iv.getIdProductDetail());
-                product.setSold(product.getSold() + iv.getQuantity());
-                products.add(product);
+                if(product!=null)productRepository.incrementSold(product.getId(),iv.getQuantity());
             }
-            productRepository.saveAll(products);
         }
         if(newStatus.equals(InvoiceStatus.YEU_CAU_DOI_HANG)){
             if(invoice.getCompletedDate() != null){

@@ -951,6 +951,12 @@ SET @f6s_customer_column = IF(
 PREPARE f6s_customer_stmt FROM @f6s_customer_column;
 EXECUTE f6s_customer_stmt;
 DEALLOCATE PREPARE f6s_customer_stmt;
+
+-- POS cash metadata 24/10: historical invoices remain NULL, no fabricated receipts.
+SET @f6s_cash_sql=IF((SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='invoice' AND column_name='cash_received')=0,'ALTER TABLE invoice ADD COLUMN cash_received DECIMAL(19,0) NULL','SELECT 1');
+PREPARE f6s_cash_stmt FROM @f6s_cash_sql; EXECUTE f6s_cash_stmt; DEALLOCATE PREPARE f6s_cash_stmt;
+SET @f6s_cash_sql=IF((SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='invoice' AND column_name='cash_change')=0,'ALTER TABLE invoice ADD COLUMN cash_change DECIMAL(19,0) NULL','SELECT 1');
+PREPARE f6s_cash_stmt FROM @f6s_cash_sql; EXECUTE f6s_cash_stmt; DEALLOCATE PREPARE f6s_cash_stmt;
 -- F6S catalog metadata, 24/10/2026. STOP WEB, back up, select the existing schema.
 -- No product, inventory, user or invoice is deleted/renamed/reset.
 SET @ddl = IF(EXISTS(SELECT 1 FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='shoe_attribute' AND column_name='code'),'SELECT 1','ALTER TABLE shoe_attribute ADD COLUMN code VARCHAR(32) NULL');

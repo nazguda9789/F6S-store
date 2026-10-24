@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface HistoryInvoiceStatusRepository extends JpaRepository<HistoryInvoiceStatus, Long> {
 
-    @Query("select h from HistoryInvoiceStatus h where h.invoice.id = ?1")
+    @Query("select h from HistoryInvoiceStatus h where h.invoice.id = ?1 order by h.createdDate, h.id")
     List<HistoryInvoiceStatus> findByInvoice(Long invoiceId);
 
     @Query("SELECT COUNT(h) " +

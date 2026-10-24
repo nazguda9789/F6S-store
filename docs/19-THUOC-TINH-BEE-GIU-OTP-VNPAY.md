@@ -1,5 +1,7 @@
 # Thao tác thuộc tính theo Bee — giữ nguyên OTP và VNPAY
 
+Lưu ý bản POS tiếp theo **cần SQL tiền mặt** theo [tài liệu 20](20-LUONG-POS-THEO-BEE.md). Nội dung không cần SQL bên dưới chỉ mô tả riêng tính năng thêm nhanh thuộc tính.
+
 ## Giới hạn thay đổi
 
 Không sửa mã xác thực OTP, Google OAuth, cấu hình mail, VNPAY, URL callback, TMN Code hoặc Hash Secret. Không thêm secret; không tự import SQL vào database đang dùng của bạn. Test Java về đăng ký/xác thực và VNPAY là kiểm thử hồi quy, không xác nhận gửi Gmail hoặc thu tiền thật.

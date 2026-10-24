@@ -308,7 +308,13 @@ async function changeOrderToInvoice() {
     if (!await createDonTam(true)) return;
     let status = $('input[name="invoiceStatus"]:checked').val();
     let orderType = $('input[name="orderType"]:checked').val();
-    const response = await fetch(`/adm-prj/qtht-001/api/order-draft/save-order-to-invoice?orderId=${selectInvoice}&invoiceType=${orderType}&invoiceStatus=${status}`, {
+    const checkoutParams=new URLSearchParams({orderId:selectInvoice,invoiceType:orderType,invoiceStatus:status});
+    if(orderType==='TAI_QUAY'&&status==='HOAN_THANH') {
+        const cash=document.getElementById('pos-cash-received')?.value;
+        if(!cash || !Number.isSafeInteger(Number(cash)) || Number(cash)<0){toastr.error('Nhập tiền khách đưa bằng số nguyên VND.');return;}
+        checkoutParams.set('cashReceived',cash);
+    }
+    const response = await fetch(`/adm-prj/qtht-001/api/order-draft/save-order-to-invoice?${checkoutParams}`, {
         method: 'POST'
     });
     if(response.status > 300){
@@ -322,7 +328,8 @@ async function changeOrderToInvoice() {
             type: "success"
         },
         function() {
-            window.location.reload();
+            if(result.data?.invoiceId)window.location.href=location.pathname.replace(/\/create$/,'/detail')+'?id='+result.data.invoiceId;
+            else window.location.reload();
         });
     }
     else{

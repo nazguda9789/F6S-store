@@ -9,25 +9,46 @@
     <title th:text="'Chi tiết giao dịch - '+${invoice.code}"></title>
     <head th:replace="common/libadmin :: libheaderadmin"></head>
     <link rel="stylesheet" type="text/css" href="/admin/css/invoice.css">
+    <link rel="stylesheet" href="/admin/css/invoice-receipt.css">
 </head>
 <body class="sb-nav-fixed">
-<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div th:replace="${employeeView == true} ? ~{common/employee/navbarEmployee :: headerAdmin} : ~{common/navbarAdmin :: headerAdmin}"></div>
 <div id="layoutSidenav">
-    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+    <div th:replace="${employeeView == true} ? ~{common/employee/navbarEmployee :: sidenavAdmin} : ~{common/navbarAdmin :: sidenavAdmin}"></div>
     <div id="layoutSidenav_content">
         <main>
             <div class="container-fluid">
-                <div class="container py-4">
+                <div class="container py-4" id="invoice-receipt">
+                    <header class="receipt-brand"><strong>F6S</strong><span>HÓA ĐƠN BÁN HÀNG</span></header>
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3 class="mb-0">
                             <span class="text-primary">Giao dịch <span th:text="${invoice.code}"></span></span>
-                            <span class="badge bg-danger ms-2" th:text="${invoice.labelStatus}"></span>
+                            <span class="badge ms-2" th:style="'background-color:'+${invoice.invoiceStatus.color}" th:text="${invoice.labelStatus}"></span>
                         </h3>
-                        <div class="d-flex gap-2">
-                            <button onclick="printShippingLabel()" class="btn btn-outline-secondary"><i class="fa fa-print"></i></button>
-                            <a class="btn btn-primary" href="/adm-prj/qtht-001/invoice/create">Tạo giao dịch</a>
+                        <div class="d-flex gap-2 no-print">
+                            <button onclick="printShippingLabel()" class="btn btn-outline-secondary"><i class="fa fa-print"></i> In hóa đơn</button>
+                            <a class="btn btn-outline-primary" href="list">Danh sách giao dịch</a>
+                            <a class="btn btn-primary" href="create">Tạo giao dịch</a>
                         </div>
                     </div>
+
+                    <div class="receipt-metadata">
+                        <span>Ngày tạo: <strong th:text="${#temporals.format(invoice.createdDate,'HH:mm dd/MM/yyyy')}"></strong></span>
+                        <span>Hình thức: <strong th:text="${invoice.invoiceTypeLabel}"></strong></span>
+                        <span>Phương thức: <strong th:text="${invoice.cashReceived != null ? 'Tiền mặt tại quầy' : invoice.payType}"></strong></span>
+                    </div>
+                    <section class="inv-detail-card no-print" aria-label="Lịch sử giao dịch">
+                        <div class="inv-detail-card-header">Lịch sử trạng thái</div>
+                        <ol class="invoice-timeline" th:if="${!#lists.isEmpty(invoiceHistory)}">
+                            <li th:each="h : ${invoiceHistory}">
+                                <strong th:text="${h.label}"></strong>
+                                <time th:text="${h.createdDate == null ? 'Chưa có thời điểm' : #temporals.format(h.createdDate,'HH:mm dd/MM/yyyy')}"></time>
+                                <span th:text="${h.createdBy == null || h.createdBy == '' ? 'Hệ thống' : h.createdBy}"></span>
+                                <p th:if="${h.note != null && h.note != ''}" th:text="${h.note}"></p>
+                            </li>
+                        </ol>
+                        <p class="p-3 text-muted" th:if="${#lists.isEmpty(invoiceHistory)}">Chưa có lịch sử được ghi nhận. Không suy đoán các bước giao dịch cũ.</p>
+                    </section>
 
                     <div class="row g-4">
                         <div class="col-md-6">
@@ -37,15 +58,14 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <h6 class="text-secondary">Người gửi</h6>
-                                            <p class="mb-0"><span class="inv-detail-value">038.226.7161</span></p>
-                                            <p class="mb-0 text-muted">Xã Nam Lý, Tỉnh Ninh Bình</p>
+                                            <p class="mb-0"><span class="inv-detail-value">F6S — Giày thể thao</span></p>
+                                            <p class="mb-0 text-muted">Thông tin hỗ trợ tại trang Liên hệ của cửa hàng.</p>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <h6 class="text-secondary">Người nhận</h6>
                                             <p class="mb-0"><span class="inv-detail-value" th:text="${invoice.fullName}"></span></p>
                                             <p class="mb-0 text-muted"  th:text="${@formatUtils.formatPhone(invoice.phone)}"></p>
-                                            <p class="mb-0 text-muted" th:text="${invoice.addressDetail}+', '+${invoice.wardName}+', '+${invoice.provinceName}" th:if="${invoice.districtName == null || invoice.districtName == ''}"></p>
-                                            <p class="mb-0 text-muted" th:text="${invoice.addressDetail}+', '+${invoice.wardName}+', '+ ${invoice.districtName}+', '+${invoice.provinceName}" th:if="${invoice.districtName != null && invoice.districtName != ''}"></p>
+                                            <p class="mb-0 text-muted"><span th:if="${invoice.addressDetail != null}" th:text="${invoice.addressDetail}"></span><span th:if="${invoice.wardName != null}" th:text="' · '+${invoice.wardName}"></span><span th:if="${invoice.districtName != null}" th:text="' · '+${invoice.districtName}"></span><span th:if="${invoice.provinceName != null}" th:text="' · '+${invoice.provinceName}"></span></p>
                                         </div>
                                     </div>
                                 </div>
@@ -83,9 +103,17 @@
                                             <div class="inv-detail-label">Tổng tiền khách phải trả</div>
                                             <div class="inv-detail-value"><h3 class="text-green">[[${#numbers.formatDecimal(invoice.totalAmount + invoice.shipCost - invoice.discount, 0, 'POINT', 0, 'POINT')}]] đ</h3></div>
                                         </div>
+                                        <div class="col-6 mb-3" th:if="${invoice.cashReceived != null}">
+                                            <div class="inv-detail-label">Tiền khách đưa (nhân viên ghi nhận)</div>
+                                            <strong id="receipt-cash-received" th:text="${#numbers.formatDecimal(invoice.cashReceived,0,'POINT',0,'POINT')}+' đ'"></strong>
+                                        </div>
+                                        <div class="col-6 mb-3" th:if="${invoice.cashChange != null}">
+                                            <div class="inv-detail-label">Tiền thừa trả khách</div>
+                                            <strong id="receipt-cash-change" th:text="${#numbers.formatDecimal(invoice.cashChange,0,'POINT',0,'POINT')}+' đ'"></strong>
+                                        </div>
                                         <div class="col-12">
                                             <div class="inv-detail-label">Ghi chú vận chuyển</div>
-                                            <p class="inv-detail-notes-value">Cho kiểm hàng</p>
+                                            <p class="inv-detail-notes-value">Kiểm tra thông tin nhận hàng trước khi bàn giao.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -121,6 +149,8 @@
                             </table>
                         </div>
                     </div>
+
+                    <p class="receipt-footer">Cảm ơn bạn đã mua sắm tại F6S. Hóa đơn lưu thông tin giao dịch; trạng thái giao hàng không thay thế xác nhận thanh toán của ngân hàng.</p>
 
                 </div>
                 <script>

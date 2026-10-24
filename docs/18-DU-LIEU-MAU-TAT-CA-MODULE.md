@@ -1,5 +1,7 @@
 # Dữ liệu minh họa các module — 24/10/2026
 
+Bản code POS tiếp theo cần hai cột tiền mặt. Cài mới dùng [ZIP demo POS mới](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-DEMO-POS-20261024.zip); database demo đã có chạy migration theo [tài liệu 20](20-LUONG-POS-THEO-BEE.md). Gói ALL-MODULES trước đây được giữ để tra cứu.
+
 Đây là bộ dữ liệu nghiệp vụ giả để trình diễn/kiểm thử, **không phải viết lại mọi chức năng của website**. Không gửi email, tạo thanh toán VNPAY, gọi vận chuyển hoặc chứng thực giao dịch bên ngoài khi import.
 
 ## Cài mới để trình diễn (khuyến nghị)

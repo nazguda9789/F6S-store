@@ -57,6 +57,7 @@ public class InvoiceAdminController {
             model.addAttribute("invoice", result.getData());
             List<InvoiceDetail> invoiceDetails = invoiceService.getDetailByInvoiceId(result.getData().getId());
             model.addAttribute("invoiceDetails", invoiceDetails);
+            model.addAttribute("invoiceHistory", invoiceService.getHistoryById(id).getHistoryInvoiceStatuses());
         }
         else{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog not found");

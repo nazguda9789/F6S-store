@@ -16,7 +16,7 @@ if (!base || process.env.F6S_DISPOSABLE_DB !== '1') throw new Error('Set F6S_BAS
   const post=async(path,data)=>{const r=await page.request.post(api+path,data ? {data}:{});assert.equal(r.status(),200);return r.json();};
   const created=await post('/new'); assert.equal(created.success,true);const id=created.data.id;
   assert.equal((await post('/add-to-order?orderId='+id+'&detailId=239')).success,true);
-  const url='/save-order-to-invoice?orderId='+id+'&invoiceType=TAI_QUAY&invoiceStatus=HOAN_THANH';
+  const url='/save-order-to-invoice?orderId='+id+'&invoiceType=TAI_QUAY&invoiceStatus=HOAN_THANH&cashReceived=100000000';
   const results=await Promise.all([post(url),post(url)]);
   assert.equal(results.filter(r=>r.success).length,1,'Concurrent requests must produce exactly one invoice');
   assert.equal((await post(url)).success,false,'Repeated checkout must not produce another invoice');

@@ -27,6 +27,7 @@ import java.util.*;
 
 @Service
 public class OrderDraftService {
+    @Autowired private PosPricingService posPricing;
 
     @Autowired
     private ProductDetailRepository productDetailRepository;
@@ -86,12 +87,18 @@ public class OrderDraftService {
                     || !Boolean.TRUE.equals(customer.getActived()) || Boolean.TRUE.equals(customer.getDeleted())
                     || !Boolean.TRUE.equals(customer.getActivationStatus())) return Result.fail("Khách hàng không hợp lệ hoặc đã ngừng hoạt động.");
         }
+        double requestedDiscount=input.getDiscount()==null?0D:input.getDiscount();
+        if(input.getVoucherCode()!=null&&!input.getVoucherCode().isBlank()) {
+            Double amount=input.getId()==null?0D:orderDetailDraftRepository.totalByOrderId(input.getId());
+            try { requestedDiscount=posPricing.price(amount==null?0:amount,requestedDiscount,input.getShipCost(),input.getVoucherCode()).discount(); }
+            catch(IllegalArgumentException e){return Result.fail(e.getMessage());}
+        }
         orderDraft.setCustomerId(input.getCustomerId());
         orderDraft.setFullName(input.getFullName() == null || input.getFullName().isBlank() ? "Khách lẻ" : input.getFullName().strip());
         orderDraft.setPhone(input.getPhone()); orderDraft.setEmail(input.getEmail()); orderDraft.setNote(input.getNote());
         orderDraft.setAddressDetail(input.getAddressDetail()); orderDraft.setProvinceCode(input.getProvinceCode());
         orderDraft.setProvinceName(input.getProvinceName()); orderDraft.setWardCode(input.getWardCode()); orderDraft.setWardName(input.getWardName());
-        orderDraft.setDiscount(input.getDiscount() == null ? 0D : input.getDiscount());
+        orderDraft.setDiscount(requestedDiscount);
         orderDraft.setShipCost(input.getShipCost() == null ? 0D : input.getShipCost()); orderDraft.setVoucherCode(input.getVoucherCode());
         Double serverTotal = input.getId() == null ? Double.valueOf(0D) : orderDetailDraftRepository.totalByOrderId(input.getId());
         orderDraft.setTotalAmount(serverTotal == null ? 0D : serverTotal);
@@ -153,6 +160,22 @@ public class OrderDraftService {
     }
 
     @Transactional
+    public Result<?> addBySku(Long orderId,String sku){
+        if(sku==null||sku.isBlank()||sku.strip().length()>64)return Result.fail("Nhập mã SKU hợp lệ, tối đa 64 ký tự.");
+        if(orderDraftRepository.findByIdForUpdate(orderId).isEmpty())return Result.fail("Chọn hóa đơn chờ đang mở trước khi quét mã.");
+        var variant=productDetailRepository.findBySkuIgnoreCase(sku.strip()).orElse(null);
+        if(variant==null)return Result.fail("Không tìm thấy biến thể theo SKU này.");
+        var line=orderDetailDraftRepository.findByDetailAndOrderId(variant.getId(),orderId).orElse(null);
+        if(line!=null){
+            if(line.getQuantity()==null||line.getQuantity()==Integer.MAX_VALUE)return Result.fail("Số lượng hiện tại không hợp lệ.");
+            var parent=productRepository.findById(variant.getProductId()).orElse(null);
+            if(parent==null||!Boolean.TRUE.equals(parent.getActive()))return Result.fail("Sản phẩm đã ngừng bán.");
+            return changeQuantity(line.getId(),line.getQuantity()+1);
+        }
+        return addToOrder(variant.getId(),orderId);
+    }
+
+    @Transactional
     public Result<?> deleteDetail(Long detailId) {
         Optional<OrderDetailDraft> orderDetailDraft = orderDetailDraftRepository.findById(detailId);
         if(orderDetailDraft.isEmpty()){
@@ -208,7 +231,12 @@ public class OrderDraftService {
 
     @Transactional
     public Result<?> changeToInvoice(Long orderId, InvoiceType invoiceType, InvoiceStatus invoiceStatus){
-        if ((invoiceType != InvoiceType.TAI_QUAY && invoiceType != InvoiceType.FACEBOOK)
+        return changeToInvoice(orderId,invoiceType,invoiceStatus,null);
+    }
+
+    @Transactional
+    public Result<?> changeToInvoice(Long orderId, InvoiceType invoiceType, InvoiceStatus invoiceStatus, java.math.BigDecimal cashReceived){
+        if ((invoiceType != InvoiceType.TAI_QUAY && invoiceType != InvoiceType.FACEBOOK && invoiceType != InvoiceType.ONLINE)
                 || (invoiceStatus != InvoiceStatus.DANG_CHO_VAN_CHUYEN && invoiceStatus != InvoiceStatus.HOAN_THANH))
             return Result.fail("Loại giao dịch hoặc trạng thái khởi tạo không hợp lệ.");
         Optional<OrderDraft> orderDraftOptional = orderDraftRepository.findByIdForUpdate(orderId);
@@ -227,15 +255,26 @@ public class OrderDraftService {
         }
         Double discount = orderDraftOptional.get().getDiscount();
         Double shipping = orderDraftOptional.get().getShipCost();
+        if(orderDraftOptional.get().getVoucherCode()!=null&&!orderDraftOptional.get().getVoucherCode().isBlank()){
+            try { discount=posPricing.price(merchandiseTotal,discount,shipping,orderDraftOptional.get().getVoucherCode()).discount(); }
+            catch(IllegalArgumentException e){return Result.fail(e.getMessage());}
+            orderDraftOptional.get().setDiscount(discount);
+        }
         if (!Double.isFinite(merchandiseTotal) || discount == null || !Double.isFinite(discount) || discount < 0 || discount > merchandiseTotal
                 || shipping == null || !Double.isFinite(shipping) || shipping < 0)
             return Result.fail("Tiền giảm giá hoặc phí vận chuyển không hợp lệ.");
         orderDraftOptional.get().setTotalAmount(merchandiseTotal);
+        PosPricingService.Cash cash=null;
+        if(invoiceType==InvoiceType.TAI_QUAY && invoiceStatus==InvoiceStatus.HOAN_THANH){
+            try { cash=PosPricingService.cash(merchandiseTotal+shipping-discount,cashReceived); }
+            catch(IllegalArgumentException e){return Result.fail(e.getMessage());}
+        }
         Float weight = 0F;
         for(OrderDetailDraft o : orderDetailDrafts){
             weight += (o.getWeight() == null ? 0F : o.getWeight()) * o.getQuantity();
         }
         Invoice invoice = invoiceMapper.orderToInvoice(orderDraftOptional.get());
+        if(cash!=null){invoice.setCashReceived(cash.received());invoice.setCashChange(cash.change());}
         List<InvoiceDetail> list = invoiceMapper.orderDetailToInvoiceDetail(orderDetailDrafts);
         invoice.setCreatedDate(LocalDateTime.now());
         invoice.setUpdateDate(LocalDateTime.now());
@@ -272,6 +311,7 @@ public class OrderDraftService {
             // Trừ stock
             product.setStock(product.getStock() - i.getQuantity());
             productDetailRepository.save(product);
+            if(invoiceStatus==InvoiceStatus.HOAN_THANH) productRepository.incrementSold(product.getProductId(),i.getQuantity());
             // Tạo invoice detail
         }
         invoiceDetailRepository.saveAll(list);
@@ -304,6 +344,19 @@ public class OrderDraftService {
             messagingTemplate.convertAndSend("/topic/count-order", listStt);
         }
 
-        return new Result<>(true, orderId, "Đã chuyển sang đơn hàng chính thức");
+        String completedMessage="Đã chuyển sang đơn hàng chính thức";
+        if(cash!=null)completedMessage+=". Tiền thừa trả khách: "+vnFormat.format(cash.change())+" đ.";
+        return new Result<>(true, java.util.Map.of("orderId",orderId,"invoiceId",invoice.getId(),"code",invoice.getCode()), completedMessage);
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly=true)
+    public Result<?> quote(Long orderId){
+        var draft=orderDraftRepository.findById(orderId).orElse(null);
+        if(draft==null)return Result.fail("Đơn chờ không tồn tại hoặc đã chuyển giao dịch.");
+        Double subtotal=orderDetailDraftRepository.totalByOrderId(orderId);
+        try{
+            var price=posPricing.price(subtotal==null?0:subtotal,draft.getDiscount(),draft.getShipCost(),draft.getVoucherCode());
+            return Result.ok(java.util.Map.of("price",price,"vouchers",posPricing.suggestions(price.merchandise())),"Báo giá từ dữ liệu server, chưa phải thanh toán.");
+        }catch(IllegalArgumentException e){return Result.fail(e.getMessage());}
     }
 }

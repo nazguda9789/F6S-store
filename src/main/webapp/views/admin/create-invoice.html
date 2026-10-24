@@ -2,6 +2,7 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8" />
+    <script defer src="/admin/js/pos-checkout.js"></script>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="Admin Dashboard" />
@@ -13,9 +14,9 @@
 
 </head>
 <body class="sb-nav-fixed">
-<div th:replace="common/navbarAdmin :: headerAdmin"></div>
+<div th:replace="${employeeView == true} ? ~{common/employee/navbarEmployee :: headerAdmin} : ~{common/navbarAdmin :: headerAdmin}"></div>
 <div id="layoutSidenav">
-    <div th:replace="common/navbarAdmin :: sidenavAdmin"></div>
+    <div th:replace="${employeeView == true} ? ~{common/employee/navbarEmployee :: sidenavAdmin} : ~{common/navbarAdmin :: sidenavAdmin}"></div>
     <div id="layoutSidenav_content">
         <main>
             <div class="container-fluid my-4">
@@ -98,19 +99,19 @@
                                         <div class="custom-input">
                                             <div class="input-wrapper">
                                                 <span class="icon"><i class="fa fa-money-bill"></i> Phí ship: </span>
-                                                <input type="text" name="shipcost" id="shipcost" placeholder="Phí ship" class="form-control input-form" value="30000">
+                                                <input type="number" min="0" name="shipcost" id="shipcost" placeholder="Phí ship" class="form-control input-form" value="0">
                                             </div>
                                         </div>
                                         <div class="custom-input">
                                             <div class="input-wrapper">
                                                 <span class="icon"><i class="fa fa-money-bill"></i> Giảm giá: </span>
-                                                <input type="text" name="discount" id="discount" placeholder="Giảm giá" class="form-control input-form">
+                                                <input type="number" min="0" step="1" name="discount" id="discount" placeholder="Giảm giá" class="form-control input-form">
                                             </div>
                                         </div>
                                         <div class="custom-input">
                                             <div class="input-wrapper">
                                                 <span class="icon"><i class="fa fa-money-bill"></i> Tổng Sp: </span>
-                                                <input type="text" name="totalAmount" id="totalAmount" placeholder="Tổng tiền" class="form-control input-form">
+                                                <input type="text" readonly name="totalAmount" id="totalAmount" placeholder="Tổng tiền" class="form-control input-form">
                                             </div>
                                         </div>
                                     </div>
@@ -263,12 +264,12 @@
                 <div class="status-update-card">
                     <h4 class="mb-3">⚙️ Chọn trạng thái</h4>
                     <div class="btn-group" role="group" aria-label="Chọn trạng thái">
-                        <input type="radio" class="btn-check" name="invoiceStatus" id="status1" checked value="DANG_CHO_VAN_CHUYEN" autocomplete="off">
+                        <input type="radio" class="btn-check" name="invoiceStatus" id="status1" value="DANG_CHO_VAN_CHUYEN" autocomplete="off">
                         <label class="btn btn-outline-primary" for="status1">
                             <i class="fas fa-hourglass-half"></i> Đang chờ vận chuyển
                         </label>
 
-                        <input type="radio" class="btn-check" name="invoiceStatus" id="status2" value="HOAN_THANH" autocomplete="off">
+                        <input type="radio" class="btn-check" name="invoiceStatus" id="status2" checked value="HOAN_THANH" autocomplete="off">
                         <label class="btn btn-outline-success" for="status2">
                             <i class="fas fa-check-circle"></i> Hoàn thành
                         </label>
@@ -276,13 +277,21 @@
 
                     <h4 class="mb-3" style="display: block;margin-top:30px">⚙️ Loại đơn hàng</h4>
                     <div class="btn-group" role="group" aria-label="Loại đơn hàng">
-                        <input type="radio" class="btn-check" name="orderType" id="orderTypeFacebook" value="FACEBOOK" checked autocomplete="off">
-                        <label class="btn btn-outline-primary" for="orderTypeFacebook">Facebook</label>
+                        <input type="radio" class="btn-check" name="orderType" id="orderTypeFacebook" value="ONLINE" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="orderTypeFacebook">Giao hàng</label>
 
-                        <input type="radio" class="btn-check" name="orderType" id="orderTypeTaiQuay" value="TAI_QUAY" autocomplete="off">
+                        <input type="radio" class="btn-check" name="orderType" id="orderTypeTaiQuay" checked value="TAI_QUAY" autocomplete="off">
                         <label class="btn btn-outline-danger" for="orderTypeTaiQuay">Tại quầy</label>
                     </div><br><br>
-                    <p class="text-muted">Sau khi lưu thành công, hóa đơn chờ được đóng tự động để tránh tạo giao dịch trùng.</p>
+                    <section class="border rounded p-3 mb-3" id="pos-cash-panel">
+                        <p id="pos-server-total" role="status">Bấm Kiểm tra tổng tiền để lấy báo giá từ server.</p>
+                        <label for="pos-cash-received">Tiền khách đưa (VND)</label>
+                        <input type="number" min="0" step="1" id="pos-cash-received" class="form-control" autocomplete="off">
+                        <p id="pos-cash-change" class="mt-2" role="status"></p>
+                        <button type="button" id="pos-quote-button" class="btn btn-outline-primary">Kiểm tra tổng tiền và voucher</button>
+                        <div id="pos-voucher-suggestions" class="d-flex flex-wrap gap-2 mt-2"></div>
+                    </section>
+                    <p class="text-muted">Hoàn thành tại quầy là nhân viên ghi nhận đã nhận tiền mặt; không giả lập thanh toán VNPAY. Giao hàng chờ vận chuyển chưa phải xác nhận thu tiền. Sau khi lưu, hóa đơn chờ được đóng tự động.</p>
                 </div>
             </div>
             <div class="modal-footer">

@@ -50,6 +50,9 @@ public class OrderDraftApi {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @PostMapping("/add-by-sku")
+    public ResponseEntity<?> addBySku(@RequestParam Long orderId,@RequestParam String sku){return ResponseEntity.ok(orderDraftService.addBySku(orderId,sku));}
+
     @PostMapping("/find-detail-by-order")
     public ResponseEntity<?> findDetailByOrder(@RequestParam Long orderId) {
         List<OrderDetailDraft> result = orderDraftService.findDetailByOrder(orderId);
@@ -82,8 +85,12 @@ public class OrderDraftApi {
 
     @PostMapping("/save-order-to-invoice")
     public ResponseEntity<?> saveToInvoice(@RequestParam Long orderId, @RequestParam InvoiceType invoiceType,
-                                           @RequestParam InvoiceStatus invoiceStatus) {
-        Result<?> result = orderDraftService.changeToInvoice(orderId, invoiceType, invoiceStatus);
+                                           @RequestParam InvoiceStatus invoiceStatus,
+                                           @RequestParam(required=false) java.math.BigDecimal cashReceived) {
+        Result<?> result = orderDraftService.changeToInvoice(orderId, invoiceType, invoiceStatus,cashReceived);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @GetMapping("/quote")
+    public ResponseEntity<?> quote(@RequestParam Long orderId){return ResponseEntity.ok(orderDraftService.quote(orderId));}
 }

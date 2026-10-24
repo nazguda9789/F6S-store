@@ -1,10 +1,12 @@
 # F6S — Website quản lý bán giày thể thao
 
-[Thêm nhanh thuộc tính theo Bee, giữ nguyên OTP/VNPAY](docs/19-THUOC-TINH-BEE-GIU-OTP-VNPAY.md): thêm danh mục/hãng/đế/chất liệu/màu/size ngay trong form giày, không mất dữ liệu đang nhập. Bản này không cần SQL/secret mới nếu đã nâng catalog 24/10.
+**Cập nhật POS 24/10 — cần nâng SQL trước code:** nhập/quét SKU, gợi ý voucher từ server, tiền khách đưa/tiền thừa, lịch sử và in hóa đơn. Máy đã nâng catalog chạy `sql/cap_nhat_thanh_toan_tai_quay_20261024.sql`; bản `nang_cap_f6s.sql` mới đã gộp. [Luồng mới và hướng dẫn](docs/20-LUONG-POS-THEO-BEE.md). [Tải SQL POS hiện hành](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SQL-POS-20261024.zip) → Download raw. OTP/VNPAY và secret giữ nguyên.
 
-**Bộ demo các module:** [tải SQL demo riêng](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-DEMO-ALL-MODULES-20261024.zip) → Download raw. Có 5 nhân viên, 5 khách hàng, 5 mẫu giày và dữ liệu giỏ/đơn/giảm giá/nội dung. [Danh sách, cách import và các bảng không nên chèn giả](docs/18-DU-LIEU-MAU-TAT-CA-MODULE.md). Chỉ dùng database `_demo`, không trộn hóa đơn mẫu vào dữ liệu thật.
+[Thêm nhanh thuộc tính theo Bee, giữ nguyên OTP/VNPAY](docs/19-THUOC-TINH-BEE-GIU-OTP-VNPAY.md): thêm danh mục/hãng/đế/chất liệu/màu/size ngay trong form giày, không mất dữ liệu đang nhập. Riêng tính năng này không cần SQL; bản POS hiện hành cần migration ở trên.
 
-[Tải gói SQL mới 24/10/2026](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SQL-20261024.zip) → chọn **Download raw**. [Chi tiết model, thuộc tính và dữ liệu mẫu](docs/17-CATALOG-SQL-VA-DU-LIEU-MAU.md).
+**Bộ demo các module:** [tải SQL demo riêng bản POS](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-DEMO-POS-20261024.zip) → Download raw. Có 5 nhân viên, 5 khách hàng, 5 mẫu giày và dữ liệu giỏ/đơn/giảm giá/nội dung. [Danh sách, cách import và các bảng không nên chèn giả](docs/18-DU-LIEU-MAU-TAT-CA-MODULE.md). Chỉ dùng database `_demo`, không trộn hóa đơn mẫu vào dữ liệu thật.
+
+[Gói SQL catalog trước bản POS](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SQL-20261024.zip) được giữ để tra cứu, không đủ hai cột tiền mặt của code mới. [Chi tiết model, thuộc tính và dữ liệu mẫu](docs/17-CATALOG-SQL-VA-DU-LIEU-MAU.md).
 
 **Bản catalog 24/10: bắt buộc nâng SQL trước khi chạy code mới.** Có metadata/mã thuộc tính và bộ 5 giày demo/25 biến thể. Máy cũ: dừng web, sao lưu, import `sql/nang_cap_f6s.sql`; muốn thêm mẫu thì import tiếp `sql/du_lieu_mau_catalog_20261024.sql`. Cài mới dùng `f6s_shop.sql` (có DROP DATABASE). [Hướng dẫn SQL hiện hành](sql/HUONG_DAN_GOI_SQL.md).
 

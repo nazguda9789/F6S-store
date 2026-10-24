@@ -26,6 +26,7 @@ class OrderDraftWorkflowTests {
     @Mock com.web.utils.EmailInvoice emailInvoice;
     @Mock HistoryInvoiceStatusRepository historyInvoiceStatusRepository;
     @Mock com.web.bot.TeleSend teleSend;
+    @Mock PosPricingService posPricing;
     @InjectMocks OrderDraftService service;
     @BeforeEach void init() { MockitoAnnotations.openMocks(this); }
 
@@ -113,9 +114,11 @@ class OrderDraftWorkflowTests {
         Product parent = new Product(); parent.setActive(true);
         when(productDetailRepository.findByIdForUpdate(4L)).thenReturn(Optional.of(variant));
         when(productRepository.findById(3L)).thenReturn(Optional.of(parent));
-        assertTrue(service.changeToInvoice(7L, com.web.enums.InvoiceType.TAI_QUAY, com.web.enums.InvoiceStatus.HOAN_THANH).isSuccess());
+        assertTrue(service.changeToInvoice(7L, com.web.enums.InvoiceType.TAI_QUAY, com.web.enums.InvoiceStatus.HOAN_THANH,new java.math.BigDecimal("300")).isSuccess());
         assertEquals(3,variant.getStock()); assertEquals(10L,invoice.getCustomerId()); assertEquals(2L,invoice.getUserId());
         assertNotNull(invoice.getCompletedDate());
+        assertEquals(new java.math.BigDecimal("300"),invoice.getCashReceived());assertEquals(new java.math.BigDecimal("100"),invoice.getCashChange());
+        verify(productRepository).incrementSold(3L,2);
         verify(orderDetailDraftRepository).deleteAll(java.util.List.of(line)); verify(orderDraftRepository).delete(draft);
         assertFalse(service.changeToInvoice(7L, com.web.enums.InvoiceType.TAI_QUAY, com.web.enums.InvoiceStatus.HOAN_THANH).isSuccess());
         verify(productDetailRepository,times(1)).save(variant); verify(invoiceDetailRepository,times(1)).saveAll(any());
@@ -124,4 +127,17 @@ class OrderDraftWorkflowTests {
         assertFalse(service.changeToInvoice(7L, com.web.enums.InvoiceType.TAI_QUAY, com.web.enums.InvoiceStatus.DA_HUY).isSuccess());
         verifyNoInteractions(orderDraftRepository, productDetailRepository);
     }
+
+    @Test void invalidVoucherDoesNotPartiallyUpdateManagedDraft(){
+        var draft=new OrderDraft();draft.setId(7L);draft.setFullName("Before");when(orderDraftRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(draft));when(orderDetailDraftRepository.totalByOrderId(7L)).thenReturn(200D);
+        when(posPricing.price(anyDouble(),any(),any(),eq("BAD"))).thenThrow(new IllegalArgumentException("invalid"));
+        var input=new OrderDraft();input.setId(7L);input.setFullName("Changed");input.setVoucherCode("BAD");assertFalse(service.create(input).isSuccess());assertEquals("Before",draft.getFullName());verify(orderDraftRepository,never()).save(any());
+    }
+    @Test void cashShortageDoesNotCreateInvoiceOrTouchStock(){
+        var draft=new OrderDraft();draft.setId(7L);when(orderDraftRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(draft));
+        var line=new OrderDetailDraft();line.setQuantity(1);line.setPrice(200D);when(orderDetailDraftRepository.findByOrder(7L)).thenReturn(java.util.List.of(line));
+        assertFalse(service.changeToInvoice(7L,com.web.enums.InvoiceType.TAI_QUAY,com.web.enums.InvoiceStatus.HOAN_THANH,new java.math.BigDecimal("199")).isSuccess());verifyNoInteractions(invoiceRepository,invoiceMapper,productDetailRepository);
+    }
+    @Test void unknownSkuCannotChangeDraft(){when(orderDraftRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(new OrderDraft()));assertFalse(service.addBySku(7L,"UNKNOWN").isSuccess());verify(orderDetailDraftRepository,never()).save(any());}
+    @Test void rejectsEmptyAndOversizeSku(){assertFalse(service.addBySku(7L," ").isSuccess());assertFalse(service.addBySku(7L,"X".repeat(65)).isSuccess());verifyNoInteractions(productDetailRepository);}
 }

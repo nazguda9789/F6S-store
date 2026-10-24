@@ -49,7 +49,7 @@ async function filterInvoice(page) {
                     </td>
                     <td>
                         <div class="d-flex flex-column">
-                            <span>${list[i].payType}</span>
+                            <span>${list[i].cashReceived != null ? 'Tiền mặt tại quầy' : list[i].payType}</span>
                             <span>Tạm tính: <strong>${formatmoney(list[i].totalAmount)}</strong></span>
                             <span>Phí ship: ${formatmoney(list[i].shipCost)}</span>
                             <span class="cod-amount">Giảm giá: ${formatmoney(list[i].discount)}</span>
@@ -63,7 +63,7 @@ async function filterInvoice(page) {
                     <td>
                         <a onclick="getHistoryStatus(${list[i].id})" data-bs-toggle="modal" data-bs-target="#lichSuModal" class="btn btn-outline-primary btn-sm"><i class="fa fa-clock"></i><br></a>
                         <a href="detail?id=${list[i].id}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="fa fa-eye"></i></a>
-                        ${list[i].trackingCode == null?`<button onclick="vanDon()" title="Tạo vận đơn" class="btn btn-outline-dark btn-sm"><i class="fa fa-truck"></i></button>`:''}
+                        ${list[i].trackingCode == null?`<span title="Chưa có vận đơn; tích hợp vận chuyển cần triển khai riêng" class="text-muted small">Chưa có vận đơn</span>`:''}
                     </td>
                 </tr>`
     }
@@ -75,7 +75,7 @@ async function filterInvoice(page) {
             <td colspan="7">
                 <div class="empty-table-message">
                     <p>Không có đơn hàng nào được tìm thấy.</p>
-                    <a href="#" class="btn btn-primary">Tạo đơn hàng</a>
+                    <a href="create" class="btn btn-primary">Tạo giao dịch</a>
                 </div>
             </td>
         </tr>`

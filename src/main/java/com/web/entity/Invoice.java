@@ -66,6 +66,12 @@ public class Invoice {
 
     private Double discount = 0D;
 
+    @Column(precision=19,scale=0)
+    private java.math.BigDecimal cashReceived;
+
+    @Column(precision=19,scale=0)
+    private java.math.BigDecimal cashChange;
+
     private String voucherCode;
 
     private Double shipCost;

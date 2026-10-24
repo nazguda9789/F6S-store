@@ -56,12 +56,14 @@ public class InvoiceEmployeeController {
             model.addAttribute("invoice", result.getData());
             List<InvoiceDetail> invoiceDetails = invoiceService.getDetailByInvoiceId(result.getData().getId());
             model.addAttribute("invoiceDetails", invoiceDetails);
+            model.addAttribute("invoiceHistory", invoiceService.getHistoryById(id).getHistoryInvoiceStatuses());
         }
         else{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Blog not found");
         }
         model.addAttribute("isInvoicePage", true);
-        return "employee/invoice-detail";
+        model.addAttribute("employeeView",true);
+        return "admin/invoice-detail";
     }
 
     @GetMapping("/create")
@@ -71,6 +73,7 @@ public class InvoiceEmployeeController {
         model.addAttribute("vouchers", voucherService.available());
         model.addAttribute("orderDrafts", orderDraftRepository.findAll());
 
-        return "employee/create-invoice";
+        model.addAttribute("employeeView",true);
+        return "admin/create-invoice";
     }
 }

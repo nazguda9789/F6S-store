@@ -17,6 +17,10 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("update Product p set p.sold = coalesce(p.sold,0) + ?2 where p.id = ?1")
+    int incrementSold(Long id, Integer quantity);
+
 
     @Query("select pc.id from ProductCategory pc where pc.category.id = ?1")
     Long checkProductExistByCategory(Long categoryId);
