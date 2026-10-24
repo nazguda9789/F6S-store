@@ -2,7 +2,7 @@
 -- FRESH INSTALL ONLY. Use a new database; stop on any error. Never use mysql --force.
 -- No OTP, service keys or VNPAY payment receipts are fabricated.
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE f6s_shop_clean_demo;
+USE f6s_shop;
 -- Optional: five staff/customers, vouchers, carts and synthetic invoices. Never use real-store reports.
 -- Accounts are inactive, with no shared password. No banking/payment proof is inserted.
 START TRANSACTION;

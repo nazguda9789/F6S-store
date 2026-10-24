@@ -5,7 +5,7 @@ Thay cho file all-in-one có stored procedure. Bộ này chỉ dùng SQL thườ
 ## Khi vừa gặp lỗi #2014
 
 1. Dừng import file cũ. Làm mới phpMyAdmin hoặc đăng xuất/đăng nhập lại để dùng kết nối mới. Nếu lỗi còn ngay trên kết nối mới, khởi động lại **Apache** trong XAMPP.
-2. Không nhập đè, không xóa database `f6s_shop_demo` đã nhập dở nếu chưa backup. Bộ mới tạo database khác: **`f6s_shop_clean_demo`**.
+2. Không nhập đè, không xóa database `f6s_shop_demo` đã nhập dở nếu chưa backup. Bộ mới dùng tên database: **`f6s_shop`**.
 3. Giải nén ZIP mới. Import từng file theo thứ tự, chờ file trước thành công rồi mới chọn file sau. Không bật tiếp tục bỏ qua lỗi.
 
 | Thứ tự | File | Nội dung |
@@ -16,14 +16,14 @@ Thay cho file all-in-one có stored procedure. Bộ này chỉ dùng SQL thườ
 
 **Chỉ 01 + 02 là đủ để chạy web với catalog.** File 03 không bắt buộc, các hóa đơn giả của nó sẽ ảnh hưởng báo cáo trong database demo. Không cần nhập bất kỳ SQL cũ hoặc file maintenance nào.
 
-Nếu database `f6s_shop_clean_demo` đã tồn tại, dừng lại. Chọn tên database mới và sửa tên ở CREATE DATABASE/USE trong **cả ba file**; không thêm IF NOT EXISTS để nhập chồng lên dữ liệu. Các file seed chỉ dành cho database trống vừa tạo; không chạy lại một bước đã thành công và không dùng `--force`.
+Nếu database `f6s_shop` đã tồn tại, dừng lại. Chọn tên database mới và sửa tên ở CREATE DATABASE/USE trong **cả ba file**; không thêm IF NOT EXISTS để nhập chồng lên dữ liệu. Các file seed chỉ dành cho database trống vừa tạo; không chạy lại một bước đã thành công và không dùng `--force`.
 
 ## Chạy web
 
 JDK 17 + MySQL/MariaDB phù hợp + Maven Wrapper. Trong IntelliJ Run Configuration → Environment variables:
 
 ```properties
-SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/f6s_shop_clean_demo
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/f6s_shop
 SPRING_DATASOURCE_USERNAME=root
 SPRING_DATASOURCE_PASSWORD=
 ```

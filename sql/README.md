@@ -2,7 +2,7 @@
 
 ## Cài mới / sửa lỗi import phpMyAdmin
 
-Chỉ dùng [install/](install/README.md): `01_schema.sql` → `02_catalog_admin.sql` → tùy chọn `03_demo_optional.sql`. Không CALL/routine, không DROP database. Tạo database mới `f6s_shop_clean_demo`; không đụng database nhập dở `f6s_shop_demo`.
+Chỉ dùng [install/](install/README.md): `01_schema.sql` → `02_catalog_admin.sql` → tùy chọn `03_demo_optional.sql`. Không CALL/routine, không DROP database. Tạo database mới `f6s_shop`; không đụng database nhập dở `f6s_shop_demo`.
 
 ## Database thật cần giữ
 

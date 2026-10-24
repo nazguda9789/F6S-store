@@ -2,7 +2,7 @@
 -- FRESH INSTALL ONLY. Use a new database; stop on any error. Never use mysql --force.
 -- No OTP, service keys or VNPAY payment receipts are fabricated.
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE f6s_shop_clean_demo;
+USE f6s_shop;
 -- Run once AFTER 01. Admin: admin@gmail.com / 123123; change before public use.
 START TRANSACTION;
 INSERT INTO catalog_release(release_key) VALUES('sports-20261024');

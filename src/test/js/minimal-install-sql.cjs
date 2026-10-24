@@ -4,7 +4,7 @@ const container=process.env.F6S_MYSQL_CONTAINER||'f6s-mysql-review';
 const db='f6s_minimal_'+Date.now()+'_demo';
 const args=['exec','-i',container,'mysql','-uroot','-N'];
 const query=s=>execFileSync('docker',args.concat(db),{input:s,encoding:'utf8'}).trim();
-const files=['01_schema.sql','02_catalog_admin.sql','03_demo_optional.sql'].map(n=>fs.readFileSync('sql/install/'+n,'utf8').replaceAll('f6s_shop_clean_demo',db));
+const files=['01_schema.sql','02_catalog_admin.sql','03_demo_optional.sql'].map(n=>fs.readFileSync('sql/install/'+n,'utf8').replaceAll('f6s_shop',db));
 for(const sql of files){const clean=sql.replace(/--[^\n]*/g,'');assert.doesNotMatch(clean,/(?:^|;)\s*(CALL|DELIMITER|CREATE PROCEDURE|PREPARE|EXECUTE|SELECT\b|SIGNAL|DROP DATABASE|DROP TABLE|DELETE FROM)/i);assert.doesNotMatch(clean,/FOREIGN_KEY_CHECKS\s*=\s*(ON|OFF)/i);}
 const run=s=>execFileSync('docker',args,{input:s,encoding:'utf8'}).trim();
 assert.equal(run(files[0]),'');assert.equal(Number(query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE()")),38);

@@ -1,9 +1,9 @@
 -- F6S Sports / 01 CREATE NEW DATABASE AND TABLES
--- Creates f6s_shop_clean_demo. Does NOT drop or overwrite your current f6s_shop/f6s_shop_demo.
+-- Creates f6s_shop. Does NOT drop or overwrite an existing database.
 -- If it exists, STOP: use a new name in ALL THREE files, not IF NOT EXISTS or --force.
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE DATABASE f6s_shop_clean_demo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE f6s_shop_clean_demo;
+CREATE DATABASE f6s_shop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE f6s_shop;
 SET FOREIGN_KEY_CHECKS = 0;
 CREATE TABLE `banner` (
   `id` bigint NOT NULL AUTO_INCREMENT,

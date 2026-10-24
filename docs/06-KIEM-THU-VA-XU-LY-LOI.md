@@ -4,7 +4,7 @@
 
 MySQL thử nghiệm chấp nhận `SET FOREIGN_KEY_CHECKS=ON`. Cảnh báo parser phpMyAdmin về ON và lỗi driver `#2014 Commands out of sync` không phải cùng một bằng chứng lỗi cú pháp. File gộp cũ có CALL trả result set; kết nối chưa xử lý hết có thể lỗi ở câu lệnh sau.
 
-Bộ mới: [sql/install](../sql/install/README.md), không CALL/routine, chỉ FK_CHECKS=0/1. Làm mới kết nối phpMyAdmin; nếu còn lỗi trên kết nối mới, restart Apache trong XAMPP. Dùng database mới `f6s_shop_clean_demo`, import 01 rồi 02; 03 tùy chọn. Không xóa database cũ có dữ liệu hoặc tiếp tục bỏ qua lỗi import.
+Bộ mới: [sql/install](../sql/install/README.md), không CALL/routine, chỉ FK_CHECKS=0/1. Làm mới kết nối phpMyAdmin; nếu còn lỗi trên kết nối mới, restart Apache trong XAMPP. Dùng database mới `f6s_shop`, import 01 rồi 02; 03 tùy chọn. Không xóa database cũ có dữ liệu hoặc tiếp tục bỏ qua lỗi import.
 
 ## Lỗi chạy thường gặp
 

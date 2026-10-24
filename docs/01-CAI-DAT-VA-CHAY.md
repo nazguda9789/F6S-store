@@ -13,14 +13,14 @@ XAMPP chỉ dùng cho MySQL/phpMyAdmin. Web này chạy bằng Java trên cổng
 
 Đọc [hướng dẫn phpMyAdmin](../sql/install/README.md). Import `01_schema.sql` rồi `02_catalog_admin.sql`; chỉ thêm `03_demo_optional.sql` nếu muốn dữ liệu nghiệp vụ mẫu. Không import all-in-one hoặc SQL maintenance cùng bộ cài mới.
 
-Database mặc định của bộ này là `f6s_shop_clean_demo`, khác database nhập dở từ file cũ. Nếu tên này đã tồn tại, dừng và chọn tên mới trong cả ba file; không bỏ qua lỗi CREATE DATABASE để tiếp tục.
+Database mặc định của bộ này là `f6s_shop`, chỉ dành cho cài mới, không nhập chồng lên database cũ. Nếu tên này đã tồn tại, dừng và chọn tên mới trong cả ba file; không bỏ qua lỗi CREATE DATABASE để tiếp tục.
 
 ## Datasource và khởi động
 
 IntelliJ → Run Configuration → Environment variables:
 
 ```properties
-SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/f6s_shop_clean_demo
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/f6s_shop
 SPRING_DATASOURCE_USERNAME=root
 SPRING_DATASOURCE_PASSWORD=
 ```
@@ -30,7 +30,7 @@ Mật khẩu/cổng MySQL phải đúng máy. Không thay tài khoản MySQL b�
 PowerShell:
 
 ```powershell
-$env:SPRING_DATASOURCE_URL='jdbc:mysql://localhost:3306/f6s_shop_clean_demo'
+$env:SPRING_DATASOURCE_URL='jdbc:mysql://localhost:3306/f6s_shop'
 $env:SPRING_DATASOURCE_USERNAME='root'
 $env:SPRING_DATASOURCE_PASSWORD=''
 .\mvnw.cmd spring-boot:run

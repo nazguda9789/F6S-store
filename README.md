@@ -14,7 +14,7 @@ Cần **JDK 17**, MySQL/XAMPP và Internet để tải Maven dependency lần đ
 PowerShell, tại thư mục project:
 
 ```powershell
-$env:SPRING_DATASOURCE_URL='jdbc:mysql://localhost:3306/f6s_shop_clean_demo'
+$env:SPRING_DATASOURCE_URL='jdbc:mysql://localhost:3306/f6s_shop'
 $env:SPRING_DATASOURCE_USERNAME='root'
 $env:SPRING_DATASOURCE_PASSWORD=''
 .\mvnw.cmd spring-boot:run
@@ -24,7 +24,7 @@ Thay cổng/mật khẩu MySQL theo máy. IntelliJ: đặt các biến trên tro
 
 Mở **http://localhost:8080**. Admin local: **admin@gmail.com / 123123**, phải đổi trước khi công khai.
 
-**Bản SQL tạo database mới `f6s_shop_clean_demo`, không xóa `f6s_shop` hoặc `f6s_shop_demo` đã nhập dở. Nếu tên database mới đã tồn tại, dừng lại, không tiếp tục bỏ qua lỗi.** Cách xử lý và thứ tự chi tiết: [sql/install/README.md](sql/install/README.md).
+**Bản SQL tạo database mới `f6s_shop`, không xóa `f6s_shop` hoặc `f6s_shop_demo` đã nhập dở. Nếu tên database mới đã tồn tại, dừng lại, không tiếp tục bỏ qua lỗi.** Cách xử lý và thứ tự chi tiết: [sql/install/README.md](sql/install/README.md).
 
 ## Nếu đang gặp #2014 khi import
 
