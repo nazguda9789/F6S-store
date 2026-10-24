@@ -1,5 +1,11 @@
 # F6S Sports — catalog mới, không dùng lại bộ giày cũ
 
+## Bản gộp một file để tải nhanh
+
+[F6S_ALL_IN_ONE_20261024.sql](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S_ALL_IN_ONE_20261024.sql) → Download raw. Đã gộp cấu trúc hiện hành, 25 giày/250 biến thể mới, thuộc tính, nội dung và bộ demo 5 nhân viên/5 khách cùng nghiệp vụ mẫu. **Chỉ import file này**, không nhập tiếp các file nâng cấp, seed cũ hay khôi phục. Không gộp SQL cũ/rollback vì chúng có mục đích đối lập với cài mới.
+
+Tạo database riêng `f6s_shop_demo`; nếu đã tồn tại phải dừng import, không tiếp tục bỏ qua lỗi. Datasource cho bản demo: `jdbc:mysql://localhost:3306/f6s_shop_demo`. Không dùng bản gộp cài mới để cập nhật database thật đang giữ OTP/VNPAY/tài khoản; trường hợp đó dùng cách A bên dưới. File không chứa secret thật hoặc OTP/biên lai VNPAY giả.
+
 ## Phạm vi
 
 Thay dữ liệu và nội dung catalog theo cấu trúc quản lý giày đã quan sát từ Bee; giữ thương hiệu F6S, mã OTP và luồng VNPAY hiện tại. Không có source/model nội bộ của Bee để khẳng định cấu trúc database giống 100%. Các nghiệp vụ đã có về POS/thu tiền mặt/SKU/voucher/ảnh/tài khoản vẫn được giữ; phần đổi trả, hoàn tiền, kho và báo cáo cần tiếp tục nghiệm thu riêng.

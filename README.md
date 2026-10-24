@@ -2,6 +2,8 @@
 
 ## Phiên bản hiện hành: F6S Sports
 
+**Muốn cài demo bằng đúng một file:** [F6S_ALL_IN_ONE_20261024.sql](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S_ALL_IN_ONE_20261024.sql) → **Download raw** → import duy nhất file này. Tạo database mới `f6s_shop_demo`, có schema/catalog và dữ liệu nghiệp vụ mẫu; không import thêm SQL cũ hoặc file rollback. Nếu database đã tồn tại phải dừng, không bỏ qua lỗi. Không dùng bản cài mới này để cập nhật database thật đang dùng.
+
 **Catalog mới hoàn toàn:** 25 mẫu giày, 250 biến thể, 5 nhóm thể thao; hãng/đế/chất liệu/màu/size, banner và bài hướng dẫn mới. Không nạp lại bộ giày nguồn. Ảnh và hàng hóa là mẫu trình diễn, cần thay dữ liệu thật trước khi kinh doanh.
 
 - [Hướng dẫn cài/chuyển catalog và bảo toàn OTP/VNPAY](docs/21-CATALOG-THE-THAO-MOI.md).
