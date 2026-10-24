@@ -1,5 +1,15 @@
 # Cài mới bằng phpMyAdmin — bản tối thiểu
 
+## XAMPP / MariaDB và trường hợp chỉ có bảng banner
+
+Bản cập nhật tạo toàn bộ bảng trước, sau đó mới thêm khóa ngoại; không phụ thuộc việc tắt kiểm tra khóa ngoại giữa các câu lệnh import.
+
+Đã kiểm tra cài mới và phục hồi trạng thái chỉ có banner trên MariaDB 10.4.34 và MySQL 8.4.11, giữ nguyên bản ghi banner có sẵn. Chưa chạy trực tiếp trên đúng XAMPP/MariaDB 10.4.32 của bạn.
+
+Nếu `SHOW TABLES` trong `f6s_shop` chỉ có **banner** (lỗi tạo blog trước đây): sao lưu trước, import **01_resume_banner_only.sql** trong ZIP mới **thay cho 01_schema.sql**. File này giữ nguyên bảng và dữ liệu banner, tạo các bảng còn thiếu. Sau khi thành công mới import 02 và tùy chọn 03.
+
+Nếu đã có bất kỳ bảng nào khác ngoài banner, không chạy file phục hồi này. Không chạy lại file 01 sau phục hồi, không bỏ qua lỗi và không xóa database cũ. Với cài mới hoàn toàn, dùng 01_schema.sql như bên dưới.
+
 Thay cho file all-in-one có stored procedure. Bộ này chỉ dùng SQL thường, không `CALL`, `DELIMITER`, `PREPARE` hoặc SELECT trả trạng thái; dùng `FOREIGN_KEY_CHECKS = 0/1`.
 
 ## Khi vừa gặp lỗi #2014

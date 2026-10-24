@@ -4,7 +4,7 @@
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE f6s_shop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE f6s_shop;
-SET FOREIGN_KEY_CHECKS = 0;
+SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE `banner` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `active` bit(1) DEFAULT NULL,
@@ -34,8 +34,7 @@ CREATE TABLE `blog` (
   `user_id` bigint DEFAULT NULL,
   `archived` bit(1) NOT NULL DEFAULT b'0',
   PRIMARY KEY (`id`),
-  KEY `FKkr2fy24puc3x3sdnla4r1iok1` (`user_id`),
-  CONSTRAINT `FKkr2fy24puc3x3sdnla4r1iok1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  KEY `FKkr2fy24puc3x3sdnla4r1iok1` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `carts` (
@@ -47,8 +46,7 @@ CREATE TABLE `carts` (
   `product_detail_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK5qqlwln52o0l6o17r3awg39ap` (`user_id`,`product_detail_id`),
-  KEY `FKmdnywg3iwer4982fw0ftydg2d` (`product_detail_id`),
-  CONSTRAINT `FKmdnywg3iwer4982fw0ftydg2d` FOREIGN KEY (`product_detail_id`) REFERENCES `product_detail` (`id`)
+  KEY `FKmdnywg3iwer4982fw0ftydg2d` (`product_detail_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `catalog_variant_merge` (
@@ -76,9 +74,7 @@ CREATE TABLE `category` (
   `meta_description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKdi4x1yrvivfjqs0vsh9ux99dv` (`parent_category_id`),
-  KEY `FKr1xsxlrwmvkn7l7tvhhhbfk6n` (`category_parent`),
-  CONSTRAINT `FKdi4x1yrvivfjqs0vsh9ux99dv` FOREIGN KEY (`parent_category_id`) REFERENCES `parent_category` (`id`),
-  CONSTRAINT `FKr1xsxlrwmvkn7l7tvhhhbfk6n` FOREIGN KEY (`category_parent`) REFERENCES `category` (`id`)
+  KEY `FKr1xsxlrwmvkn7l7tvhhhbfk6n` (`category_parent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `chatting` (
@@ -88,8 +84,7 @@ CREATE TABLE `chatting` (
   `type` enum('STAFF','USER') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK9tb33e2hjail6s43sc004tg8c` (`user_id`),
-  CONSTRAINT `FK9tb33e2hjail6s43sc004tg8c` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  KEY `FK9tb33e2hjail6s43sc004tg8c` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `cloud_key` (
@@ -134,9 +129,7 @@ CREATE TABLE `discount_product` (
   `user_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKi9j126a6ufxbtntwm4xkr7xlh` (`product_id`),
-  KEY `FKmvy3dc5qp9693j2u76qltlphe` (`user_id`),
-  CONSTRAINT `FKi9j126a6ufxbtntwm4xkr7xlh` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`),
-  CONSTRAINT `FKmvy3dc5qp9693j2u76qltlphe` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  KEY `FKmvy3dc5qp9693j2u76qltlphe` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `history_invoice_status` (
@@ -150,8 +143,7 @@ CREATE TABLE `history_invoice_status` (
   `full_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK7apv8t606rwsilnfpr386llqk` (`invoice_id`),
-  CONSTRAINT `FK7apv8t606rwsilnfpr386llqk` FOREIGN KEY (`invoice_id`) REFERENCES `invoice` (`id`)
+  KEY `FK7apv8t606rwsilnfpr386llqk` (`invoice_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `history_pay` (
@@ -237,8 +229,7 @@ CREATE TABLE `order_detail_draft` (
   `order_draft_id` bigint DEFAULT NULL,
   `weight` float DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK1koigceex111hcfsfyecx3jd6` (`order_draft_id`),
-  CONSTRAINT `FK1koigceex111hcfsfyecx3jd6` FOREIGN KEY (`order_draft_id`) REFERENCES `order_draft` (`id`)
+  KEY `FK1koigceex111hcfsfyecx3jd6` (`order_draft_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `order_draft` (
@@ -261,8 +252,7 @@ CREATE TABLE `order_draft` (
   `created_by_id` bigint DEFAULT NULL,
   `customer_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FKgj3np37929dj2hbx42ysise47` (`created_by_id`),
-  CONSTRAINT `FKgj3np37929dj2hbx42ysise47` FOREIGN KEY (`created_by_id`) REFERENCES `users` (`id`)
+  KEY `FKgj3np37929dj2hbx42ysise47` (`created_by_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `otp_codes` (
@@ -320,10 +310,7 @@ CREATE TABLE `product` (
   UNIQUE KEY `uk_f6s_product_code` (`code`),
   KEY `fk_f6s_product_brand` (`brand_id`),
   KEY `fk_f6s_product_sole` (`sole_id`),
-  KEY `fk_f6s_product_material` (`material_id`),
-  CONSTRAINT `fk_f6s_product_brand` FOREIGN KEY (`brand_id`) REFERENCES `shoe_attribute` (`id`),
-  CONSTRAINT `fk_f6s_product_material` FOREIGN KEY (`material_id`) REFERENCES `shoe_attribute` (`id`),
-  CONSTRAINT `fk_f6s_product_sole` FOREIGN KEY (`sole_id`) REFERENCES `shoe_attribute` (`id`)
+  KEY `fk_f6s_product_material` (`material_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `product_category` (
@@ -332,9 +319,7 @@ CREATE TABLE `product_category` (
   `product_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKkud35ls1d40wpjb5htpp14q4e` (`category_id`),
-  KEY `FK2k3smhbruedlcrvu6clued06x` (`product_id`),
-  CONSTRAINT `FK2k3smhbruedlcrvu6clued06x` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`),
-  CONSTRAINT `FKkud35ls1d40wpjb5htpp14q4e` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`)
+  KEY `FK2k3smhbruedlcrvu6clued06x` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `product_color_image` (
@@ -361,9 +346,7 @@ CREATE TABLE `product_detail` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_f6s_variant_sku` (`sku`),
   KEY `FKt0bufofieb9x0kkqksxne62x` (`color`),
-  KEY `FKaaygyla1v780j4xvyj225h0ar` (`size`),
-  CONSTRAINT `FKaaygyla1v780j4xvyj225h0ar` FOREIGN KEY (`size`) REFERENCES `size` (`id`),
-  CONSTRAINT `FKt0bufofieb9x0kkqksxne62x` FOREIGN KEY (`color`) REFERENCES `color` (`id`)
+  KEY `FKaaygyla1v780j4xvyj225h0ar` (`size`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `product_image` (
@@ -371,8 +354,7 @@ CREATE TABLE `product_image` (
   `link_image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `product_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK6oo0cvcdtb6qmwsga468uuukk` (`product_id`),
-  CONSTRAINT `FK6oo0cvcdtb6qmwsga468uuukk` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`)
+  KEY `FK6oo0cvcdtb6qmwsga468uuukk` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `product_view_history` (
@@ -477,7 +459,26 @@ CREATE TABLE IF NOT EXISTS demo_dataset_install (
   dataset_key VARCHAR(80) PRIMARY KEY,
   installed_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   description VARCHAR(500) NOT NULL,
-  release_key VARCHAR(64) NOT NULL,
-  CONSTRAINT fk_demo_release FOREIGN KEY(release_key) REFERENCES catalog_release(release_key)
+  release_key VARCHAR(64) NOT NULL
 ) ENGINE=InnoDB;
+-- All referenced tables now exist.
+ALTER TABLE `blog` ADD CONSTRAINT `FKkr2fy24puc3x3sdnla4r1iok1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+ALTER TABLE `carts` ADD CONSTRAINT `FKmdnywg3iwer4982fw0ftydg2d` FOREIGN KEY (`product_detail_id`) REFERENCES `product_detail` (`id`);
+ALTER TABLE `category` ADD CONSTRAINT `FKdi4x1yrvivfjqs0vsh9ux99dv` FOREIGN KEY (`parent_category_id`) REFERENCES `parent_category` (`id`);
+ALTER TABLE `category` ADD CONSTRAINT `FKr1xsxlrwmvkn7l7tvhhhbfk6n` FOREIGN KEY (`category_parent`) REFERENCES `category` (`id`);
+ALTER TABLE `chatting` ADD CONSTRAINT `FK9tb33e2hjail6s43sc004tg8c` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+ALTER TABLE `discount_product` ADD CONSTRAINT `FKi9j126a6ufxbtntwm4xkr7xlh` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`);
+ALTER TABLE `discount_product` ADD CONSTRAINT `FKmvy3dc5qp9693j2u76qltlphe` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+ALTER TABLE `history_invoice_status` ADD CONSTRAINT `FK7apv8t606rwsilnfpr386llqk` FOREIGN KEY (`invoice_id`) REFERENCES `invoice` (`id`);
+ALTER TABLE `order_detail_draft` ADD CONSTRAINT `FK1koigceex111hcfsfyecx3jd6` FOREIGN KEY (`order_draft_id`) REFERENCES `order_draft` (`id`);
+ALTER TABLE `order_draft` ADD CONSTRAINT `FKgj3np37929dj2hbx42ysise47` FOREIGN KEY (`created_by_id`) REFERENCES `users` (`id`);
+ALTER TABLE `product` ADD CONSTRAINT `fk_f6s_product_brand` FOREIGN KEY (`brand_id`) REFERENCES `shoe_attribute` (`id`);
+ALTER TABLE `product` ADD CONSTRAINT `fk_f6s_product_material` FOREIGN KEY (`material_id`) REFERENCES `shoe_attribute` (`id`);
+ALTER TABLE `product` ADD CONSTRAINT `fk_f6s_product_sole` FOREIGN KEY (`sole_id`) REFERENCES `shoe_attribute` (`id`);
+ALTER TABLE `product_category` ADD CONSTRAINT `FK2k3smhbruedlcrvu6clued06x` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`);
+ALTER TABLE `product_category` ADD CONSTRAINT `FKkud35ls1d40wpjb5htpp14q4e` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`);
+ALTER TABLE `product_detail` ADD CONSTRAINT `FKaaygyla1v780j4xvyj225h0ar` FOREIGN KEY (`size`) REFERENCES `size` (`id`);
+ALTER TABLE `product_detail` ADD CONSTRAINT `FKt0bufofieb9x0kkqksxne62x` FOREIGN KEY (`color`) REFERENCES `color` (`id`);
+ALTER TABLE `product_image` ADD CONSTRAINT `FK6oo0cvcdtb6qmwsga468uuukk` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`);
+ALTER TABLE `demo_dataset_install` ADD CONSTRAINT fk_demo_release FOREIGN KEY(release_key) REFERENCES catalog_release(release_key);
 SET FOREIGN_KEY_CHECKS = 1;
