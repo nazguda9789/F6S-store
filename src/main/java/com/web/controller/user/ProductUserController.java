@@ -63,7 +63,7 @@ public class ProductUserController {
     @GetMapping({"/product/{slug}"})
     public String productView(@PathVariable String slug, Model model, HttpServletRequest request, HttpSession session){
         Product product = productService.findBySlug(slug);
-        if(product == null){
+        if(product == null || !Boolean.TRUE.equals(product.getActive())){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
         }
         ActiveDiscountResponse discountResponse = discountProductService.getActiveDiscount(product.getId(), product.getPrice());

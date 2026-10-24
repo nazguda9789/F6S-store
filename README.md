@@ -1,5 +1,19 @@
 # F6S — Website quản lý bán giày thể thao
 
+## Phiên bản hiện hành: F6S Sports
+
+**Catalog mới hoàn toàn:** 25 mẫu giày, 250 biến thể, 5 nhóm thể thao; hãng/đế/chất liệu/màu/size, banner và bài hướng dẫn mới. Không nạp lại bộ giày nguồn. Ảnh và hàng hóa là mẫu trình diễn, cần thay dữ liệu thật trước khi kinh doanh.
+
+- [Hướng dẫn cài/chuyển catalog và bảo toàn OTP/VNPAY](docs/21-CATALOG-THE-THAO-MOI.md).
+- [SQL Sports hiện hành](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SPORTS-CATALOG-20261024.zip) — Download raw.
+- [Demo Sports đủ các màn](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SPORTS-DEMO-20261024.zip) — database riêng, có 5 nhân viên/5 khách và nghiệp vụ mẫu.
+
+**Máy đang dùng:** dừng web, backup, nâng schema nếu chưa ở bản POS, rồi import `sql/thay_catalog_the_thao_20261024.sql`; giữ nguyên datasource/OTP/VNPAY/secret. Giày cũ bị ngừng bán, lịch sử được giữ; giỏ cũ được lưu dự phòng rồi dọn. Đọc kỹ hướng dẫn trước khi thay toàn bộ catalog.
+
+**Cài mới:** `f6s_shop.sql` hiện tại tạo database mới, không DROP. Nếu database đã tồn tại phải dừng import, không bỏ qua lỗi. JDK 17 + MySQL 8 + Maven; chạy `./mvnw spring-boot:run`, mở `http://localhost:8080`. Không dùng các ZIP cũ bên dưới cho bản Sports.
+
+## Lịch sử các đợt trước (không phải hướng dẫn cài bản Sports)
+
 **Cập nhật POS 24/10 — cần nâng SQL trước code:** nhập/quét SKU, gợi ý voucher từ server, tiền khách đưa/tiền thừa, lịch sử và in hóa đơn. Máy đã nâng catalog chạy `sql/cap_nhat_thanh_toan_tai_quay_20261024.sql`; bản `nang_cap_f6s.sql` mới đã gộp. [Luồng mới và hướng dẫn](docs/20-LUONG-POS-THEO-BEE.md). [Tải SQL POS hiện hành](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SQL-POS-20261024.zip) → Download raw. OTP/VNPAY và secret giữ nguyên.
 
 [Thêm nhanh thuộc tính theo Bee, giữ nguyên OTP/VNPAY](docs/19-THUOC-TINH-BEE-GIU-OTP-VNPAY.md): thêm danh mục/hãng/đế/chất liệu/màu/size ngay trong form giày, không mất dữ liệu đang nhập. Riêng tính năng này không cần SQL; bản POS hiện hành cần migration ở trên.

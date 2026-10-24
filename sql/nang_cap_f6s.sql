@@ -1,4 +1,7 @@
 -- F6S: NANG CAP database dang dung, KHONG DROP / TRUNCATE / reset mat khau.
+-- Blog archive metadata for the sports catalog; does not retire any content by itself.
+SET @sports_ddl=IF((SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='blog' AND column_name='archived')=0,'ALTER TABLE blog ADD COLUMN archived BIT NOT NULL DEFAULT 0','SELECT 1');
+PREPARE sports_stmt FROM @sports_ddl; EXECUTE sports_stmt; DEALLOCATE PREPARE sports_stmt;
 -- Sao luu va chon dung schema truoc khi chay. Co the chay lai.
 -- Nang cap OTP/thuoc tinh va chuan hoa ma SKU (luu ma cu vao legacy_sku).
 -- DUNG WEB truoc khi chay. Khong tao san pham mau. Co buoc gop 245 -> 244 da duyet, co dieu kien/audit; khong xoa dong lich su.

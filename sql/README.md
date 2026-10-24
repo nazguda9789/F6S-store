@@ -1,5 +1,7 @@
 # Chọn file SQL F6S
 
+**Bản hiện hành là Sports**, xem [tài liệu 21](../docs/21-CATALOG-THE-THAO-MOI.md). Cài mới: `f6s_shop.sql` sạch, không DROP/không giày cũ. Đang dùng: backup + `thay_catalog_the_thao_20261024.sql` sau khi đã nâng schema POS. Seed `bo_sung_du_lieu.sql` cũ bị chặn; không dùng ZIP cũ bên dưới cho phiên bản này. Các phần sau là lịch sử trước Sports.
+
 **POS mới nhất:** mã nguồn có `cash_received`/`cash_change`; chạy `cap_nhat_thanh_toan_tai_quay_20261024.sql` hoặc bản nâng cấp tổng hợp mới trước khi chạy web. [Gói SQL POS](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SQL-POS-20261024.zip) → Download raw. Không reset OTP/VNPAY. [Luồng và giới hạn](../docs/20-LUONG-POS-THEO-BEE.md).
 
 **Mới nhất 24/10:** bắt buộc chạy bản `nang_cap_f6s.sql` hiện tại trước code mới để bổ sung metadata thuộc tính. Bộ mẫu riêng `du_lieu_mau_catalog_20261024.sql` thêm 5 giày/25 biến thể và 5 mẫu mỗi nhóm thuộc tính; không tự thêm mẫu khi chỉ nâng cấu trúc. Cài mới `f6s_shop.sql` đã có 55 giày gồm 50 nguồn + 5 demo. [Hướng dẫn chọn file và cảnh báo đầy đủ](HUONG_DAN_GOI_SQL.md). Các số lượng 50 sản phẩm bên dưới mô tả bộ nguồn cũ.

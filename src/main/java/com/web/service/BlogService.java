@@ -25,7 +25,7 @@ public class BlogService {
     private BlogRepository blogRepository;
 
     public Page<Blog> findAllList(Pageable pageable){
-        Page<Blog> list = blogRepository.findAll(pageable);
+        Page<Blog> list = blogRepository.findByArchivedFalse(pageable);
         return list;
     }
 
@@ -62,7 +62,8 @@ public class BlogService {
     }
 
     public Page<Blog> allBlogByAdmin(BlogSearchAdmin blogSearchAdmin, Pageable pageable) {
-        BlogSpecification spec = new BlogSpecification(blogSearchAdmin.getFrom(), blogSearchAdmin.getTo(), blogSearchAdmin.getSearch());
+        org.springframework.data.jpa.domain.Specification<Blog> spec = new BlogSpecification(blogSearchAdmin.getFrom(), blogSearchAdmin.getTo(), blogSearchAdmin.getSearch());
+        if(blogSearchAdmin.getArchived()!=null)spec=spec.and((root,query,cb)->cb.equal(root.get("archived"),blogSearchAdmin.getArchived()));
         Page<Blog> page = blogRepository.findAll(spec, pageable);
         return page;
     }

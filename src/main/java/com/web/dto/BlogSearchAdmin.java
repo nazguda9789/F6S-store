@@ -12,4 +12,5 @@ public class BlogSearchAdmin {
     private Date from;
     private Date to;
     private String search;
+    private Boolean archived = false;
 }

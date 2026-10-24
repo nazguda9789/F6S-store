@@ -38,6 +38,7 @@
                 <label class="lb-form">Mô tả ngắn</label>
                 <textarea onkeyup="document.getElementById('metaDescription').value = this.value" th:field="*{description}" rows="3" class="form-control"></textarea>
                 <br><br>
+                <label class="my-2"><input type="checkbox" th:field="*{archived}"> Lưu trữ — không hiển thị trên cửa hàng</label>
                 <button id="btnadd" class="btn btn-success form-control action-btn" th:text="${param.id == null?'Thêm bài viết':'Cập nhật bài viết'}"></button>
               </div>
               <div class="col-lg-3 col-md-3 col-sm-12 col-12">

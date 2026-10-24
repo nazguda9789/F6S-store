@@ -17,12 +17,14 @@ public interface BlogRepository extends JpaRepository<Blog,Long>, JpaSpecificati
     @Query("update Blog b set b.numView = (b.numView + 1)")
     int updateView();
 
-    @Query(value = "select * from blog order by id desc limit 1 offset 0", nativeQuery = true)
+    @Query(value = "select * from blog where archived = false order by id desc limit 1 offset 0", nativeQuery = true)
     Blog lastBlog();
 
-    @Query(value = "select * from blog order by id desc limit 5 offset 1", nativeQuery = true)
+    @Query(value = "select * from blog where archived = false order by id desc limit 5 offset 1", nativeQuery = true)
     List<Blog> listBlogIndex();
 
-    @Query("select b from Blog b where b.slug = ?1")
+    @Query("select b from Blog b where b.slug = ?1 and b.archived = false")
     Optional<Blog> findBySlug(String slug);
+
+    org.springframework.data.domain.Page<Blog> findByArchivedFalse(org.springframework.data.domain.Pageable pageable);
 }

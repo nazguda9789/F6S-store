@@ -56,9 +56,10 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
     @Query("select p from ProductDetail p where p.active = true and p.productId in ?1 order by p.color.id desc")
     List<ProductDetail> findAllByProductId(List<Long> listIdProduct);
 
-    @Query("select cast(sum(p.stock) as int) from ProductDetail p")
+    @Query("select cast(coalesce(sum(d.stock),0) as int) from ProductDetail d, Product p where d.productId=p.id and d.active=true and p.active=true")
     Integer totalProduct();
 
+    @Query(value="select d.* from product_detail d join product p on p.id=d.product_id where d.active=1 and p.active=1 and d.stock < ?1 order by d.stock,d.id limit 5",nativeQuery=true)
     List<ProductDetail> findTop5ByStockLessThanOrderByStockAsc(Integer stock);
     Optional<ProductDetail> findByProductIdAndColorIdAndSizeId(Long productId, Long colorId, Long sizeId);
 

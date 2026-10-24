@@ -10,6 +10,7 @@ async function filterBlog(page) {
         "from": from,
         "to": to,
         "search": document.getElementById("search").value == ''?null:document.getElementById("search").value,
+        "archived": document.getElementById('blogArchiveFilter')?.value === '' ? null : document.getElementById('blogArchiveFilter')?.value === 'true',
     }
     var size = document.getElementById("showEntries").value
     var sort = document.getElementById("sortby").value

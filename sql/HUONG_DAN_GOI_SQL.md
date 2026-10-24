@@ -1,5 +1,7 @@
 # Gói SQL F6S — 24/10/2026
 
+**Tài liệu này mô tả gói trước Sports.** Bản hiện hành đổi catalog và installer sạch, xem [hướng dẫn Sports](../docs/21-CATALOG-THE-THAO-MOI.md). Không dùng các ZIP POS/catalog cũ dưới đây để cài bản mới. File `f6s_shop.sql` mới không DROP, khác bản dump lịch sử được mô tả bên dưới.
+
 [Tải ZIP POS hiện hành](https://github.com/nazguda9789/F6S-store/blob/main/downloads/F6S-SQL-POS-20261024.zip) → Download raw. Đã nâng catalog: chạy riêng `cap_nhat_thanh_toan_tai_quay_20261024.sql` để thêm hai cột tiền mặt trước code POS. Nâng từ bản cũ hơn dùng `nang_cap_f6s.sql` mới đã gộp. Các ảnh minh họa mẫu nằm trong code mới, cần tải code cùng phiên bản.
 
 ## Máy đang có database: giữ dữ liệu

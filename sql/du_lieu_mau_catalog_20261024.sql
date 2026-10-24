@@ -1,4 +1,18 @@
 -- OPTIONAL DEMO ONLY. Back up and stop the web. Run after nang_cap_f6s.sql.
+-- Legacy sample set: refuse to reintroduce old shoes after the sports replacement.
+DELIMITER $$
+DROP PROCEDURE IF EXISTS check_legacy_catalog_seed$$
+CREATE PROCEDURE check_legacy_catalog_seed()
+BEGIN
+ IF EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='catalog_release') THEN
+  IF EXISTS(SELECT 1 FROM catalog_release WHERE release_key='sports-20261024' AND state='APPLIED') THEN
+   SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Old catalog seed disabled after sports release. Use the new sports installer.';
+  END IF;
+ END IF;
+END$$
+CALL check_legacy_catalog_seed()$$
+DROP PROCEDURE check_legacy_catalog_seed$$
+DELIMITER ;
 -- Adds demo records without deleting/reclassifying old products or resetting stock on rerun.
 -- Serial imports only; do not run concurrently. No real orders, payments, accounts or secrets.
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -50,6 +50,9 @@ public class Blog {
 
     private String seoTitle;
 
+    @Column(nullable=false)
+    private boolean archived = false;
+
     @ManyToOne
     private User user;
 
