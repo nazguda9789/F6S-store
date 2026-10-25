@@ -61,7 +61,7 @@ Vite proxy `/api` → backend 8081. Nếu đổi cổng API, đặt `API_PROXY_T
 2. Danh sách sản phẩm → Mã QR: xem/in tem từng biến thể. SKU không thay đổi khi sửa cùng màu–size.
 3. Khuyến mãi → tạo mã %/tiền, thời gian, số lượt, chọn sản phẩm áp dụng. Không tự áp toàn catalog.
 4. POS → tạo tối đa 5 hóa đơn tạm → quét SKU/QR hoặc chọn biến thể còn hàng → áp mã/tính lại → nhập tiền khách đưa → chốt → In hóa đơn. Không có giữ chỗ kho lúc mới thêm vào hóa đơn tạm.
-5. Đơn hàng → xác nhận COMPLETED chỉ sau giao/thu tiền, hoặc hủy PENDING để hoàn tồn. Không hỗ trợ tự hoàn tiền đơn đã hoàn thành.
+5. Đơn hàng → xác nhận → đóng gói → gắn vận đơn thủ công → giao → hoàn tất/thu tiền; hoặc hủy trước giao để hoàn tồn. Có hồ sơ trả toàn bộ và ghi chứng từ tiền hoàn, không tự chuyển tiền. Xem [demo và cấu hình tích hợp](DEMO-CHECKOUT-PAYMENTS.md).
 6. Tổng quan → lọc ngày/tháng, xem doanh thu thuần, tỷ lệ thành công, sản phẩm bán chạy.
 
 ## 5. Kiểm thử

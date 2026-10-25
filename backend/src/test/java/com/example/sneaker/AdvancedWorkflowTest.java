@@ -316,12 +316,13 @@ class AdvancedWorkflowTest {
     assertThatThrownBy(() -> management.status(id, "PACKING", "admin", "", "PENDING"))
         .isInstanceOf(ResponseStatusException.class);
     management.status(id, "PACKING", "admin", "Đóng gói", "CONFIRMED");
+    management.shipment(id, "Demo", "DEMO-123", "admin");
     management.status(id, "SHIPPING", "admin", "Bàn giao", "PACKING");
     assertThatThrownBy(() -> management.status(id, "CANCELLED"))
         .isInstanceOf(ResponseStatusException.class);
     management.status(id, "COMPLETED", "admin", "Đã giao", "SHIPPING");
     management.status(id, "COMPLETED");
-    assertThat(management.detail(id).timeline()).hasSize(5);
+    assertThat(management.detail(id).timeline()).hasSize(6);
     assertThat(variants.findById(v.id()).orElseThrow().getStock()).isEqualTo(9);
   }
 

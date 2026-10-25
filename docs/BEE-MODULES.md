@@ -23,7 +23,7 @@ Sao lưu `f6s_shop`, dừng backend trước khi thay schema.
 - Database Vue/SQL Server đã có dữ liệu: chỉ chạy `database/03_upgrade_bee_modules.sql`. Không chạy lại 01, không xóa database. Nếu cần thêm catalog mẫu, đọc cảnh báo đầu 02 trước khi chạy.
 - Khởi động backend sau nâng cấp; danh mục thuộc tính mặc định chỉ được tạo khi bảng thuộc tính hoàn toàn trống. Không tự tạo nhân viên/mật khẩu hoặc khách giả.
 
-Cấu trúc có 19 bảng ứng dụng; nhập catalog có thêm bảng kỹ thuật `catalog_import_history`. Script 03 không xóa sản phẩm, tồn kho, đơn hay lịch sử. DDL được xuất bằng SQLServerDialect; kiểm thử tự động dùng H2 MSSQL mode, chưa thay thế nghiệm thu trên SQL Server thật.
+Cấu trúc mới nhất có 24 bảng ứng dụng; nhập catalog có thêm bảng kỹ thuật `catalog_import_history`. Bản đã nâng Bee bằng 03 chạy thêm 04 cho tích hợp mới; xem [hướng dẫn demo](DEMO-CHECKOUT-PAYMENTS.md). Script nâng cấp không xóa sản phẩm, tồn kho, đơn hay lịch sử. DDL được xuất bằng SQLServerDialect; kiểm thử tự động dùng H2 MSSQL mode, chưa thay thế nghiệm thu trên SQL Server thật.
 
 ## Ảnh và giới hạn
 
@@ -31,4 +31,4 @@ Cấu trúc có 19 bảng ứng dụng; nhập catalog có thêm bảng kỹ thu
 
 25 tên model thật/250 biến thể trong catalog là dữ liệu demo: giá, phối màu, size và tồn không phải dữ liệu hãng. Ảnh hiện còn placeholder vì chưa có nguồn tải được kiểm chứng; hãy tải ảnh đúng model/màu và có quyền sử dụng qua thư viện ảnh. Không dùng ảnh minh họa sai sản phẩm để quảng cáo.
 
-Chưa có hoàn trả/hoàn tiền, tự gửi email mời nhân viên, tra cứu địa chỉ hành chính tự động, tài khoản khách tự phục vụ, đồng bộ vận chuyển hoặc tích hợp OTP/VNPAY vào backend Vue mới. Không thay đổi phần OTP/VNPAY của mã cũ. Không coi bản này là sẵn sàng vận hành thương mại trước kiểm thử SQL Server, bảo mật và thanh toán thực tế.
+Đã thêm tài khoản khách qua email OTP, hồ sơ/đơn của tôi, VNPAY kiểm tra IPN, giao hàng thủ công và hoàn toàn bộ tiền có chứng từ. Chưa tự gửi email mời nhân viên, tra địa chỉ hành chính, đồng bộ hãng vận chuyển hoặc tự gọi API chuyển tiền hoàn. Không thay đổi phần OTP/VNPAY của mã cũ. Không coi bản này là sẵn sàng vận hành thương mại trước kiểm thử SQL Server, bảo mật và thanh toán thực tế.

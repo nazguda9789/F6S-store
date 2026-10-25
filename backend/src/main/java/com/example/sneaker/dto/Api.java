@@ -103,7 +103,20 @@ public final class Api {
       @NotBlank @Size(min = 10, max = 500) String address,
       @Size(max = 500) String note,
       @NotEmpty @Size(max = 50) List<@Valid CheckoutLine> items,
-      @Size(max = 30) String promotionCode) {
+      @Size(max = 30) String promotionCode,
+      @Pattern(regexp = "COD|VNPAY") String paymentMethod) {
+    public Checkout(
+        java.util.UUID requestKey,
+        String customerName,
+        String email,
+        String phone,
+        String address,
+        String note,
+        List<CheckoutLine> items,
+        String promotionCode) {
+      this(requestKey, customerName, email, phone, address, note, items, promotionCode, null);
+    }
+
     public Checkout(
         java.util.UUID requestKey,
         String customerName,
@@ -130,7 +143,10 @@ public final class Api {
       BigDecimal cashReceived,
       BigDecimal cashChange,
       String customerName,
-      String phone) {}
+      String phone,
+      String paymentStatus,
+      BigDecimal shippingFee,
+      String paymentUrl) {}
 
   public record OrderLineView(
       String productName,

@@ -66,7 +66,8 @@ function logout() {
           </button>
           <div v-if="groups.accounts" class="nav-submenu">
             <RouterLink v-if="auth.isAdmin" to="/admin/staff">Nhân viên</RouterLink
-            ><RouterLink to="/admin/customers">Khách hàng</RouterLink>
+            ><RouterLink to="/admin/customers">Khách hàng</RouterLink
+            ><RouterLink v-if="auth.isAdmin" to="/admin/shop-accounts">Tài khoản online</RouterLink>
           </div>
         </div>
         <div v-if="auth.isAdmin" class="nav-group">

@@ -2,12 +2,14 @@
 
 **Dùng SSMS/SQL Server, không dùng phpMyAdmin hoặc `sql/install` (bản MySQL cũ).** Các file này dùng database `f6s_shop`. Không xóa database cũ để cài lại. Sao lưu trước và dừng backend khi import.
 
+[Tải bộ SQL demo mới nhất](../downloads/F6S-SQLSERVER-DEMO-20261025.zip), gồm schema 24 bảng, catalog và nâng cấp 03/04; các ZIP phát hành trước được giữ để đối chiếu, không phải schema mới nhất.
+
 ## Chọn đúng thứ tự
 
 ### Database chưa tồn tại
 
 1. Chạy `00_create_database.sql` trong SSMS để tạo `f6s_shop`.
-2. Chạy `01_schema.sql`: tạo 19 bảng ứng dụng, đúng Entity hiện tại.
+2. Chạy `01_schema.sql`: tạo 24 bảng ứng dụng, đúng Entity hiện tại.
 3. Chạy `02_real_products.sql`: thêm danh mục, sản phẩm và biến thể trực tiếp. Không cần chạy Java để có sản phẩm.
 
 ### Database đã tồn tại nhưng chưa có bảng
@@ -15,6 +17,8 @@
 Bỏ qua 00; chạy **01 → 02** trong hai lần Execute riêng. Chờ mỗi file thành công trước khi chạy file sau, dừng khi có lỗi.
 
 ### Backend đã tạo bảng
+
+Đã nâng module Bee: chạy thêm **04_upgrade_integrations.sql** để thêm email login/session, giao dịch VNPAY, hồ sơ hoàn tiền và các cột vận chuyển. Không có secret hoặc OTP mẫu trong SQL. Xem [hướng dẫn demo](../docs/DEMO-CHECKOUT-PAYMENTS.md).
 
 Bản cũ đã có dữ liệu: sao lưu, dừng backend, chạy **03_upgrade_bee_modules.sql** để thêm nhân viên, khách hàng/địa chỉ, thuộc tính, thư viện ảnh và lịch sử đơn. Không xóa database, không chạy lại 01. Xem [hướng dẫn module Bee](../docs/BEE-MODULES.md).
 

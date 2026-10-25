@@ -30,7 +30,7 @@ class SqlCatalogDataTest {
       assertThat(
               number(
                   sql, "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='dbo'"))
-          .isEqualTo(19);
+          .isEqualTo(24);
       sql.execute(table(seed, "Products", "seed_products"));
       sql.execute(table(seed, "Variants", "seed_variants"));
       sql.execute(insert(seed, "@Products").replace("@Products", "seed_products"));

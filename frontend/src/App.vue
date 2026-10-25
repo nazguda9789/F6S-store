@@ -28,7 +28,8 @@ watch(
       <nav aria-label="Điều hướng chính" class="desktop-nav">
         <RouterLink to="/">Trang chủ</RouterLink
         ><RouterLink to="/catalog">Tất cả sản phẩm</RouterLink
-        ><RouterLink to="/catalog?featured=true">F6S Select <ArrowIcon /></RouterLink>
+        ><RouterLink to="/catalog?featured=true">F6S Select <ArrowIcon /></RouterLink
+        ><RouterLink to="/account">Tài khoản</RouterLink>
       </nav>
       <div class="flex gap-3 items-center">
         <button class="cart-trigger" @click="cart.open = true">
@@ -45,7 +46,8 @@ watch(
     </div>
     <nav v-if="menu" class="mobile-nav shell" aria-label="Menu di động">
       <RouterLink to="/">Trang chủ</RouterLink><RouterLink to="/catalog">Sản phẩm</RouterLink
-      ><RouterLink to="/catalog?featured=true">F6S Select</RouterLink>
+      ><RouterLink to="/catalog?featured=true">F6S Select</RouterLink
+      ><RouterLink to="/account">Tài khoản</RouterLink>
     </nav>
   </header>
   <main id="main" tabindex="-1"><RouterView /></main>
@@ -67,7 +69,7 @@ watch(
         <h2 class="font-semibold mb-4">Thông tin bản demo</h2>
         <p class="text-sm text-white/60">
           Catalog có tên model thật; giá và tồn là demo. Ảnh sản phẩm đang chờ bổ sung. Thanh toán
-          COD; chưa tích hợp OTP/VNPAY của bản cũ.
+          COD tại cửa hàng demo. Email OTP và VNPAY chỉ bật khi có cấu hình dịch vụ hợp lệ.
         </p>
       </div>
     </div>

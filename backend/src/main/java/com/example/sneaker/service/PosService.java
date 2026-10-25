@@ -225,6 +225,7 @@ public class PosService {
     }
     order.setChannel("POS");
     order.setPaymentMethod("CASH");
+    order.setPaymentStatus("PAID");
     order.setStatus("COMPLETED");
     order.setCompletedAt(Instant.now());
     inventory.consume(order, quantities, locked);

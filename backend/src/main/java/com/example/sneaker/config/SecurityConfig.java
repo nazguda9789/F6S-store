@@ -41,10 +41,15 @@ public class SecurityConfig {
   }
 
   @Bean
-  SecurityFilterChain security(HttpSecurity http) throws Exception {
+  SecurityFilterChain security(
+      HttpSecurity http, com.example.sneaker.service.ShopAuthService customerAuth)
+      throws Exception {
     return http.cors(Customizer.withDefaults())
         .csrf(c -> c.disable())
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(
+            new CustomerBearerFilter(customerAuth),
+            org.springframework.security.web.authentication.www.BasicAuthenticationFilter.class)
         .authorizeHttpRequests(
             a ->
                 a.requestMatchers(HttpMethod.OPTIONS, "/**")
@@ -52,6 +57,16 @@ public class SecurityConfig {
                     .requestMatchers(
                         "/api/admin/session", "/api/admin/pos/**", "/api/admin/customers/**")
                     .hasAnyRole("ADMIN", "STAFF")
+                    .requestMatchers("/api/me/**")
+                    .hasRole("CUSTOMER")
+                    .requestMatchers(HttpMethod.POST, "/api/auth/otp", "/api/auth/verify")
+                    .permitAll()
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/integrations",
+                        "/api/payments/vnpay/ipn",
+                        "/api/payments/vnpay/return")
+                    .permitAll()
                     .requestMatchers("/api/admin/**")
                     .hasRole("ADMIN")
                     .requestMatchers(

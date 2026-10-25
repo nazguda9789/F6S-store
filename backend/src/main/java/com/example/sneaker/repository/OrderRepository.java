@@ -17,6 +17,8 @@ public interface OrderRepository
         org.springframework.data.jpa.repository.JpaSpecificationExecutor<CustomerOrder> {
   Optional<CustomerOrder> findByRequestKey(String key);
 
+  List<CustomerOrder> findTop50ByShopAccountIdOrderByCreatedAtDesc(String id);
+
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("select o from CustomerOrder o where o.id=:id")
   Optional<CustomerOrder> lockId(@Param("id") Long id);
@@ -31,8 +33,9 @@ public interface OrderRepository
   }
 
   @Query(
-      "select coalesce(sum(o.total),0) as revenue,count(o) as completedOrders from CustomerOrder o"
-          + " where o.status='COMPLETED' and o.completedAt>=:start and o.completedAt<:end")
+      "select coalesce(sum(o.total-coalesce(o.refundedAmount,0)),0) as revenue,count(o) as"
+          + " completedOrders from CustomerOrder o where o.status='COMPLETED' and"
+          + " o.completedAt>=:start and o.completedAt<:end")
   Revenue revenue(@Param("start") Instant start, @Param("end") Instant end);
 
   @Query("select count(o) from CustomerOrder o where o.createdAt>=:start and o.createdAt<:end")
@@ -59,7 +62,8 @@ public interface OrderRepository
       "select i.variant.product.id as productId,i.variant.product.code as"
           + " code,i.variant.product.name as name,sum(i.quantity) as"
           + " quantity,sum(i.unitPrice*i.quantity) as grossRevenue from OrderItem i where"
-          + " i.order.status='COMPLETED' and i.order.completedAt>=:start and"
+          + " i.order.status='COMPLETED' and (i.order.paymentStatus is null or"
+          + " i.order.paymentStatus<>'REFUNDED') and i.order.completedAt>=:start and"
           + " i.order.completedAt<:end group by"
           + " i.variant.product.id,i.variant.product.code,i.variant.product.name order by"
           + " sum(i.quantity) desc,i.variant.product.id asc")

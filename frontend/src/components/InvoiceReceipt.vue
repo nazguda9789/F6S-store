@@ -51,6 +51,9 @@ function print() {
           ><b>− {{ money(invoice.discount) }}</b>
         </p>
         <p class="text-lg">
+          <span>Phí giao hàng</span><b>{{ money(invoice.shippingFee || 0) }}</b>
+        </p>
+        <p class="text-lg">
           <span>Thanh toán</span><b>{{ money(invoice.total) }}</b>
         </p>
         <template v-if="invoice.cashReceived != null"
@@ -63,8 +66,8 @@ function print() {
         >
       </div>
       <p class="text-xs mt-5">
-        Trạng thái: {{ invoice.status }} · {{ invoice.paymentMethod }}<br />Cảm ơn bạn đã mua sắm
-        tại F6S.<br />Bản in bán hàng, không phải hóa đơn VAT.
+        Trạng thái: {{ invoice.status }} · {{ invoice.paymentMethod }} / {{ invoice.paymentStatus
+        }}<br />Cảm ơn bạn đã mua sắm tại F6S.<br />Bản in bán hàng, không phải hóa đơn VAT.
       </p>
     </div>
   </section>

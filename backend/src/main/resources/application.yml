@@ -33,3 +33,21 @@ app:
   seed-demo: ${SEED_DEMO:false}
   cors-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
   media-dir: ${MEDIA_DIR:./uploads/media}
+  shipping-fee: ${SHIPPING_FEE:0}
+  shipping-free-above: ${SHIPPING_FREE_ABOVE:2000000}
+  vnpay:
+    enabled: ${VNPAY_ENABLED:false}
+    merchant: ${VNPAY_TMN_CODE:}
+    secret: ${VNPAY_HASH_SECRET:}
+    pay-url: ${VNPAY_PAY_URL:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+    return-url: ${VNPAY_RETURN_URL:http://localhost:5173/payment/return}
+  otp:
+    enabled: ${OTP_ENABLED:false}
+    secret: ${OTP_SECRET:}
+  smtp:
+    starttls: ${SMTP_STARTTLS:true}
+    host: ${SMTP_HOST:}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    from: ${SMTP_FROM:}

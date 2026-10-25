@@ -7,6 +7,16 @@ const router = createRouter({
   },
   routes: [
     {
+      path: '/account',
+      component: () => import('../views/AccountView.vue'),
+      meta: { title: 'Tài khoản khách hàng' },
+    },
+    {
+      path: '/payment/return',
+      component: () => import('../views/PaymentReturnView.vue'),
+      meta: { title: 'Kết quả VNPAY' },
+    },
+    {
       path: '/admin/login',
       component: () => import('../views/admin/LoginView.vue'),
       meta: { title: 'Đăng nhập quản trị' },
@@ -16,6 +26,11 @@ const router = createRouter({
       component: () => import('../layouts/AdminLayout.vue'),
       meta: { admin: true },
       children: [
+        {
+          path: 'shop-accounts',
+          component: () => import('../views/admin/OnlineAccountsView.vue'),
+          meta: { title: 'Tài khoản khách online', adminOnly: true },
+        },
         {
           path: 'staff',
           component: () => import('../views/admin/PeopleView.vue'),

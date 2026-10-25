@@ -53,7 +53,12 @@ class SqlServerSchemaExportTest {
                 ShoeAttribute.class,
                 MediaAsset.class,
                 ProductColorImage.class,
-                OrderEvent.class)) sources.addAnnotatedClass(type);
+                OrderEvent.class,
+                PaymentAttempt.class,
+                EmailChallenge.class,
+                OrderRefund.class,
+                ShopAccount.class,
+                ShopSession.class)) sources.addAnnotatedClass(type);
         var metadata = sources.buildMetadata();
         SchemaManagementToolCoordinator.process(metadata, registry, settings, action -> {});
       } finally {
@@ -67,6 +72,6 @@ class SqlServerSchemaExportTest {
             "nvarchar(180)",
             "identity",
             "create table dbo.pos_draft_invoices");
-    assertThat(sql.lines().filter(l -> l.startsWith("create table ")).count()).isEqualTo(19);
+    assertThat(sql.lines().filter(l -> l.startsWith("create table ")).count()).isEqualTo(24);
   }
 }

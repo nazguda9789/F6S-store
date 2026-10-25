@@ -29,6 +29,10 @@ public class CustomerOrder {
   @JoinColumn(name = "customer_id")
   private Customer customer;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "shop_account_id")
+  private ShopAccount shopAccount;
+
   @Column(nullable = false, length = 254)
   private String email;
 
@@ -69,6 +73,23 @@ public class CustomerOrder {
   private BigDecimal cashChange;
 
   private Instant completedAt;
+
+  @Column(length = 20)
+  private String paymentStatus;
+
+  @Column(precision = 19, scale = 0)
+  private BigDecimal shippingFee;
+
+  @Column(length = 60)
+  private String carrier;
+
+  @Column(length = 100)
+  private String trackingCode;
+
+  private Instant shippedAt;
+
+  @Column(precision = 19, scale = 0)
+  private BigDecimal refundedAmount;
 
   @Column(nullable = false)
   private Instant createdAt = Instant.now();

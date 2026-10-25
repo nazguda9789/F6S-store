@@ -33,7 +33,10 @@ public class OrderManagementService {
       String address,
       String note,
       OrderView order,
-      List<Event> timeline) {}
+      List<Event> timeline,
+      String carrier,
+      String trackingCode,
+      Instant shippedAt) {}
 
   private Entry entry(CustomerOrder o) {
     return new Entry(
@@ -54,7 +57,24 @@ public class OrderManagementService {
                         e.getActor(),
                         e.getNote(),
                         e.getCreatedAt()))
-            .toList());
+            .toList(),
+        o.getCarrier(),
+        o.getTrackingCode(),
+        o.getShippedAt());
+  }
+
+  @Transactional
+  public Entry shipment(Long id, String carrier, String tracking, String actor) {
+    var o = orders.lockId(id).orElseThrow(() -> missing("Không tìm thấy đơn"));
+    if (!o.getChannel().equals("ONLINE") || !Set.of("CONFIRMED", "PACKING").contains(o.getStatus()))
+      throw bad("Chỉ gắn vận đơn cho đơn online đã xác nhận/đóng gói");
+    if (!Objects.equals(o.getCarrier(), carrier)
+        || !Objects.equals(o.getTrackingCode(), tracking)) {
+      o.setCarrier(carrier.trim());
+      o.setTrackingCode(tracking.trim());
+      audit.record(o, o.getStatus(), actor, "Gắn vận đơn " + carrier + ": " + tracking);
+    }
+    return entry(o);
   }
 
   @Transactional(readOnly = true)
@@ -153,7 +173,19 @@ public class OrderManagementService {
         p.setUsedCount(p.getUsedCount() - 1);
       }
     }
-    if (status.equals("COMPLETED")) order.setCompletedAt(Instant.now());
+    if (Set.of("CONFIRMED", "PACKING", "SHIPPING", "COMPLETED").contains(status)
+        && order.getPaymentMethod().equals("VNPAY")
+        && !"PAID".equals(order.getPaymentStatus()))
+      throw bad("Cần VNPAY xác nhận đã thu tiền trước khi xử lý giao hàng");
+    if (status.equals("SHIPPING")) {
+      if (order.getTrackingCode() == null || order.getCarrier() == null)
+        throw bad("Cần gắn hãng giao hàng và mã vận đơn trước khi giao");
+      order.setShippedAt(Instant.now());
+    }
+    if (status.equals("COMPLETED")) {
+      order.setCompletedAt(Instant.now());
+      if (order.getPaymentMethod().equals("COD")) order.setPaymentStatus("PAID");
+    }
     order.setStatus(status);
     audit.record(order, from, actor, reason);
     return CheckoutService.view(order);

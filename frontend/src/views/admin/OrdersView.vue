@@ -23,6 +23,11 @@ const actions = {
   COMPLETED: 'Xác nhận đã giao / thu tiền',
 }
 const filters = reactive({ q: '', status: '', channel: '' }),
+  shipment = reactive({ carrier: 'Giao hàng demo', trackingCode: '' }),
+  refund = ref(null),
+  refundReason = ref(''),
+  refundReference = ref(''),
+  goodsReceived = ref(false),
   data = ref({ content: [], page: 0, totalPages: 0, totalElements: 0 }),
   selected = ref(null),
   busy = ref(false),
@@ -43,6 +48,14 @@ async function detail(entry) {
   error.value = ''
   try {
     selected.value = await api('/admin/orders/' + entry.id)
+    Object.assign(shipment, {
+      carrier: selected.value.carrier || 'Giao hàng demo',
+      trackingCode: selected.value.trackingCode || '',
+    })
+    refund.value = await api('/admin/orders/' + entry.id + '/refund')
+    refundReason.value = ''
+    refundReference.value = ''
+    goodsReceived.value = false
   } catch (e) {
     error.value = e.message
   } finally {
@@ -79,6 +92,56 @@ async function transition(entry, status) {
 function selectStatus(value) {
   filters.status = value
   load()
+}
+async function afterSales(work) {
+  busy.value = true
+  error.value = ''
+  try {
+    await work()
+    selected.value = await api('/admin/orders/' + selected.value.id)
+    refund.value = await api('/admin/orders/' + selected.value.id + '/refund')
+    await load(data.value.page)
+  } catch (e) {
+    error.value = e.message
+  } finally {
+    busy.value = false
+  }
+}
+async function saveShipment() {
+  await afterSales(() =>
+    api('/admin/orders/' + selected.value.id + '/shipment', {
+      method: 'PUT',
+      body: JSON.stringify(shipment),
+    }),
+  )
+}
+async function requestRefund() {
+  await afterSales(() =>
+    api('/admin/orders/' + selected.value.id + '/refund', {
+      method: 'POST',
+      body: JSON.stringify({ reason: refundReason.value }),
+    }),
+  )
+}
+async function resolveRefund(approve) {
+  if (
+    !confirm(
+      approve
+        ? 'Chỉ xác nhận nếu đã thực hiện hoàn tiền thực tế và có chứng từ. Tiếp tục?'
+        : 'Từ chối yêu cầu hoàn?',
+    )
+  )
+    return
+  await afterSales(() =>
+    api('/admin/orders/' + selected.value.id + '/refund', {
+      method: 'PUT',
+      body: JSON.stringify({
+        approve,
+        goodsReceived: goodsReceived.value,
+        settlementReference: refundReference.value,
+      }),
+    }),
+  )
 }
 onMounted(() => load())
 </script>
@@ -207,12 +270,90 @@ onMounted(() => load())
         <p>{{ selected.customerName }} · {{ selected.phone || 'Khách lẻ tại quầy' }}</p>
         <p>{{ selected.email }}<br />{{ selected.address }}</p>
         <p v-if="selected.note">Ghi chú: {{ selected.note }}</p>
+        <p class="mt-3">
+          Thanh toán: {{ selected.order.paymentMethod }} / {{ selected.order.paymentStatus }} · Phí
+          giao {{ money(selected.order.shippingFee) }}
+        </p>
+        <p v-if="selected.trackingCode">
+          Vận đơn: {{ selected.carrier }} · {{ selected.trackingCode }}
+        </p>
       </div>
+      <form
+        v-if="
+          selected.order.channel === 'ONLINE' &&
+          ['CONFIRMED', 'PACKING'].includes(selected.order.status)
+        "
+        class="admin-card mt-5"
+        @submit.prevent="saveShipment"
+      >
+        <h3 class="font-semibold mb-4">Giao hàng demo / vận đơn thủ công</h3>
+        <label class="field"
+          >Đơn vị giao hàng<input v-model.trim="shipment.carrier" required maxlength="60" /></label
+        ><label class="field"
+          >Mã vận đơn<input
+            v-model.trim="shipment.trackingCode"
+            required
+            pattern="[A-Za-z0-9._-]{3,100}"
+            maxlength="100"
+            placeholder="DEMO-001" /></label
+        ><button class="button" :disabled="busy">Lưu vận đơn</button>
+      </form>
+      <section
+        v-if="
+          ['COMPLETED', 'CANCELLED'].includes(selected.order.status) &&
+          ['PAID', 'REFUNDED'].includes(selected.order.paymentStatus)
+        "
+        class="admin-card mt-5"
+      >
+        <h3 class="font-semibold mb-4">Trả hàng / Hoàn toàn bộ tiền</h3>
+        <p class="text-sm mb-4">
+          Hoàn tiền được thực hiện ngoài hệ thống (tiền mặt/chuyển khoản/cổng VNPAY), sau đó ghi mã
+          chứng từ để đối soát. Không tự chuyển tiền khi bấm nút.
+        </p>
+        <form v-if="!refund" @submit.prevent="requestRefund">
+          <label class="field"
+            >Lý do hoàn<textarea
+              v-model.trim="refundReason"
+              required
+              minlength="5"
+              maxlength="500"
+            /></label
+          ><button class="button" :disabled="busy">Mở yêu cầu hoàn</button>
+        </form>
+        <template v-else
+          ><p>{{ refund.status }} · {{ money(refund.amount) }} · {{ refund.reason }}</p>
+          <p v-if="refund.settlementReference">Chứng từ: {{ refund.settlementReference }}</p>
+          <form
+            v-if="refund.status === 'REQUESTED'"
+            class="mt-4"
+            @submit.prevent="resolveRefund(true)"
+          >
+            <label class="field"
+              >Mã chứng từ đã hoàn tiền<input
+                v-model.trim="refundReference"
+                required
+                maxlength="120" /></label
+            ><label v-if="selected.order.status === 'COMPLETED'" class="block mb-4"
+              ><input v-model="goodsReceived" type="checkbox" required /> Đã nhận và kiểm tra toàn
+              bộ hàng trả về kho</label
+            ><button class="button" :disabled="busy">Xác nhận đã hoàn tiền</button
+            ><button
+              type="button"
+              class="button button-outline ml-3"
+              :disabled="busy"
+              @click="resolveRefund(false)"
+            >
+              Từ chối yêu cầu
+            </button>
+          </form></template
+        >
+      </section>
     </section>
     <InvoiceReceipt v-if="selected" :invoice="selected.order" class="admin-card mt-6" />
     <p class="text-xs text-stone-500 mt-5">
       Không bỏ qua bước xử lý. Chỉ hủy trước giao vận chuyển; hệ thống hoàn tồn và lượt mã đúng một
-      lần. Đơn đã giao/hoàn thành chưa có nghiệp vụ trả hàng và hoàn tiền.
+      lần. Hoàn tiền chỉ ghi nhận sau chứng từ thực tế; trả hàng hỗ trợ toàn bộ đơn, không hỗ trợ
+      trả từng phần.
     </p>
   </section>
 </template>

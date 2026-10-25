@@ -1,12 +1,32 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useCustomer } from '../stores/customer'
 import { useCart } from '../stores/cart'
 import { api, money } from '../lib/api'
 const cart = useCart(),
-  form = reactive({ customerName: '', email: '', phone: '', address: '', note: '' }),
+  customer = useCustomer(),
+  config = ref({ vnpay: false, shipping: { fee: 0, freeAbove: 2000000 } }),
+  form = reactive({
+    customerName: customer.profile?.fullName || '',
+    email: customer.profile?.email || '',
+    phone: customer.profile?.phone || '',
+    address: customer.profile?.address || '',
+    note: '',
+    paymentMethod: 'COD',
+  }),
   busy = ref(false),
   error = ref(''),
   order = ref(null)
+const shippingFee = computed(() =>
+  cart.total >= Number(config.value.shipping.freeAbove) ? 0 : Number(config.value.shipping.fee),
+)
+onMounted(async () => {
+  try {
+    config.value = await api('/integrations')
+  } catch (e) {
+    error.value = 'Không tải được cấu hình giao hàng: ' + e.message
+  }
+})
 let requestKey = '',
   fingerprint = ''
 async function submit() {
@@ -29,6 +49,7 @@ async function submit() {
     })
     cart.consume(body.items)
     cart.toast('Đơn hàng đã được ghi nhận')
+    if (order.value.paymentUrl) window.location.assign(order.value.paymentUrl)
   } catch (e) {
     error.value = e.message
   } finally {
@@ -46,7 +67,10 @@ async function submit() {
       <p class="mt-4">
         Đơn hàng <strong>{{ order.code }}</strong> đã được ghi nhận.
       </p>
-      <p class="mt-2">Tổng tiền: {{ money(order.total) }} · Thanh toán khi nhận hàng (COD).</p>
+      <p class="mt-2">
+        Tổng tiền: {{ money(order.total) }} · {{ order.paymentMethod }} / {{ order.paymentStatus }}.
+      </p>
+      <a v-if="order.paymentUrl" class="button mt-5" :href="order.paymentUrl">Tiếp tục đến VNPAY</a>
       <p class="text-sm text-stone-500 mt-3">
         Đây là xác nhận trên website; bản mới chưa gửi email xác nhận.
       </p>
@@ -72,6 +96,7 @@ async function submit() {
             <label class="field"
               >Email<input
                 v-model.trim="form.email"
+                :readonly="!!customer.profile"
                 autocomplete="email"
                 type="email"
                 required
@@ -108,10 +133,22 @@ async function submit() {
             />
           </label>
           <h2 class="text-xl font-semibold my-6">02 / Phương thức thanh toán</h2>
-          <div class="payment-option">◉ Thanh toán khi nhận hàng (COD)</div>
+          <label class="payment-option block"
+            ><input v-model="form.paymentMethod" type="radio" value="COD" /> Thanh toán khi nhận
+            hàng (COD)</label
+          >
+          <label class="payment-option block mt-3"
+            ><input
+              v-model="form.paymentMethod"
+              type="radio"
+              value="VNPAY"
+              :disabled="!config.vnpay"
+            />
+            VNPAY {{ !config.vnpay ? '(chưa cấu hình)' : '' }}</label
+          >
           <p class="text-sm text-stone-500 mt-3">
-            Bản kiến trúc mới chưa tích hợp OTP và VNPAY. Cấu hình bản cũ được giữ nguyên ở dự án
-            cũ.
+            Phí giao hàng demo: {{ money(shippingFee) }}. Đơn được xử lý giao hàng trong trang quản
+            trị; không tự gọi hãng vận chuyển.
           </p>
         </fieldset>
         <div v-if="error" role="alert" class="error-box mt-5">
@@ -141,10 +178,10 @@ async function submit() {
           <span>Tạm tính</span><span>{{ money(cart.total) }}</span>
         </div>
         <div class="flex justify-between my-3 text-sm">
-          <span>Vận chuyển (demo)</span><span>Miễn phí</span>
+          <span>Vận chuyển (demo)</span><span>{{ money(shippingFee) }}</span>
         </div>
         <div class="flex justify-between pt-4 border-t text-xl font-semibold">
-          <span>Tổng cộng</span><span>{{ money(cart.total) }}</span>
+          <span>Tổng cộng</span><span>{{ money(cart.total + shippingFee) }}</span>
         </div>
         <button class="text-sm underline mt-5" :disabled="busy" @click="cart.open = true">
           Chỉnh sửa giỏ hàng

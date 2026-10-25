@@ -4,6 +4,8 @@
 
 [Cài đặt và chạy](VUE-SQLSERVER.md) · [API, matrix, QR/POS, khuyến mãi và dashboard](API-RETAIL.md).
 
+[Demo online/tại quầy, đăng nhập OTP, vận đơn, hoàn tiền và VNPAY](DEMO-CHECKOUT-PAYMENTS.md) · [Các module theo Bee](BEE-MODULES.md).
+
 ## Bản Thymeleaf / MySQL cũ (đối chiếu, rollback)
 
 Các mục bên dưới chỉ áp dụng source `src/` và SQL MySQL cũ, không áp dụng backend/frontend mới.
