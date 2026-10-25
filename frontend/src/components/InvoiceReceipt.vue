@@ -14,6 +14,10 @@ function print() {
     <div class="receipt-paper">
       <h2 class="text-3xl font-black italic">F6S SPORTS</h2>
       <p class="text-sm">HÓA ĐƠN BÁN HÀNG · {{ invoice.channel }}</p>
+      <p class="text-xs mt-2">
+        Khách hàng: {{ invoice.customerName || 'Khách lẻ' }}
+        <span v-if="invoice.phone">· {{ invoice.phone }}</span>
+      </p>
       <p class="text-xs mt-3">
         {{ invoice.code }}<br />{{
           new Date(invoice.createdAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })

@@ -17,14 +17,36 @@ const router = createRouter({
       meta: { admin: true },
       children: [
         {
+          path: 'staff',
+          component: () => import('../views/admin/PeopleView.vue'),
+          props: { kind: 'staff' },
+          meta: { title: 'Nhân viên', adminOnly: true },
+        },
+        {
+          path: 'customers',
+          component: () => import('../views/admin/PeopleView.vue'),
+          props: { kind: 'customers' },
+          meta: { title: 'Khách hàng' },
+        },
+        {
+          path: 'attributes',
+          component: () => import('../views/admin/AttributesView.vue'),
+          meta: { title: 'Thuộc tính sản phẩm', adminOnly: true },
+        },
+        {
+          path: 'media',
+          component: () => import('../views/admin/MediaView.vue'),
+          meta: { title: 'Thư viện hình ảnh', adminOnly: true },
+        },
+        {
           path: '',
           component: () => import('../views/admin/DashboardView.vue'),
-          meta: { title: 'Tổng quan' },
+          meta: { title: 'Tổng quan', adminOnly: true },
         },
         {
           path: 'products',
           component: () => import('../views/admin/ProductsView.vue'),
-          meta: { title: 'Quản lý sản phẩm' },
+          meta: { title: 'Quản lý sản phẩm', adminOnly: true },
         },
         {
           path: 'pos',
@@ -34,12 +56,12 @@ const router = createRouter({
         {
           path: 'promotions',
           component: () => import('../views/admin/PromotionsView.vue'),
-          meta: { title: 'Khuyến mãi' },
+          meta: { title: 'Khuyến mãi', adminOnly: true },
         },
         {
           path: 'orders',
           component: () => import('../views/admin/OrdersView.vue'),
-          meta: { title: 'Đơn hàng' },
+          meta: { title: 'Đơn hàng', adminOnly: true },
         },
       ],
     },
@@ -68,5 +90,6 @@ const router = createRouter({
 })
 router.beforeEach((to) => {
   if (to.meta.admin && !useAuth().authenticated) return '/admin/login'
+  if (to.meta.adminOnly && !useAuth().isAdmin) return '/admin/pos'
 })
 export default router

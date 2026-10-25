@@ -2,6 +2,8 @@
 
 Bản phát triển chính hiện nằm tại `backend/` và `frontend/`. Giữ thương hiệu F6S, giao diện xanh rừng/kem/lime và nghiệp vụ quản lý bán giày.
 
+Đợt hoàn thiện theo Bee: [module, phân quyền, ảnh và cách nâng cấp database không xóa dữ liệu](docs/BEE-MODULES.md). Database đã có dữ liệu dùng `database/03_upgrade_bee_modules.sql`, không chạy lại schema 01.
+
 ```text
 backend/     Spring Boot 3, JPA, Validation, Security, SQL Server
 frontend/    Vue 3, Composition API, Pinia, Vite, Tailwind
@@ -41,4 +43,4 @@ Backend: `cd backend` → `mvn test`. Frontend: `cd frontend` → `npm test`, `n
 
 Source `src/`, `pom.xml`, Maven Wrapper gốc cùng `sql/`, `downloads/` là **bản Java/Thymeleaf/MySQL cũ được giữ để đối chiếu/rollback**. Không chạy `mvn spring-boot:run` tại gốc nếu muốn dùng bản mới; phải vào `backend/`. [Hướng dẫn MySQL cũ](docs/01-CAI-DAT-VA-CHAY.md) chỉ áp dụng bản cũ.
 
-Database, tài khoản, OTP/email, Google login, VNPAY và secret cũ **chưa tự chuyển sang bản SQL Server**. Không xóa database cũ, không copy nguyên file application.properties sang backend mới, không đổi URL callback thanh toán khi chưa port/kiểm thử. Bản mới hiện chỉ COD online / tiền mặt POS, một tài khoản quản trị cấu hình qua môi trường. Chưa có quản lý nhân viên/phân quyền chi tiết, trả hàng/hoàn tiền, đối soát thanh toán hoặc migration dữ liệu thật.
+Database, tài khoản, OTP/email, Google login, VNPAY và secret cũ **chưa tự chuyển sang bản SQL Server**. Không xóa database cũ, không copy nguyên file application.properties sang backend mới, không đổi URL callback thanh toán khi chưa port/kiểm thử. Bản mới hiện chỉ COD online / tiền mặt POS; admin cấu hình qua môi trường và nhân viên lưu database với quyền POS/khách hàng. Chưa có trả hàng/hoàn tiền, đối soát thanh toán hoặc migration dữ liệu thật từ hệ thống cũ.

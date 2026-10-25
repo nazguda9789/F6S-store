@@ -2,6 +2,8 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import QRCode from 'qrcode'
 import { api, money } from '../../lib/api'
+import ProductMetadataEditor from '../../components/ProductMetadataEditor.vue'
+const details = ref({ brandId: null, soleId: null, materialId: null, images: [] })
 const categories = ref([]),
   result = ref({ content: [], page: 0, totalPages: 0 }),
   editing = ref(null),
@@ -64,6 +66,7 @@ function add() {
   editing.value = null
   showForm.value = true
   rows.value = []
+  details.value = { brandId: null, soleId: null, materialId: null, images: [] }
   Object.assign(form, {
     name: '',
     brand: 'F6S',
@@ -109,7 +112,18 @@ async function edit(p) {
       size: v.size,
       stock: v.stock,
       price: v.price,
+      weightGrams: v.weightGrams,
     }))
+    details.value = {
+      brandId: detail.metadata?.brand?.id ?? null,
+      soleId: detail.metadata?.sole?.id ?? null,
+      materialId: detail.metadata?.material?.id ?? null,
+      images: (detail.metadata?.images || []).map((i) => ({
+        color: i.color,
+        mediaId: i.mediaId,
+        url: i.url,
+      })),
+    }
     previewSignature = signature.value
   })
 }
@@ -124,6 +138,12 @@ async function save() {
       hoverImageUrl: form.hoverImageUrl,
       categoryId: Number(form.categoryId),
       featured: form.featured,
+      metadata: {
+        brandId: details.value.brandId,
+        soleId: details.value.soleId,
+        materialId: details.value.materialId,
+        images: details.value.images.map((i) => ({ color: i.color, mediaId: i.mediaId })),
+      },
     }
     let p
     if (editing.value)
@@ -295,6 +315,11 @@ onMounted(() =>
             khỏi sản phẩm khi sửa sẽ ngừng bán, không xóa lịch sử.
           </p>
         </div>
+        <ProductMetadataEditor
+          v-model="details"
+          v-model:brand="form.brand"
+          :colors="selection.colors"
+        />
         <div v-if="rows.length" class="table-scroll mt-5">
           <table class="admin-table">
             <thead>
@@ -303,6 +328,7 @@ onMounted(() =>
                 <th>Size</th>
                 <th>Số lượng tồn</th>
                 <th>Giá riêng (₫)</th>
+                <th>Khối lượng gói hàng (g, tùy chọn)</th>
               </tr>
             </thead>
             <tbody>
@@ -329,6 +355,17 @@ onMounted(() =>
                     step="1"
                     required
                     aria-label="Giá biến thể"
+                  />
+                </td>
+                <td>
+                  <input
+                    v-model.number="row.weightGrams"
+                    type="number"
+                    min="1"
+                    max="10000"
+                    step="1"
+                    placeholder="Chưa đo"
+                    aria-label="Khối lượng biến thể"
                   />
                 </td>
               </tr>

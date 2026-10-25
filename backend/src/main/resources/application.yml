@@ -23,8 +23,13 @@ spring:
     deserialization:
       fail-on-unknown-properties: true
       accept-float-as-int: false
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
 app:
   admin-username: ${ADMIN_USERNAME:admin}
   admin-password: ${ADMIN_PASSWORD}
   seed-demo: ${SEED_DEMO:false}
   cors-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+  media-dir: ${MEDIA_DIR:./uploads/media}

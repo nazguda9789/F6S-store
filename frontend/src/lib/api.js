@@ -12,7 +12,7 @@ export async function api(path, options = {}) {
   const response = await fetch((import.meta.env.VITE_API_BASE || '/api') + path, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...(path.startsWith('/admin') && adminAuthorization
         ? { Authorization: adminAuthorization }
         : {}),

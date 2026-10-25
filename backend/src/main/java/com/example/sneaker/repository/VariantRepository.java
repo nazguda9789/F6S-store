@@ -7,6 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface VariantRepository extends JpaRepository<ProductVariant, Long> {
+  boolean existsByColorIgnoreCase(String color);
+
+  boolean existsBySize(String size);
+
   java.util.Optional<ProductVariant> findBySku(String sku);
 
   interface Identity {

@@ -18,6 +18,10 @@ public class PosDraft {
   @Column(nullable = false, length = 100)
   private String owner;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "customer_id")
+  private Customer customer;
+
   @Column(nullable = false, unique = true, length = 36)
   private String requestKey;
 

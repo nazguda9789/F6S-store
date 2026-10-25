@@ -296,6 +296,36 @@ class AdvancedWorkflowTest {
   }
 
   @Test
+  void deliveryTimelineRejectsSkippedAndStaleTransitions() {
+    var v = product.variants().get(0);
+    UUID key = UUID.randomUUID();
+    checkout.checkout(
+        new Checkout(
+            key,
+            "Test",
+            "test@example.com",
+            "0912345678",
+            "123 Nguyễn Trãi, Hà Nội",
+            "",
+            List.of(new CheckoutLine(v.id(), 1)),
+            null));
+    var id = orders.findByRequestKey(key.toString()).orElseThrow().getId();
+    assertThatThrownBy(() -> management.status(id, "COMPLETED"))
+        .isInstanceOf(ResponseStatusException.class);
+    management.status(id, "CONFIRMED", "admin", "Đã xác minh", "PENDING");
+    assertThatThrownBy(() -> management.status(id, "PACKING", "admin", "", "PENDING"))
+        .isInstanceOf(ResponseStatusException.class);
+    management.status(id, "PACKING", "admin", "Đóng gói", "CONFIRMED");
+    management.status(id, "SHIPPING", "admin", "Bàn giao", "PACKING");
+    assertThatThrownBy(() -> management.status(id, "CANCELLED"))
+        .isInstanceOf(ResponseStatusException.class);
+    management.status(id, "COMPLETED", "admin", "Đã giao", "SHIPPING");
+    management.status(id, "COMPLETED");
+    assertThat(management.detail(id).timeline()).hasSize(5);
+    assertThat(variants.findById(v.id()).orElseThrow().getStock()).isEqualTo(9);
+  }
+
+  @Test
   void dashboardUsesCompletionTimeVietnamZoneAndIgnoresPending() {
     var d = draft();
     pos.scan(d.id(), owner, scan(product.variants().get(0).sku(), 1));

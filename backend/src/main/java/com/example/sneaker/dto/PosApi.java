@@ -17,6 +17,11 @@ public final class PosApi {
 
   public record Quantity(@Min(1) @Max(99) int quantity) {}
 
+  public record CustomerSelection(Long customerId) {}
+
+  public record SelectedCustomer(
+      Long id, String code, String fullName, String phone, String email, String address) {}
+
   public record Payment(
       @NotNull @DecimalMin("0") @Digits(integer = 15, fraction = 0) BigDecimal cashReceived,
       @Size(max = 30) String promotionCode,
@@ -41,7 +46,12 @@ public final class PosApi {
       String imageUrl) {}
 
   public record Draft(
-      Long id, String status, Instant createdAt, List<Line> lines, BigDecimal subtotal) {}
+      Long id,
+      String status,
+      Instant createdAt,
+      List<Line> lines,
+      BigDecimal subtotal,
+      SelectedCustomer customer) {}
 
   public record Quote(
       BigDecimal subtotal, BigDecimal discount, BigDecimal total, String promotionCode) {}

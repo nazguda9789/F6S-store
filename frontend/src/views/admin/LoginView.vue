@@ -14,7 +14,7 @@ async function login() {
   try {
     await auth.login(username.value, password.value)
     password.value = ''
-    router.replace('/admin')
+    router.replace(auth.isAdmin ? '/admin' : '/admin/pos')
   } catch (e) {
     error.value = e.message
   } finally {

@@ -35,6 +35,8 @@ public class ProductVariant {
   @Column(nullable = false, precision = 19, scale = 0)
   private java.math.BigDecimal price;
 
+  private Integer weightGrams;
+
   @Column(nullable = false)
   private boolean active = true;
 }

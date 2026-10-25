@@ -125,6 +125,16 @@ export const usePos = defineStore('pos', () => {
     activeId.value = id
     quote.value = null
   }
+  async function customer(customerId) {
+    return execute(async () =>
+      update(
+        await api(`/admin/pos/drafts/${activeId.value}/customer`, {
+          method: 'PUT',
+          body: JSON.stringify({ customerId }),
+        }),
+      ),
+    )
+  }
   window.addEventListener('f6s-session-cleared', () => {
     drafts.value = []
     activeId.value = null
@@ -151,5 +161,6 @@ export const usePos = defineStore('pos', () => {
     price,
     pay,
     select,
+    customer,
   }
 })

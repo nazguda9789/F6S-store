@@ -25,6 +25,10 @@ public class CustomerOrder {
   @Column(nullable = false, length = 120)
   private String customerName;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "customer_id")
+  private Customer customer;
+
   @Column(nullable = false, length = 254)
   private String email;
 

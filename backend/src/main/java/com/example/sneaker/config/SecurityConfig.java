@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.*;
 
@@ -18,14 +17,27 @@ public class SecurityConfig {
   @Bean
   UserDetailsService users(
       @Value("${app.admin-username}") String username,
-      @Value("${app.admin-password}") String password) {
+      @Value("${app.admin-password}") String password,
+      com.example.sneaker.repository.StaffRepository staff) {
     if (password.length() < 12)
       throw new IllegalArgumentException("ADMIN_PASSWORD cần ít nhất 12 ký tự");
-    return new InMemoryUserDetailsManager(
+    var admin =
         User.withUsername(username)
             .password("{bcrypt}" + new BCryptPasswordEncoder().encode(password))
             .roles("ADMIN")
-            .build());
+            .build();
+    return requested -> {
+      if (requested.equalsIgnoreCase(username)) return User.withUserDetails(admin).build();
+      var account =
+          staff
+              .findByUsername(requested.toLowerCase(java.util.Locale.ROOT))
+              .orElseThrow(() -> new UsernameNotFoundException("Thông tin đăng nhập không hợp lệ"));
+      return User.withUsername(account.getUsername())
+          .password(account.getPasswordHash())
+          .roles("STAFF")
+          .disabled(!account.isActive())
+          .build();
+    };
   }
 
   @Bean
@@ -37,10 +49,17 @@ public class SecurityConfig {
             a ->
                 a.requestMatchers(HttpMethod.OPTIONS, "/**")
                     .permitAll()
+                    .requestMatchers(
+                        "/api/admin/session", "/api/admin/pos/**", "/api/admin/customers/**")
+                    .hasAnyRole("ADMIN", "STAFF")
                     .requestMatchers("/api/admin/**")
                     .hasRole("ADMIN")
                     .requestMatchers(
-                        HttpMethod.GET, "/api/products/**", "/api/categories", "/api/facets")
+                        HttpMethod.GET,
+                        "/api/products/**",
+                        "/api/categories",
+                        "/api/facets",
+                        "/api/media/*")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/orders")
                     .permitAll()

@@ -18,9 +18,14 @@ public final class Api {
       @NotBlank @Pattern(regexp = "(?:3[5-9]|4[0-9]|50)(?:\\.5)?") String size,
       @Min(0) @Max(100000) int stock,
       @DecimalMin("1") @DecimalMax("1000000000") @Digits(integer = 10, fraction = 0)
-          BigDecimal price) {
+          BigDecimal price,
+      @Min(1) @Max(10000) Integer weightGrams) {
+    public VariantInput(String color, String size, int stock, BigDecimal price) {
+      this(color, size, stock, price, null);
+    }
+
     public VariantInput(String color, String size, int stock) {
-      this(color, size, stock, null);
+      this(color, size, stock, null, null);
     }
   }
 
@@ -34,7 +39,31 @@ public final class Api {
       @Size(max = 1000) @Pattern(regexp = "(?:https://[^\\s]+|/[^\\s]*)?") String hoverImageUrl,
       @NotNull Long categoryId,
       boolean featured,
-      @NotEmpty @Size(max = 100) List<@Valid VariantInput> variants) {}
+      @NotEmpty @Size(max = 100) List<@Valid VariantInput> variants,
+      @Valid CatalogAdminApi.Metadata metadata) {
+    public ProductInput(
+        String name,
+        String brand,
+        BigDecimal price,
+        String description,
+        String imageUrl,
+        String hoverImageUrl,
+        Long categoryId,
+        boolean featured,
+        List<VariantInput> variants) {
+      this(
+          name,
+          brand,
+          price,
+          description,
+          imageUrl,
+          hoverImageUrl,
+          categoryId,
+          featured,
+          variants,
+          null);
+    }
+  }
 
   public record VariantView(
       Long id,
@@ -43,7 +72,8 @@ public final class Api {
       String size,
       int stock,
       BigDecimal price,
-      String qrPayload) {}
+      String qrPayload,
+      Integer weightGrams) {}
 
   public record ProductView(
       Long id,
@@ -58,7 +88,8 @@ public final class Api {
       boolean featured,
       CategoryView category,
       List<String> colorways,
-      List<VariantView> variants) {}
+      List<VariantView> variants,
+      CatalogAdminApi.Details metadata) {}
 
   public record PageView<T>(List<T> content, int page, int totalPages, long totalElements) {}
 
@@ -97,7 +128,9 @@ public final class Api {
       String promotionCode,
       String channel,
       BigDecimal cashReceived,
-      BigDecimal cashChange) {}
+      BigDecimal cashChange,
+      String customerName,
+      String phone) {}
 
   public record OrderLineView(
       String productName,

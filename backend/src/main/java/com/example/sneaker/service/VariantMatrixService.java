@@ -40,7 +40,8 @@ public class VariantMatrixService {
                 color,
                 size,
                 row == null ? input.defaultStock() : row.stock(),
-                row == null ? input.defaultPrice() : row.price()));
+                row == null ? input.defaultPrice() : row.price(),
+                row == null ? null : row.weightGrams()));
       }
     return result;
   }
@@ -58,6 +59,7 @@ public class VariantMatrixService {
             input.hoverImageUrl(),
             input.categoryId(),
             input.featured(),
-            rows));
+            rows,
+            input.metadata()));
   }
 }

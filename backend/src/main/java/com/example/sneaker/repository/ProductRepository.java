@@ -13,4 +13,12 @@ public interface ProductRepository
   Optional<Product> lockById(@Param("id") Long id);
 
   boolean existsByCategoryIdAndActiveTrue(Long id);
+
+  boolean existsByBrandIgnoreCase(String brand);
+
+  boolean existsBySoleAttributeId(Long id);
+
+  boolean existsByMaterialAttributeId(Long id);
+
+  boolean existsByImageUrlOrHoverImageUrl(String url, String hoverUrl);
 }

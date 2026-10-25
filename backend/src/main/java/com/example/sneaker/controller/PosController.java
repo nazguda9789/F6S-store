@@ -16,6 +16,12 @@ import org.springframework.web.bind.annotation.*;
 public class PosController {
   private final PosService pos;
 
+  @PutMapping("/{id}/customer")
+  public Draft customer(
+      @PathVariable Long id, Principal user, @Valid @RequestBody CustomerSelection input) {
+    return pos.customer(id, user.getName(), input.customerId());
+  }
+
   @GetMapping
   public List<Draft> list(Principal user) {
     return pos.list(user.getName());

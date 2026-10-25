@@ -15,8 +15,13 @@ public class AdminController {
   private final com.example.sneaker.service.VariantMatrixService matrix;
 
   @GetMapping("/session")
-  public java.util.Map<String, String> session(java.security.Principal user) {
-    return java.util.Map.of("username", user.getName());
+  public java.util.Map<String, Object> session(
+      org.springframework.security.core.Authentication user) {
+    return java.util.Map.of(
+        "username",
+        user.getName(),
+        "roles",
+        user.getAuthorities().stream().map(a -> a.getAuthority().replace("ROLE_", "")).toList());
   }
 
   @PostMapping("/products/matrix/preview")

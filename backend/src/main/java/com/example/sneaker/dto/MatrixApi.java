@@ -22,7 +22,12 @@ public final class MatrixApi {
       @NotBlank String size,
       @NotNull @Min(0) @Max(100000) Integer stock,
       @NotNull @DecimalMin("1") @DecimalMax("1000000000") @Digits(integer = 10, fraction = 0)
-          BigDecimal price) {}
+          BigDecimal price,
+      @Min(1) @Max(10000) Integer weightGrams) {
+    public Override(String color, String size, Integer stock, BigDecimal price) {
+      this(color, size, stock, price, null);
+    }
+  }
 
   public record Create(
       @NotBlank @Size(max = 180) String name,
@@ -32,5 +37,18 @@ public final class MatrixApi {
       @Size(max = 1000) @Pattern(regexp = "(?:https://[^\\s]+|/[^\\s]*)?") String hoverImageUrl,
       @NotNull Long categoryId,
       boolean featured,
-      @NotNull @Valid Selection matrix) {}
+      @NotNull @Valid Selection matrix,
+      @Valid CatalogAdminApi.Metadata metadata) {
+    public Create(
+        String name,
+        String brand,
+        String description,
+        String imageUrl,
+        String hoverImageUrl,
+        Long categoryId,
+        boolean featured,
+        Selection matrix) {
+      this(name, brand, description, imageUrl, hoverImageUrl, categoryId, featured, matrix, null);
+    }
+  }
 }

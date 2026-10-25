@@ -26,6 +26,9 @@ public class PosService {
   private final OrderRepository orders;
   private final InventoryService inventory;
   private final PromotionService promotions;
+  private final CustomerRepository customers;
+  private final CustomerAddressRepository customerAddresses;
+  private final OrderAuditService audit;
 
   public List<Draft> list(String owner) {
     return drafts.findByOwnerAndStatusOrderByIdAsc(owner, "OPEN").stream().map(this::view).toList();
@@ -147,6 +150,33 @@ public class PosService {
     d.setStatus("CANCELLED");
   }
 
+  @Transactional
+  public Draft customer(Long id, String owner, Long customerId) {
+    var d = lock(id, owner);
+    open(d);
+    d.setCustomer(
+        customerId == null
+            ? null
+            : customers
+                .findById(customerId)
+                .filter(Customer::isActive)
+                .orElseThrow(() -> bad("Khách hàng không tồn tại hoặc đã ngừng hoạt động")));
+    return view(d);
+  }
+
+  private SelectedCustomer selectedCustomer(Customer c) {
+    if (c == null) return null;
+    var address =
+        customerAddresses
+            .findByCustomerIdAndActiveTrueOrderByDefaultAddressDescIdAsc(c.getId())
+            .stream()
+            .findFirst()
+            .map(CustomerAddress::fullAddress)
+            .orElse("");
+    return new SelectedCustomer(
+        c.getId(), c.getCode(), c.getFullName(), c.getPhone(), c.getEmail(), address);
+  }
+
   public Quote quote(Long id, String owner, String code) {
     var d = drafts.findById(id).orElseThrow(() -> missing("Không tìm thấy hóa đơn"));
     checkOwner(d, owner);
@@ -182,6 +212,17 @@ public class PosService {
     order.setPhone("");
     order.setAddress("Tại quầy");
     order.setNote("");
+    if (d.getCustomer() != null) {
+      var c = d.getCustomer();
+      if (!c.isActive())
+        throw bad("Khách hàng đã ngừng hoạt động; hãy chọn khách khác hoặc khách lẻ");
+      var snapshot = selectedCustomer(c);
+      order.setCustomer(c);
+      order.setCustomerName(snapshot.fullName());
+      order.setPhone(snapshot.phone());
+      order.setEmail(snapshot.email() == null ? "" : snapshot.email());
+      order.setAddress(snapshot.address().isBlank() ? "Tại quầy" : snapshot.address());
+    }
     order.setChannel("POS");
     order.setPaymentMethod("CASH");
     order.setStatus("COMPLETED");
@@ -196,6 +237,7 @@ public class PosService {
     order.setCashReceived(input.cashReceived());
     order.setCashChange(input.cashReceived().subtract(order.getTotal()));
     orders.saveAndFlush(order);
+    audit.record(order, null, owner, "Thanh toán tiền mặt tại quầy");
     d.setInvoice(order);
     d.setStatus("CHECKED_OUT");
     return CheckoutService.view(order);
@@ -246,6 +288,7 @@ public class PosService {
         d.getStatus(),
         d.getCreatedAt(),
         lines,
-        lines.stream().map(Line::subtotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+        lines.stream().map(Line::subtotal).reduce(BigDecimal.ZERO, BigDecimal::add),
+        selectedCustomer(d.getCustomer()));
   }
 }

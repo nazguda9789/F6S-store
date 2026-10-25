@@ -47,6 +47,52 @@ public class Product {
   @JoinColumn(name = "category_id")
   private Category category;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "brand_attribute_id")
+  private ShoeAttribute brandAttribute;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "sole_attribute_id")
+  private ShoeAttribute soleAttribute;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "material_attribute_id")
+  private ShoeAttribute materialAttribute;
+
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("displayOrder ASC,id ASC")
+  private List<ProductColorImage> colorImages = new ArrayList<>();
+
+  private java.time.Instant createdAt;
+  private java.time.Instant updatedAt;
+
+  @Column(length = 100)
+  private String createdBy;
+
+  @Column(length = 100)
+  private String updatedBy;
+
+  private String actor() {
+    var auth =
+        org.springframework.security.core.context.SecurityContextHolder.getContext()
+            .getAuthentication();
+    return auth == null ? "system" : auth.getName();
+  }
+
+  @PrePersist
+  private void created() {
+    createdAt = java.time.Instant.now();
+    updatedAt = createdAt;
+    createdBy = actor();
+    updatedBy = createdBy;
+  }
+
+  @PreUpdate
+  private void updated() {
+    updatedAt = java.time.Instant.now();
+    updatedBy = actor();
+  }
+
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
   @OrderBy("id ASC")
   private List<ProductVariant> variants = new ArrayList<>();

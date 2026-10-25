@@ -7,7 +7,7 @@
 ### Database chưa tồn tại
 
 1. Chạy `00_create_database.sql` trong SSMS để tạo `f6s_shop`.
-2. Chạy `01_schema.sql`: tạo 12 bảng ứng dụng, đúng Entity hiện tại.
+2. Chạy `01_schema.sql`: tạo 19 bảng ứng dụng, đúng Entity hiện tại.
 3. Chạy `02_real_products.sql`: thêm danh mục, sản phẩm và biến thể trực tiếp. Không cần chạy Java để có sản phẩm.
 
 ### Database đã tồn tại nhưng chưa có bảng
@@ -15,6 +15,8 @@
 Bỏ qua 00; chạy **01 → 02** trong hai lần Execute riêng. Chờ mỗi file thành công trước khi chạy file sau, dừng khi có lỗi.
 
 ### Backend đã tạo bảng
+
+Bản cũ đã có dữ liệu: sao lưu, dừng backend, chạy **03_upgrade_bee_modules.sql** để thêm nhân viên, khách hàng/địa chỉ, thuộc tính, thư viện ảnh và lịch sử đơn. Không xóa database, không chạy lại 01. Xem [hướng dẫn module Bee](../docs/BEE-MODULES.md).
 
 **Không chạy 01.** Sau khi backup và kiểm tra đang dùng đúng schema của backend Vue/SQL Server, chạy riêng **02_real_products.sql**. File 02 kiểm tra các bảng/cột catalog cần thiết, không sửa schema cũ hoặc chuyển MySQL sang SQL Server.
 

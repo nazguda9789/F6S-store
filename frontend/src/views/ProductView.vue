@@ -22,6 +22,14 @@ const selected = computed(() =>
 function stock(s) {
   return product.value?.variants.find((v) => v.color === color.value && v.size === s)?.stock || 0
 }
+const photoIndex = ref(0),
+  photos = computed(() => {
+    const images =
+      product.value?.metadata?.images?.filter((i) => i.color === color.value).map((i) => i.url) ||
+      []
+    return images.length ? images : [product.value?.imageUrl].filter(Boolean)
+  }),
+  mainPhoto = computed(() => photos.value[photoIndex.value] || product.value?.imageUrl)
 let serial = 0
 async function load() {
   const request = ++serial
@@ -42,6 +50,7 @@ async function load() {
 }
 watch(() => route.params.id, load, { immediate: true })
 watch(color, () => {
+  photoIndex.value = 0
   size.value = ''
   quantity.value = 1
 })
@@ -62,7 +71,17 @@ watch(size, () => (quantity.value = 1))
         <div>
           <div class="pdp-image">
             <span class="eyebrow">F6S / {{ product.brand }}</span
-            ><img :src="product.imageUrl" :alt="product.name" />
+            ><img :src="mainPhoto" :alt="product.name + ' / ' + color" />
+          </div>
+          <div v-if="photos.length > 1" class="pdp-thumbnails">
+            <button
+              v-for="(photo, index) in photos"
+              :key="photo"
+              :aria-pressed="photoIndex === index"
+              @click="photoIndex = index"
+            >
+              <img :src="photo" :alt="'Ảnh ' + (index + 1) + ' màu ' + color" />
+            </button>
           </div>
           <img
             v-if="product.hoverImageUrl"
@@ -78,6 +97,20 @@ watch(size, () => (quantity.value = 1))
             {{ selected ? '' : 'Từ ' }}{{ money(selected?.price ?? product.price) }}
           </p>
           <p class="text-stone-500 mt-5 leading-relaxed">{{ product.description }}</p>
+          <dl class="product-facts">
+            <div>
+              <dt>Loại đế</dt>
+              <dd>{{ product.metadata?.sole?.name || 'Chưa xác nhận' }}</dd>
+            </div>
+            <div>
+              <dt>Chất liệu</dt>
+              <dd>{{ product.metadata?.material?.name || 'Chưa xác nhận' }}</dd>
+            </div>
+            <div v-if="selected?.weightGrams">
+              <dt>Khối lượng gói hàng</dt>
+              <dd>{{ selected.weightGrams }} g</dd>
+            </div>
+          </dl>
           <fieldset class="mt-8">
             <legend class="font-semibold mb-3">Phối màu: {{ color }}</legend>
             <div class="flex gap-2 flex-wrap">

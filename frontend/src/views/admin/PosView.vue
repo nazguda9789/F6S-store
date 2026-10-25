@@ -4,6 +4,30 @@ import { usePos } from '../../stores/pos'
 import { api, money } from '../../lib/api'
 import QrScanner from '../../components/QrScanner.vue'
 import InvoiceReceipt from '../../components/InvoiceReceipt.vue'
+const customerQuery = ref(''),
+  customerOptions = ref([]),
+  customerDialog = ref(null),
+  customerError = ref('')
+async function searchCustomers() {
+  customerError.value = ''
+  try {
+    customerOptions.value = (
+      await api('/admin/customers?active=true&q=' + encodeURIComponent(customerQuery.value))
+    ).content
+  } catch (e) {
+    customerError.value = e.message
+  }
+}
+function chooseCustomer() {
+  customerDialog.value.showModal()
+  searchCustomers()
+}
+async function setCustomer(id) {
+  try {
+    await pos.customer(id)
+    customerDialog.value.close()
+  } catch {}
+}
 const pos = usePos(),
   code = ref(''),
   q = ref(''),
@@ -202,6 +226,27 @@ onMounted(() => {
         </div>
       </section>
       <aside class="admin-card pos-summary">
+        <section class="pos-customer">
+          <div class="flex justify-between items-center">
+            <h2 class="font-semibold">Khách hàng</h2>
+            <button class="text-link" :disabled="pos.busy || !pos.active" @click="chooseCustomer">
+              Chọn khách
+            </button>
+          </div>
+          <template v-if="pos.active?.customer"
+            ><strong>{{ pos.active.customer.fullName }}</strong>
+            <p>{{ pos.active.customer.phone }}</p>
+            <p>{{ pos.active.customer.address || 'Chưa có địa chỉ' }}</p>
+            <button
+              class="text-sm underline mt-2"
+              :disabled="pos.busy"
+              @click="safely(() => pos.customer(null))"
+            >
+              Chuyển về khách lẻ
+            </button></template
+          >
+          <p v-else class="text-stone-500 mt-3">Khách lẻ tại quầy</p>
+        </section>
         <h2 class="text-xl font-semibold mb-5">Thanh toán tiền mặt</h2>
         <div class="flex justify-between mb-5">
           <span>Tiền hàng</span><b>{{ money(pos.active?.subtotal || 0) }}</b>
@@ -257,5 +302,52 @@ onMounted(() => {
       </aside>
     </div>
     <InvoiceReceipt v-if="pos.receipt" :invoice="pos.receipt" class="admin-card mt-5" />
+    <dialog ref="customerDialog" class="media-dialog">
+      <div class="flex justify-between mb-5">
+        <h2 class="text-xl font-semibold">Chọn khách hàng</h2>
+        <button class="icon-button" aria-label="Đóng chọn khách" @click="customerDialog.close()">
+          ✕
+        </button>
+      </div>
+      <form class="flex gap-3 mb-5" @submit.prevent="searchCustomers">
+        <input
+          v-model.trim="customerQuery"
+          class="tool-input flex-1"
+          placeholder="Tên hoặc số điện thoại…"
+        /><button class="button button-outline">Tìm khách</button>
+      </form>
+      <p v-if="customerError" class="error-box" role="alert">{{ customerError }}</p>
+      <div class="table-scroll">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Khách hàng</th>
+              <th>Điện thoại</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="c in customerOptions" :key="c.id">
+              <td>
+                {{ c.profile.fullName }}<small>{{ c.code }}</small>
+              </td>
+              <td>{{ c.profile.phone }}</td>
+              <td>
+                <button
+                  class="button button-outline"
+                  :disabled="pos.busy"
+                  @click="setCustomer(c.id)"
+                >
+                  Chọn
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p v-if="!customerOptions.length" class="empty-state">
+        Không tìm thấy khách. Tạo hồ sơ tại Quản lý tài khoản → Khách hàng.
+      </p>
+    </dialog>
   </div>
 </template>

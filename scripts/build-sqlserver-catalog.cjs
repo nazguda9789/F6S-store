@@ -7,7 +7,7 @@ const data = JSON.parse(
   fs.readFileSync(path.join(root, 'backend/src/main/resources/catalog/real-products.json'), 'utf8'),
 )
 const ddl = fs.readFileSync(path.join(root, 'backend/target/sqlserver-schema.sql'), 'utf8').trim()
-assert.equal((ddl.match(/create table dbo\./g) || []).length, 12)
+assert.equal((ddl.match(/create table dbo\./g) || []).length, 19)
 assert.doesNotMatch(ddl, /\b(?:drop|delete|truncate)\b/i)
 assert.equal(data.products.length, 25)
 assert.equal(new Set(data.products.map((p) => p.code)).size, 25)
@@ -42,7 +42,7 @@ BEGIN TRY
 ${ddl}
 -- END HIBERNATE SQL SERVER DDL
  COMMIT TRANSACTION;
- PRINT N'Created 12 application tables. Next run 02_real_products.sql.';
+ PRINT N'Created 19 application tables. Next run 02_real_products.sql.';
 END TRY
 BEGIN CATCH
  IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;

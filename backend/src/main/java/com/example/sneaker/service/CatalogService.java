@@ -20,6 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 public class CatalogService {
   private final ProductRepository products;
   private final CategoryRepository categories;
+  private final ShoeAttributeService attributes;
+  private final MediaService media;
 
   public PageView<ProductView> search(
       Long category,
@@ -206,6 +208,7 @@ public class CatalogService {
       }
       v.setStock(row.stock());
       v.setPrice(row.price() == null ? input.price() : row.price());
+      v.setWeightGrams(row.weightGrams());
       v.setActive(true);
     }
     p.setPrice(
@@ -214,6 +217,42 @@ public class CatalogService {
             .map(ProductVariant::getPrice)
             .min(java.util.Comparator.naturalOrder())
             .orElseThrow());
+    if (input.metadata() != null) {
+      var metadata = input.metadata();
+      p.setBrandAttribute(attributes.require(metadata.brandId(), "BRAND"));
+      p.setSoleAttribute(attributes.require(metadata.soleId(), "SOLE"));
+      p.setMaterialAttribute(attributes.require(metadata.materialId(), "MATERIAL"));
+      if (p.getBrandAttribute() != null) p.setBrand(p.getBrandAttribute().getName());
+      var images =
+          metadata.images() == null
+              ? java.util.List.<com.example.sneaker.dto.CatalogAdminApi.ColorImage>of()
+              : metadata.images();
+      var mapped = new java.util.ArrayList<ProductColorImage>();
+      var order = new java.util.HashMap<String, Integer>();
+      var seenImages = new java.util.HashSet<String>();
+      for (var image : images) {
+        String color = image.color().trim();
+        if (!p.getColorways().contains(color)) throw bad("Ảnh phải gắn với màu có trong ma trận");
+        var asset = media.require(image.mediaId().toString());
+        if (!seenImages.add(color + "/" + asset.getId()))
+          throw bad("Không gắn trùng một ảnh cho cùng màu");
+        int position = order.merge(color, 1, Integer::sum) - 1;
+        if (position >= 5) throw bad("Tối đa 5 ảnh cho mỗi màu");
+        var link = new ProductColorImage();
+        link.setProduct(p);
+        link.setColor(color);
+        link.setMedia(asset);
+        link.setDisplayOrder(position);
+        mapped.add(link);
+      }
+      p.getColorImages().clear();
+      if (p.getId() != null) products.flush();
+      p.getColorImages().addAll(mapped);
+      if (!mapped.isEmpty()) {
+        p.setImageUrl(mapped.get(0).getMedia().publicUrl());
+        p.setHoverImageUrl(mapped.get(Math.min(1, mapped.size() - 1)).getMedia().publicUrl());
+      }
+    }
   }
 
   public static ProductView view(Product p) {
@@ -241,8 +280,34 @@ public class CatalogService {
                         v.getSize(),
                         v.getStock(),
                         v.getPrice(),
-                        "F6S:VARIANT:" + v.getSku()))
-            .toList());
+                        "F6S:VARIANT:" + v.getSku(),
+                        v.getWeightGrams()))
+            .toList(),
+        new com.example.sneaker.dto.CatalogAdminApi.Details(
+            ShoeAttributeService.view(p.getBrandAttribute()),
+            ShoeAttributeService.view(p.getSoleAttribute()),
+            ShoeAttributeService.view(p.getMaterialAttribute()),
+            p.getColorImages().stream()
+                .map(
+                    i ->
+                        new com.example.sneaker.dto.CatalogAdminApi.ImageView(
+                            i.getColor(),
+                            i.getMedia().getId(),
+                            i.getMedia().publicUrl(),
+                            i.getDisplayOrder()))
+                .toList(),
+            p.getCreatedAt(),
+            p.getUpdatedAt(),
+            isAdmin() ? p.getCreatedBy() : null,
+            isAdmin() ? p.getUpdatedBy() : null));
+  }
+
+  private static boolean isAdmin() {
+    var auth =
+        org.springframework.security.core.context.SecurityContextHolder.getContext()
+            .getAuthentication();
+    return auth != null
+        && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
   }
 
   public static ResponseStatusException bad(String message) {

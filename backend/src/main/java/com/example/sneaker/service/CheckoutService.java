@@ -16,6 +16,7 @@ public class CheckoutService {
   private final InventoryService inventory;
   private final OrderRepository orders;
   private final PromotionService promotions;
+  private final OrderAuditService audit;
 
   @Transactional
   public OrderView checkout(Checkout input) {
@@ -38,6 +39,7 @@ public class CheckoutService {
     inventory.consume(order, quantities, locked);
     promotions.applyOrder(order, input.promotionCode(), quantities, locked);
     orders.saveAndFlush(order);
+    audit.record(order, null, "guest", "Đặt hàng online COD");
     return view(order);
   }
 
@@ -83,6 +85,8 @@ public class CheckoutService {
         o.getPromotionCode(),
         o.getChannel(),
         o.getCashReceived(),
-        o.getCashChange());
+        o.getCashChange(),
+        o.getCustomerName(),
+        o.getPhone());
   }
 }

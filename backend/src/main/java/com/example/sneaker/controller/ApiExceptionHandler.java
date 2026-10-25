@@ -11,6 +11,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+  @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+  ResponseEntity<?> tooLarge(Exception e) {
+    return ResponseEntity.status(413).body(Map.of("message", "Ảnh vượt quá giới hạn tải lên 5 MB"));
+  }
+
   @ExceptionHandler(ResponseStatusException.class)
   ResponseEntity<?> status(ResponseStatusException e) {
     return ResponseEntity.status(e.getStatusCode())

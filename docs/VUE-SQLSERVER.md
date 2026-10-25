@@ -90,6 +90,6 @@ Chưa xác nhận runtime trên SQL Server thực tế: image Microsoft bị ch�
 
 ## 7. Trước triển khai công khai
 
-Dùng HTTPS, tài khoản DB giới hạn quyền, chứng chỉ SQL Server hợp lệ (`trustServerCertificate=false`), migration versioned và `DDL_AUTO=validate`, tắt seed. Không dùng `sa`, mật khẩu mẫu, dev server, H2 test hoặc tự động update schema trên dữ liệu kinh doanh. Cần thêm auth khách hàng, RBAC nhân viên, rate limiting/anti-abuse, audit tồn kho và kiểm thử tích hợp thanh toán trước khi bán thật.
+Dùng HTTPS, tài khoản DB giới hạn quyền, chứng chỉ SQL Server hợp lệ (`trustServerCertificate=false`), migration versioned và `DDL_AUTO=validate`, tắt seed. Không dùng `sa`, mật khẩu mẫu, dev server, H2 test hoặc tự động update schema trên dữ liệu kinh doanh. Đã có phân quyền ADMIN/STAFF; xem [module Bee và nâng cấp SQL](BEE-MODULES.md). Cần thêm auth khách hàng, rate limiting/anti-abuse, audit điều chỉnh tồn kho và kiểm thử tích hợp thanh toán trước khi bán thật.
 
 Frontend production: `npm run build`, phục vụ `frontend/dist` bằng Nginx; SPA fallback `try_files $uri $uri/ /index.html;`, reverse proxy `/api` sang backend. Không dùng Vite dev/preview làm production server.
