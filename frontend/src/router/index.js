@@ -6,6 +6,8 @@ const router = createRouter({
     return saved || { top: 0 }
   },
   routes: [
+    { path: '/login', redirect: '/account' },
+    { path: '/register', redirect: '/account' },
     {
       path: '/account',
       component: () => import('../views/AccountView.vue'),
@@ -18,8 +20,7 @@ const router = createRouter({
     },
     {
       path: '/admin/login',
-      component: () => import('../views/admin/LoginView.vue'),
-      meta: { title: 'Đăng nhập quản trị' },
+      redirect: '/account?mode=staff',
     },
     {
       path: '/admin',

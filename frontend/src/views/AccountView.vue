@@ -1,9 +1,15 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import StaffLogin from '../components/StaffLogin.vue'
 import { useCustomer } from '../stores/customer'
 import { api, money } from '../lib/api'
 import { orderLabels, paymentLabels } from '../lib/order'
 const customer = useCustomer(),
+  route = useRoute(),
+  router = useRouter(),
+  staffMode = computed(() => route.query.mode === 'staff'),
+  cooldown = ref(0),
   email = ref(''),
   code = ref(''),
   challenge = ref(null),
@@ -14,6 +20,7 @@ const customer = useCustomer(),
   orders = ref([])
 const profile = reactive({ fullName: '', phone: '', address: '' })
 async function run(work) {
+  if (busy.value) return
   busy.value = true
   error.value = ''
   notice.value = ''
@@ -26,14 +33,29 @@ async function run(work) {
   }
 }
 async function send() {
+  if (cooldown.value || !enabled.value) return
   await run(async () => {
     challenge.value = await api('/auth/otp', {
       method: 'POST',
       body: JSON.stringify({ email: email.value }),
     })
     notice.value = 'Mã đã gửi đến email. Kiểm tra cả mục thư rác; chờ 60 giây trước khi gửi lại.'
+    cooldown.value = 60
   })
 }
+function changeEmail() {
+  challenge.value = null
+  code.value = ''
+  notice.value = ''
+  error.value = ''
+}
+function selectMode(staff) {
+  router.replace({ path: '/account', query: staff ? { mode: 'staff' } : {} })
+}
+const countdown = setInterval(() => {
+  if (cooldown.value > 0) cooldown.value--
+}, 1000)
+onUnmounted(() => clearInterval(countdown))
 async function verify() {
   await run(async () => {
     await customer.login(challenge.value.challengeId, code.value)
@@ -64,10 +86,30 @@ onMounted(() =>
 </script>
 <template>
   <div class="shell section max-w-4xl">
-    <h1 class="page-title mb-8">Tài khoản F6S</h1>
-    <p v-if="error" role="alert" class="error-box mb-5">{{ error }}</p>
-    <p v-if="notice" role="status" class="success-panel mb-5">{{ notice }}</p>
-    <section v-if="!customer.profile" class="admin-card">
+    <h1 class="page-title mb-4">Tài khoản F6S</h1>
+    <p class="text-stone-500 mb-6">Một nơi đăng nhập cho khách mua hàng và đội ngũ cửa hàng.</p>
+    <div class="flex flex-wrap gap-3 mb-6" role="group" aria-label="Loại đăng nhập">
+      <button
+        class="button"
+        :class="{ 'button-outline': staffMode }"
+        :aria-pressed="!staffMode"
+        @click="selectMode(false)"
+      >
+        Khách hàng
+      </button>
+      <button
+        class="button"
+        :class="{ 'button-outline': !staffMode }"
+        :aria-pressed="staffMode"
+        @click="selectMode(true)"
+      >
+        Nhân viên / Quản trị
+      </button>
+    </div>
+    <StaffLogin v-if="staffMode" />
+    <p v-if="error && !staffMode" role="alert" class="error-box mb-5">{{ error }}</p>
+    <p v-if="notice && !staffMode" role="status" class="success-panel mb-5">{{ notice }}</p>
+    <section v-if="!staffMode && !customer.profile" class="admin-card">
       <h2 class="text-xl font-semibold mb-4">Đăng ký / Đăng nhập bằng email OTP</h2>
       <p class="text-sm mb-5">
         Lần đầu xác minh email sẽ tạo tài khoản. Không cần mật khẩu. Mã hết hạn sau 5 phút, tối đa 5
@@ -84,9 +126,19 @@ onMounted(() =>
             type="email"
             maxlength="254"
             required
+            :readonly="!!challenge"
             :disabled="busy" /></label
-        ><button class="button" :disabled="busy || !enabled">
-          {{ challenge ? 'Gửi lại mã' : 'Gửi mã OTP' }}
+        ><button class="button" :disabled="busy || !enabled || cooldown > 0">
+          {{ cooldown > 0 ? `Gửi lại sau ${cooldown}s` : challenge ? 'Gửi lại mã' : 'Gửi mã OTP' }}
+        </button>
+        <button
+          v-if="challenge"
+          type="button"
+          class="text-link ml-4"
+          :disabled="busy"
+          @click="changeEmail"
+        >
+          Đổi email
         </button>
       </form>
       <form v-if="challenge" @submit.prevent="verify" class="mt-6">
@@ -102,7 +154,7 @@ onMounted(() =>
         ><button class="button" :disabled="busy">Xác minh và đăng nhập</button>
       </form>
     </section>
-    <section v-else>
+    <section v-else-if="!staffMode && customer.profile">
       <div class="admin-card mb-6">
         <p class="font-semibold mb-5">{{ customer.profile.email }}</p>
         <form @submit.prevent="save">
@@ -152,8 +204,8 @@ onMounted(() =>
       <p v-if="!orders.length">Chưa có đơn hàng.</p>
     </section>
     <p class="text-xs text-stone-500 mt-6">
-      Phiên khách giữ trong bộ nhớ; tải lại trang sẽ cần đăng nhập lại. Không chia sẻ OTP hoặc liên
-      kết thanh toán.
+      Phiên đăng nhập giữ trong bộ nhớ; tải lại trang sẽ cần đăng nhập lại. Không chia sẻ mật khẩu,
+      OTP hoặc liên kết thanh toán.
     </p>
   </div>
 </template>

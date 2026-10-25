@@ -29,7 +29,7 @@ watch(
         <RouterLink to="/">Trang chủ</RouterLink
         ><RouterLink to="/catalog">Tất cả sản phẩm</RouterLink
         ><RouterLink to="/catalog?featured=true">F6S Select <ArrowIcon /></RouterLink
-        ><RouterLink to="/account">Tài khoản</RouterLink>
+        ><RouterLink to="/account">Đăng nhập / Tài khoản</RouterLink>
       </nav>
       <div class="flex gap-3 items-center">
         <button class="cart-trigger" @click="cart.open = true">
@@ -47,7 +47,7 @@ watch(
     <nav v-if="menu" class="mobile-nav shell" aria-label="Menu di động">
       <RouterLink to="/">Trang chủ</RouterLink><RouterLink to="/catalog">Sản phẩm</RouterLink
       ><RouterLink to="/catalog?featured=true">F6S Select</RouterLink
-      ><RouterLink to="/account">Tài khoản</RouterLink>
+      ><RouterLink to="/account">Đăng nhập / Tài khoản</RouterLink>
     </nav>
   </header>
   <main id="main" tabindex="-1"><RouterView /></main>

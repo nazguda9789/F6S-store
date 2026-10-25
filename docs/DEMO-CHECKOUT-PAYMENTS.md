@@ -26,6 +26,8 @@ npm run dev
 
 Mở `http://localhost:5173`; quản trị `/admin/login`. Biến môi trường phải nằm trong **Run Configuration IntelliJ** hoặc chính terminal chạy Maven. Spring Boot không tự đọc file `.env` ở thư mục gốc.
 
+Trang đăng nhập chung là `/account` (cũng có thể mở `/login` hoặc `/register`). Chọn **Khách hàng** để dùng email OTP; chọn **Nhân viên / Quản trị** để dùng tài khoản/mật khẩu được cấp. `/admin/login` cũ tự chuyển tới lựa chọn nhân viên/quản trị. Backend tự xác định quyền: admin tới tổng quan, nhân viên tới POS. Không tạo thêm quyền chỉ bằng việc chọn loại đăng nhập. Nhân viên quên mật khẩu liên hệ quản trị; khách đăng nhập lại bằng OTP mới. Phiên giữ trong bộ nhớ, không tự lưu mật khẩu vào localStorage.
+
 `SHIPPING_FEE=30000` để demo phí giao hàng, `SHIPPING_FREE_ABOVE=2000000` để miễn phí từ 2 triệu; không cấu hình phí thì mặc định 0. Phí tính trên tiền hàng sau khuyến mãi, được chụp vào đơn. POS không cộng phí giao hàng.
 
 ## 3. Kịch bản trình diễn
