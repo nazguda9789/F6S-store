@@ -39,7 +39,9 @@ mvn spring-boot:run
 
 API mặc định cổng **8081**. `http://localhost:8081/api/products` phải trả JSON. [application.yml](../backend/src/main/resources/application.yml) dùng JDBC SQL Server, Unicode nationalized, `ddl-auto=update` cho local. Không ép dialect MySQL vào đây. Schema lỗi thì dừng khởi động, không tiếp tục seed.
 
-`SEED_DEMO=true` chỉ tạo khi chưa có bất kỳ danh mục: 5 danh mục, 25 sản phẩm, 250 biến thể, size hết hàng để kiểm tra UI. Không tạo đơn/biên lai doanh thu giả, không tạo OTP hay secret. Tắt seed sau lần đầu. Hình ảnh SVG và sản phẩm chỉ là minh họa, không phải ảnh/thông số hãng đã xác minh.
+`SEED_DEMO=true` chỉ tạo khi chưa có bất kỳ danh mục: 5 danh mục, 25 model giày có thật, 250 biến thể demo, size hết hàng để kiểm tra UI. Không tạo đơn/biên lai doanh thu giả, không tạo OTP hay secret. Tắt seed sau lần đầu. Giá, phối màu/size và tồn là dữ liệu mẫu chưa xác minh từ hãng; ảnh sản phẩm chưa bổ sung.
+
+Catalog mới dùng tên model có thật (Pegasus, Samba, Chuck 70...), thay cho tên hư cấu Velocity/Urban. Giá, màu/size và tồn vẫn là demo; ảnh hiển thị “Chưa có ảnh sản phẩm”. Có thể tạo dữ liệu trực tiếp bằng [SQL 01 → 02](../database/README.md) mà không chờ Java seed. Nếu đã import SQL, đặt `SEED_DEMO=false`. Catalog cũ đã seed không tự bị xóa hoặc thay thế.
 
 ## 3. Frontend
 
@@ -74,7 +76,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Backend test dùng **H2 MSSQL compatibility mode**, 25 test hiện có, gồm CRUD/checkout và matrix/POS/promotion/dashboard. Không chạy test này trên database thật. E2E chỉ dùng database demo riêng: test tạo sản phẩm, mã, hóa đơn và trừ tồn. Admin E2E mặc định bỏ qua nếu không đặt E2E_ADMIN_PASSWORD; đặt thêm E2E_ADMIN_USERNAME nếu khác admin. E2E_BASE_URL mặc định localhost:5173; CHROMIUM_PATH nếu dùng browser có sẵn.
+Backend hiện có 29 test, gồm CRUD/checkout, matrix/POS/promotion/dashboard, catalog tham chiếu, SQL Server DDL export và SQL data smoke test. Các test thực thi database dùng **H2 MSSQL compatibility mode** (có adapter datatype/OUTPUT cho smoke test), không phải SQL Server thật. E2E chỉ dùng database demo riêng: test tạo sản phẩm, mã, hóa đơn và trừ tồn. Admin E2E mặc định bỏ qua nếu không đặt E2E_ADMIN_PASSWORD; đặt thêm E2E_ADMIN_USERNAME nếu khác admin. E2E_BASE_URL mặc định localhost:5173; CHROMIUM_PATH nếu dùng browser có sẵn.
 
 Chưa xác nhận runtime trên SQL Server thực tế: image Microsoft bị chặn tải trong môi trường triển khai. Cần nghiệm thu schema/Unicode/locking trên SQL Server của bạn, thiết bị QR camera/USB và bản in máy in thật. Build/test H2 không chứng minh production-ready.
 

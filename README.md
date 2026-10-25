@@ -13,6 +13,7 @@ docs/        Hướng dẫn chạy, API, phạm vi chuyển đổi
 
 1. Cài JDK 17, Maven 3.9+, Node 20.19+ hoặc 22.12+, SQL Server 2019/2022 và SSMS.
 2. Trong SSMS chạy [database/00_create_database.sql](database/00_create_database.sql) để tạo **database trống** `f6s_shop`. Nếu đã tồn tại, dừng và sao lưu/kiểm tra; không xóa hoặc nhập chồng. **Không import SQL MySQL/XAMPP vào SQL Server.**
+   Muốn có bảng và sản phẩm trực tiếp từ SQL: xem [bộ schema + catalog SQL Server](database/README.md), chạy **01_schema.sql → 02_real_products.sql** nếu database chưa có bảng. Backend đã tạo bảng thì bỏ qua 01, chỉ import 02 sau khi backup. Bộ này có 25 tên model có thật, giá/màu/size/tồn demo; ảnh thật chưa xác minh.
 3. Mở `backend/pom.xml` trong IntelliJ, đặt `DB_PASSWORD`, `ADMIN_PASSWORD` (ít nhất 12 ký tự), `SEED_DEMO=true`; chạy `SneakerApplication`. API: `http://localhost:8081`.
 4. Trong `frontend`: `npm ci` rồi `npm run dev`. Cửa hàng: `http://localhost:5173`, quản trị: `http://localhost:5173/admin`.
 5. Đăng nhập quản trị bằng `ADMIN_USERNAME` (mặc định `admin`) và `ADMIN_PASSWORD` đã đặt, không dùng tài khoản admin MySQL cũ.

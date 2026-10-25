@@ -66,7 +66,8 @@ watch(
       <div>
         <h2 class="font-semibold mb-4">Thông tin bản demo</h2>
         <p class="text-sm text-white/60">
-          Ảnh minh họa và sản phẩm mẫu. Thanh toán COD; chưa tích hợp OTP/VNPAY của bản cũ.
+          Catalog có tên model thật; giá và tồn là demo. Ảnh sản phẩm đang chờ bổ sung. Thanh toán
+          COD; chưa tích hợp OTP/VNPAY của bản cũ.
         </p>
       </div>
     </div>

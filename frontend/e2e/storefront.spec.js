@@ -16,7 +16,9 @@ test('home, filters, sold-out size, cart persistence and COD checkout', async ({
   if (testInfo.project.name === 'mobile') await page.getByRole('button', { name: 'Bộ lọc' }).click()
   await page.getByRole('combobox', { name: 'Thương hiệu', exact: true }).selectOption('Nike')
   await page.getByRole('button', { name: 'Áp dụng bộ lọc' }).click()
-  await expect(page.locator('.product-card')).toHaveCount(5)
+  const nike = (await (await page.request.get('/api/products?brand=Nike&limit=48')).json())
+    .totalElements
+  await expect(page.locator('.product-card')).toHaveCount(Math.min(12, nike))
   await page.locator('.product-card').first().click()
   await expect(page.getByRole('button', { name: '42', exact: true })).toBeDisabled()
   await page.getByRole('button', { name: '40', exact: true }).click()
