@@ -146,7 +146,15 @@ public final class Api {
       String phone,
       String paymentStatus,
       BigDecimal shippingFee,
-      String paymentUrl) {}
+      String paymentUrl,
+      String fulfillmentStatus,
+      String cancellationStatus,
+      String cancellationReason,
+      Instant cancellationRequestedAt,
+      String carrier,
+      String trackingCode,
+      boolean stockReleased,
+      String cancellationDecisionReason) {}
 
   public record OrderLineView(
       String productName,

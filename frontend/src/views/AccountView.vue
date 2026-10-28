@@ -18,6 +18,17 @@ const customer = useCustomer(),
   notice = ref(''),
   enabled = ref(false),
   orders = ref([])
+const cancelReasons = reactive({})
+async function cancelOrder(order) {
+  await run(async () => {
+    await api('/me/orders/' + encodeURIComponent(order.code) + '/cancellation', {
+      method: 'POST',
+      body: JSON.stringify({ reason: cancelReasons[order.code] }),
+    })
+    await load()
+    notice.value = 'Đã gửi yêu cầu hủy. Đơn chưa bị hủy cho tới khi quản trị duyệt.'
+  })
+}
 const profile = reactive({ fullName: '', phone: '', address: '' })
 async function run(work) {
   if (busy.value) return
@@ -129,7 +140,15 @@ onMounted(() =>
             :readonly="!!challenge"
             :disabled="busy" /></label
         ><button class="button" :disabled="busy || !enabled || cooldown > 0">
-          {{ cooldown > 0 ? `Gửi lại sau ${cooldown}s` : challenge ? 'Gửi lại mã' : 'Gửi mã OTP' }}
+          {{
+            busy
+              ? 'Đang xử lý…'
+              : cooldown > 0
+                ? `Gửi lại sau ${cooldown}s`
+                : challenge
+                  ? 'Gửi lại mã'
+                  : 'Gửi mã OTP'
+          }}
         </button>
         <button
           v-if="challenge"
@@ -185,21 +204,59 @@ onMounted(() =>
         </form>
       </div>
       <h2 class="text-2xl font-semibold mb-5">Đơn hàng của tôi</h2>
+      <button class="button button-outline mb-5" :disabled="busy" @click="run(load)">
+        Tải lại đơn hàng
+      </button>
       <p class="text-sm text-stone-500 mb-5">
         Hiển thị tối đa 50 đơn đặt khi đã đăng nhập. Đơn khách vãng lai không tự ghép theo email.
       </p>
       <article v-for="order in orders" :key="order.code" class="admin-card mb-4">
         <h3 class="font-semibold">{{ order.code }}</h3>
         <p class="mt-2">
-          {{ orderLabels[order.status] || order.status }} · {{ money(order.total) }} ·
-          {{ order.paymentMethod }} /
-          {{ paymentLabels[order.paymentStatus] || order.paymentStatus }}
+          Giao hàng:
+          {{ orderLabels[order.fulfillmentStatus] || orderLabels[order.status] || order.status }}
+        </p>
+        <p class="mt-2">
+          Thanh toán: {{ paymentLabels[order.paymentStatus] || order.paymentStatus }} ·
+          {{ order.paymentMethod }} · {{ money(order.total) }}
+        </p>
+        <p v-if="order.trackingCode" class="mt-2 text-sm">
+          Vận đơn: {{ order.carrier }} · {{ order.trackingCode }}
+        </p>
+        <p v-if="order.cancellationStatus" class="mt-2 text-sm">
+          Yêu cầu hủy:
+          {{
+            { REQUESTED: 'Chờ quản trị duyệt', APPROVED: 'Đã duyệt hủy', REJECTED: 'Đã từ chối' }[
+              order.cancellationStatus
+            ]
+          }}
+          · {{ order.cancellationReason }}
+        </p>
+        <p v-if="order.cancellationDecisionReason" class="text-sm mt-2">
+          Phản hồi cửa hàng: {{ order.cancellationDecisionReason }}
         </p>
         <ul class="mt-3 text-sm">
           <li v-for="item in order.items" :key="item.sku">
             {{ item.productName }} · {{ item.color }} / {{ item.size }} × {{ item.quantity }}
           </li>
         </ul>
+        <form
+          v-if="
+            ['PENDING', 'CONFIRMED', 'PACKING'].includes(order.status) &&
+            order.cancellationStatus !== 'REQUESTED'
+          "
+          class="mt-4"
+          @submit.prevent="cancelOrder(order)"
+        >
+          <label class="field"
+            >Lý do yêu cầu hủy<input
+              v-model.trim="cancelReasons[order.code]"
+              required
+              minlength="5"
+              maxlength="500"
+              :disabled="busy" /></label
+          ><button class="button button-outline" :disabled="busy">Gửi yêu cầu hủy đơn</button>
+        </form>
       </article>
       <p v-if="!orders.length">Chưa có đơn hàng.</p>
     </section>

@@ -1,5 +1,7 @@
 # Demo online, tại quầy, email OTP và VNPAY
 
+**Cập nhật giao hàng:** database bản này đã có 03/04 thì nâng thêm 05. Xem [hướng dẫn hủy từ khách, nhận hoàn, hàng chờ đối soát và ảnh](FULFILLMENT-AND-MEDIA.md). VNPAY chưa trả có thể xác nhận/chuẩn bị nhưng không được bàn giao vận chuyển; đơn quá hạn có hàng chờ để admin đối soát trước khi hủy.
+
 ## 1. Nâng cấp dữ liệu
 
 Sao lưu `f6s_shop` và dừng backend. Dùng **SSMS / SQL Server**, không dùng phpMyAdmin.

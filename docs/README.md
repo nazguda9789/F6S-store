@@ -6,6 +6,8 @@
 
 [Demo online/tại quầy, đăng nhập OTP, vận đơn, hoàn tiền và VNPAY](DEMO-CHECKOUT-PAYMENTS.md) · [Các module theo Bee](BEE-MODULES.md).
 
+[Giao thất bại, yêu cầu hủy, đối soát đơn quá hạn và sao lưu ảnh](FULFILLMENT-AND-MEDIA.md).
+
 ## Bản Thymeleaf / MySQL cũ (đối chiếu, rollback)
 
 Các mục bên dưới chỉ áp dụng source `src/` và SQL MySQL cũ, không áp dụng backend/frontend mới.

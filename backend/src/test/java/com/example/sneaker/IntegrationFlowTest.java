@@ -174,7 +174,9 @@ class IntegrationFlowTest {
   @Test
   void cancelledOrderPaidLateRequiresRefundWithoutDoubleRestocking() {
     var o = order(input("VNPAY", "late@example.test"));
-    assertThatThrownBy(() -> management.status(o.getId(), "CONFIRMED"))
+    management.status(o.getId(), "CONFIRMED");
+    management.status(o.getId(), "PACKING");
+    assertThatThrownBy(() -> management.status(o.getId(), "SHIPPING"))
         .isInstanceOf(ResponseStatusException.class);
     management.status(o.getId(), "CANCELLED");
     assertThat(vnpay.ipn(signed(o, "13000000")).get("RspCode")).isEqualTo("00");

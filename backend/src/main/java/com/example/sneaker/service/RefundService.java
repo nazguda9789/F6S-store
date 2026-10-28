@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class RefundService {
   private final OrderRepository orders;
   private final RefundRepository refunds;
-  private final InventoryService inventory;
   private final OrderAuditService audit;
+  private final InventoryReleaseService release;
 
   public record View(
       Long id,
@@ -52,8 +52,8 @@ public class RefundService {
     var old = refunds.findByOrderId(orderId);
     if (old.isPresent()) return view(old.get());
     String paid = CheckoutService.view(o).paymentStatus();
-    if (!Set.of("COMPLETED", "CANCELLED").contains(o.getStatus()) || !paid.equals("PAID"))
-      throw bad("Chỉ hoàn đơn đã thu tiền và đã hoàn tất/hủy");
+    if (!Set.of("COMPLETED", "CANCELLED", "RETURNED").contains(o.getStatus())
+        || !paid.equals("PAID")) throw bad("Chỉ hoàn đơn đã thu tiền và đã hoàn tất/hủy");
     var r = new OrderRefund();
     r.setOrder(o);
     r.setReason(reason.trim());
@@ -74,13 +74,7 @@ public class RefundService {
       if (reference == null || reference.isBlank()) throw bad("Cần mã chứng từ hoàn tiền thực tế");
       if (o.getStatus().equals("COMPLETED")) {
         if (!received) throw bad("Cần xác nhận đã nhận lại và kiểm tra toàn bộ hàng");
-        var quantities = new TreeMap<Long, Integer>();
-        o.getItems()
-            .forEach(i -> quantities.merge(i.getVariant().getId(), i.getQuantity(), Integer::sum));
-        var locked = inventory.lock(quantities);
-        quantities.forEach(
-            (id, qty) -> locked.get(id).setStock(Math.addExact(locked.get(id).getStock(), qty)));
-        r.setRestocked(true);
+        r.setRestocked(release.release(o, false));
       }
       r.setStatus("REFUNDED");
       r.setSettlementReference(reference.trim());

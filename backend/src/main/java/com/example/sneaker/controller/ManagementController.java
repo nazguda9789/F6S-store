@@ -31,8 +31,10 @@ public class ManagementController {
       @RequestParam(defaultValue = "0") @Min(0) int page,
       @RequestParam(required = false) String status,
       @RequestParam(required = false) String channel,
-      @RequestParam(required = false) @Size(max = 120) String q) {
-    return orders.list(page, status, channel, q);
+      @RequestParam(required = false) @Size(max = 120) String q,
+      @RequestParam(required = false) String paymentStatus,
+      @RequestParam(required = false) String cancellationStatus) {
+    return orders.list(page, status, channel, q, paymentStatus, cancellationStatus);
   }
 
   @GetMapping("/orders/{id}")
@@ -41,14 +43,26 @@ public class ManagementController {
   }
 
   public record Status(
-      @NotBlank @Pattern(regexp = "CONFIRMED|PACKING|SHIPPING|COMPLETED|CANCELLED") String status,
+      @NotBlank
+          @Pattern(
+              regexp =
+                  "CONFIRMED|PACKING|SHIPPING|COMPLETED|CANCELLED|DELIVERY_FAILED|RETURNING|RETURNED")
+          String status,
       @Size(max = 500) String reason,
-      @Size(max = 30) String expectedStatus) {}
+      @Size(max = 30) String expectedStatus,
+      boolean goodsReceived,
+      boolean waybillCancelled) {}
 
   @PutMapping("/orders/{id}/status")
   public OrderView status(
       @PathVariable Long id, @Valid @RequestBody Status input, java.security.Principal user) {
     return orders.status(
-        id, input.status(), user.getName(), input.reason(), input.expectedStatus());
+        id,
+        input.status(),
+        user.getName(),
+        input.reason(),
+        input.expectedStatus(),
+        input.goodsReceived(),
+        input.waybillCancelled());
   }
 }

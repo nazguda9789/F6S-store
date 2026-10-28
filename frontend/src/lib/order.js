@@ -5,6 +5,9 @@ export const orderLabels = {
   SHIPPING: 'Đang giao',
   COMPLETED: 'Đã hoàn tất',
   CANCELLED: 'Đã hủy',
+  DELIVERY_FAILED: 'Giao thất bại',
+  RETURNING: 'Đang hoàn về',
+  RETURNED: 'Đã nhận hàng hoàn',
 }
 export const paymentLabels = {
   PENDING: 'Chờ cổng xác nhận',

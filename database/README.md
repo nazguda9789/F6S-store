@@ -2,7 +2,9 @@
 
 **Dùng SSMS/SQL Server, không dùng phpMyAdmin hoặc `sql/install` (bản MySQL cũ).** Các file này dùng database `f6s_shop`. Không xóa database cũ để cài lại. Sao lưu trước và dừng backend khi import.
 
-[Tải bộ SQL demo mới nhất](../downloads/F6S-SQLSERVER-DEMO-20261025.zip), gồm schema 24 bảng, catalog và nâng cấp 03/04; các ZIP phát hành trước được giữ để đối chiếu, không phải schema mới nhất.
+[Tải bộ SQL mới nhất](../downloads/F6S-SQLSERVER-FULFILLMENT-20261028.zip), gồm schema 24 bảng, catalog và nâng cấp 03/04/05; các ZIP phát hành trước được giữ để đối chiếu, không phải schema mới nhất.
+
+**Đã chạy 03/04:** backup database và thư mục ảnh, dừng backend, chạy `05_upgrade_fulfillment.sql`. Script không reset tồn, không xóa đơn/ảnh. [Luồng mới và nơi lưu ảnh](../docs/FULFILLMENT-AND-MEDIA.md).
 
 ## Chọn đúng thứ tự
 

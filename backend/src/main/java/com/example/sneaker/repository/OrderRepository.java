@@ -17,6 +17,8 @@ public interface OrderRepository
         org.springframework.data.jpa.repository.JpaSpecificationExecutor<CustomerOrder> {
   Optional<CustomerOrder> findByRequestKey(String key);
 
+  Optional<CustomerOrder> findByCode(String code);
+
   List<CustomerOrder> findTop50ByShopAccountIdOrderByCreatedAtDesc(String id);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)

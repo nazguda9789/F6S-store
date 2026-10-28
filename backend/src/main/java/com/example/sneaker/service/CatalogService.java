@@ -83,7 +83,8 @@ public class CatalogService {
           case "newest" -> Sort.by("id").descending();
           default -> throw bad("Kiểu sắp xếp không hợp lệ");
         };
-    var result = products.findAll(filter, PageRequest.of(page, limit, order.and(Sort.by("id"))));
+    Sort finalOrder = order.getOrderFor("id") == null ? order.and(Sort.by("id")) : order;
+    var result = products.findAll(filter, PageRequest.of(page, limit, finalOrder));
     return new PageView<>(
         result.getContent().stream().map(CatalogService::view).toList(),
         page,

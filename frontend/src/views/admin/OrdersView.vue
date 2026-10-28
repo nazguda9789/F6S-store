@@ -2,6 +2,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { api, money } from '../../lib/api'
 import InvoiceReceipt from '../../components/InvoiceReceipt.vue'
+import { paymentLabels } from '../../lib/order'
 const labels = {
   PENDING: 'Chờ xác nhận',
   CONFIRMED: 'Đã xác nhận',
@@ -9,6 +10,9 @@ const labels = {
   SHIPPING: 'Đang giao',
   COMPLETED: 'Hoàn thành',
   CANCELLED: 'Đã hủy',
+  DELIVERY_FAILED: 'Giao thất bại',
+  RETURNING: 'Đang hoàn về',
+  RETURNED: 'Đã nhận hàng hoàn',
 }
 const next = {
   PENDING: 'CONFIRMED',
@@ -22,7 +26,18 @@ const actions = {
   SHIPPING: 'Giao vận chuyển',
   COMPLETED: 'Xác nhận đã giao / thu tiền',
 }
-const filters = reactive({ q: '', status: '', channel: '' }),
+const filters = reactive({
+    q: '',
+    status: '',
+    channel: '',
+    paymentStatus: '',
+    cancellationStatus: '',
+  }),
+  expiredOnly = ref(false),
+  operation = reactive({ reason: '', goodsReceived: false, waybillCancelled: false }),
+  decisionReason = ref(''),
+  reconciliationReference = ref(''),
+  verifiedUnpaid = ref(false),
   shipment = reactive({ carrier: 'Giao hàng demo', trackingCode: '' }),
   refund = ref(null),
   refundReason = ref(''),
@@ -36,7 +51,11 @@ async function load(page = 0) {
   busy.value = true
   error.value = ''
   try {
-    data.value = await api('/admin/orders?' + new URLSearchParams({ ...filters, page }))
+    data.value = await api(
+      expiredOnly.value
+        ? '/admin/payment-expiry?page=' + page
+        : '/admin/orders?' + new URLSearchParams({ ...filters, page }),
+    )
   } catch (e) {
     error.value = e.message
   } finally {
@@ -47,15 +66,23 @@ async function detail(entry) {
   busy.value = true
   error.value = ''
   try {
-    selected.value = await api('/admin/orders/' + entry.id)
+    const [nextDetail, nextRefund] = await Promise.all([
+      api('/admin/orders/' + entry.id),
+      api('/admin/orders/' + entry.id + '/refund'),
+    ])
+    selected.value = nextDetail
     Object.assign(shipment, {
       carrier: selected.value.carrier || 'Giao hàng demo',
       trackingCode: selected.value.trackingCode || '',
     })
-    refund.value = await api('/admin/orders/' + entry.id + '/refund')
+    refund.value = nextRefund
     refundReason.value = ''
     refundReference.value = ''
     goodsReceived.value = false
+    Object.assign(operation, { reason: '', goodsReceived: false, waybillCancelled: false })
+    decisionReason.value = ''
+    reconciliationReference.value = ''
+    verifiedUnpaid.value = false
   } catch (e) {
     error.value = e.message
   } finally {
@@ -70,6 +97,12 @@ async function transition(entry, status) {
         ? 'Xác nhận đã giao thành công và đã thu đủ tiền?'
         : 'Chuyển bước: ' + labels[status] + '?'
   if (!confirm(message)) return
+  const waybillCancelled = status === 'CANCELLED' && !!entry.trackingCode
+  if (
+    waybillCancelled &&
+    !confirm('Bạn đã hủy vận đơn bên hãng và hàng chưa bàn giao? Nếu chưa, chọn Hủy thao tác.')
+  )
+    return
   busy.value = true
   error.value = ''
   try {
@@ -79,6 +112,7 @@ async function transition(entry, status) {
         status,
         expectedStatus: entry.order.status,
         reason: status === 'CANCELLED' ? 'Hủy trước khi bàn giao vận chuyển' : '',
+        waybillCancelled,
       }),
     })
     if (selected.value?.id === entry.id) selected.value = await api('/admin/orders/' + entry.id)
@@ -90,7 +124,55 @@ async function transition(entry, status) {
   }
 }
 function selectStatus(value) {
+  expiredOnly.value = false
   filters.status = value
+  load()
+}
+async function deliveryAction(status) {
+  await afterSales(() =>
+    api('/admin/orders/' + selected.value.id + '/status', {
+      method: 'PUT',
+      body: JSON.stringify({
+        status,
+        expectedStatus: selected.value.order.status,
+        reason: operation.reason,
+        goodsReceived: operation.goodsReceived,
+      }),
+    }),
+  )
+}
+async function cancellationDecision(approve) {
+  await afterSales(() =>
+    api('/admin/orders/' + selected.value.id + '/cancellation', {
+      method: 'PUT',
+      body: JSON.stringify({
+        approve,
+        reason: decisionReason.value,
+        waybillCancelled: operation.waybillCancelled,
+      }),
+    }),
+  )
+}
+async function reconcileExpiry() {
+  if (
+    !confirm(
+      'Xác nhận bạn đã đối soát trên merchant portal: giao dịch chưa thu tiền. Hủy đơn và trả tồn?',
+    )
+  )
+    return
+  await afterSales(() =>
+    api('/admin/orders/' + selected.value.id + '/reconcile-expiry', {
+      method: 'POST',
+      body: JSON.stringify({
+        reference: reconciliationReference.value,
+        verifiedUnpaid: verifiedUnpaid.value,
+        waybillCancelled: operation.waybillCancelled,
+      }),
+    }),
+  )
+}
+function showExpired() {
+  expiredOnly.value = !expiredOnly.value
   load()
 }
 async function afterSales(work) {
@@ -156,8 +238,15 @@ onMounted(() => load())
       <button class="button button-outline" :disabled="busy" @click="load(data.page)">
         Tải lại
       </button>
+      <button class="button button-outline" :disabled="busy" @click="showExpired">
+        {{ expiredOnly ? 'Về tất cả đơn' : 'VNPAY quá hạn cần đối soát' }}
+      </button>
     </div>
     <p v-if="error" role="alert" class="error-box mb-5">{{ error }}</p>
+    <p v-if="expiredOnly" class="admin-card mb-5">
+      Đơn VNPAY hết hạn và qua thời gian chờ, chưa được xác nhận thu tiền. Chỉ hủy sau đối soát
+      merchant portal; vắng IPN không chứng minh chưa trả tiền.
+    </p>
     <div class="order-status-tabs" role="group" aria-label="Trạng thái hóa đơn">
       <button :class="{ selected: !filters.status }" :disabled="busy" @click="selectStatus('')">
         Tất cả</button
@@ -175,14 +264,35 @@ onMounted(() => load())
       <label class="field flex-1 mb-0"
         >Mã đơn / Khách hàng / Số điện thoại<input
           v-model.trim="filters.q"
+          :disabled="expiredOnly"
           maxlength="120" /></label
       ><label class="field mb-0"
-        >Loại đơn<select v-model="filters.channel">
+        >Loại đơn<select v-model="filters.channel" :disabled="expiredOnly">
           <option value="">Tất cả</option>
           <option value="ONLINE">Online</option>
           <option value="POS">Tại quầy</option>
         </select></label
-      ><button class="button" :disabled="busy">Lọc hóa đơn</button>
+      ><button class="button" :disabled="busy || expiredOnly">Lọc hóa đơn</button>
+      <label class="field mb-0"
+        >Thanh toán<select v-model="filters.paymentStatus" :disabled="expiredOnly">
+          <option value="">Tất cả</option>
+          <option
+            v-for="state in ['UNPAID', 'PAID', 'FAILED', 'REFUNDED']"
+            :key="state"
+            :value="state"
+          >
+            {{ paymentLabels[state] }}
+          </option>
+        </select></label
+      >
+      <label class="field mb-0"
+        >Yêu cầu hủy<select v-model="filters.cancellationStatus" :disabled="expiredOnly">
+          <option value="">Tất cả</option>
+          <option value="REQUESTED">Chờ duyệt</option>
+          <option value="APPROVED">Đã duyệt</option>
+          <option value="REJECTED">Đã từ chối</option>
+        </select></label
+      >
     </form>
     <div class="admin-card table-scroll">
       <table class="admin-table">
@@ -192,7 +302,8 @@ onMounted(() => load())
             <th>Khách hàng</th>
             <th>Loại đơn</th>
             <th>Tổng tiền</th>
-            <th>Trạng thái</th>
+            <th>Giao hàng</th>
+            <th>Thanh toán</th>
             <th>Thao tác</th>
           </tr>
         </thead>
@@ -211,7 +322,19 @@ onMounted(() => load())
               }}</span>
             </td>
             <td>{{ money(entry.order.total) }}</td>
-            <td>{{ labels[entry.order.status] || entry.order.status }}</td>
+            <td>
+              {{
+                labels[entry.order.fulfillmentStatus] ||
+                labels[entry.order.status] ||
+                entry.order.status
+              }}<small v-if="entry.order.cancellationStatus === 'REQUESTED'"
+                >Khách đang yêu cầu hủy</small
+              >
+            </td>
+            <td>
+              {{ paymentLabels[entry.order.paymentStatus] || entry.order.paymentStatus
+              }}<small>{{ entry.order.paymentMethod }}</small>
+            </td>
             <td>
               <div class="flex gap-3 flex-wrap">
                 <button class="text-link" :disabled="busy" @click="detail(entry)">
@@ -219,7 +342,13 @@ onMounted(() => load())
                 ><button
                   v-if="next[entry.order.status]"
                   class="text-link"
-                  :disabled="busy"
+                  :disabled="
+                    busy ||
+                    entry.order.cancellationStatus === 'REQUESTED' ||
+                    (['PACKING', 'SHIPPING'].includes(entry.order.status) &&
+                      entry.order.paymentMethod === 'VNPAY' &&
+                      entry.order.paymentStatus !== 'PAID')
+                  "
                   @click="transition(entry, next[entry.order.status])"
                 >
                   {{ actions[next[entry.order.status]] }}</button
@@ -278,10 +407,113 @@ onMounted(() => load())
           Vận đơn: {{ selected.carrier }} · {{ selected.trackingCode }}
         </p>
       </div>
+      <p v-if="selected.deliveryIssue" class="mt-4">
+        Sự cố giao hàng: {{ selected.deliveryIssue }}
+      </p>
+      <section v-if="selected.order.cancellationStatus === 'REQUESTED'" class="admin-card mt-5">
+        <h3 class="font-semibold">Khách yêu cầu hủy</h3>
+        <p>{{ selected.order.cancellationReason }}</p>
+        <form class="mt-4" @submit.prevent="cancellationDecision(true)">
+          <label class="field"
+            >Lý do quyết định<input
+              v-model.trim="decisionReason"
+              required
+              minlength="5"
+              maxlength="490" /></label
+          ><label v-if="selected.trackingCode" class="block mb-4"
+            ><input v-model="operation.waybillCancelled" type="checkbox" required /> Đã hủy vận đơn
+            bên ngoài, hàng chưa bàn giao</label
+          ><button class="button" :disabled="busy">Duyệt hủy đơn</button
+          ><button
+            type="button"
+            class="button button-outline ml-3"
+            :disabled="busy || decisionReason.trim().length < 5"
+            @click="cancellationDecision(false)"
+          >
+            Từ chối yêu cầu hủy
+          </button>
+        </form>
+      </section>
+      <section
+        v-if="['SHIPPING', 'DELIVERY_FAILED', 'RETURNING'].includes(selected.order.status)"
+        class="admin-card mt-5"
+      >
+        <h3 class="font-semibold mb-4">Xử lý giao thất bại / hoàn hàng</h3>
+        <form
+          @submit.prevent="
+            deliveryAction(
+              selected.order.status === 'SHIPPING'
+                ? 'DELIVERY_FAILED'
+                : selected.order.status === 'DELIVERY_FAILED'
+                  ? 'RETURNING'
+                  : 'RETURNED',
+            )
+          "
+        >
+          <label class="field"
+            >Lý do xử lý giao hàng<textarea
+              v-model.trim="operation.reason"
+              required
+              minlength="5"
+              maxlength="490"
+            /></label
+          ><label v-if="selected.order.status === 'RETURNING'" class="block mb-4"
+            ><input v-model="operation.goodsReceived" type="checkbox" required /> Đã nhận toàn bộ
+            hàng về kho, kiểm tra đủ và có thể bán lại</label
+          ><button
+            class="button"
+            :disabled="busy || selected.order.cancellationStatus === 'REQUESTED'"
+          >
+            {{
+              selected.order.status === 'SHIPPING'
+                ? 'Ghi nhận giao thất bại'
+                : selected.order.status === 'DELIVERY_FAILED'
+                  ? 'Chuyển sang đang hoàn về'
+                  : 'Xác nhận đã nhận hàng hoàn'
+            }}</button
+          ><button
+            v-if="selected.order.status === 'DELIVERY_FAILED'"
+            type="button"
+            class="button button-outline ml-3"
+            :disabled="busy"
+            @click="transition(selected, 'SHIPPING')"
+          >
+            Giao lại
+          </button>
+        </form>
+        <p class="text-sm mt-4">
+          Đang giao, giao thất bại hoặc đang hoàn về chưa cộng tồn. Chỉ cộng sau xác nhận đã nhận và
+          kiểm tra hàng; hàng hỏng/thiếu cần xử lý riêng, không xác nhận toàn bộ có thể bán lại.
+        </p>
+      </section>
+      <section v-if="selected.payment?.overdue" class="admin-card mt-5">
+        <h3 class="font-semibold mb-4">VNPAY quá hạn — đối soát thủ công</h3>
+        <p class="text-sm mb-4">
+          Hết hạn lúc {{ new Date(selected.payment.expiresAt).toLocaleString('vi-VN') }}. Kiểm tra
+          merchant portal trước. Nếu đã thu tiền, không dùng chức năng này; cần nhận IPN/đối soát
+          khoản thu.
+        </p>
+        <form @submit.prevent="reconcileExpiry">
+          <label class="field"
+            >Mã chứng từ đối soát chưa thu tiền<input
+              v-model.trim="reconciliationReference"
+              required
+              minlength="5"
+              maxlength="120" /></label
+          ><label class="block mb-4"
+            ><input v-model="verifiedUnpaid" type="checkbox" required /> Đã kiểm tra merchant portal
+            và xác nhận giao dịch chưa thu tiền</label
+          ><label v-if="selected.trackingCode" class="block mb-4"
+            ><input v-model="operation.waybillCancelled" type="checkbox" required /> Đã hủy vận đơn
+            bên ngoài</label
+          ><button class="button" :disabled="busy">Hủy đơn quá hạn sau đối soát</button>
+        </form>
+      </section>
       <form
         v-if="
           selected.order.channel === 'ONLINE' &&
-          ['CONFIRMED', 'PACKING'].includes(selected.order.status)
+          ['CONFIRMED', 'PACKING', 'DELIVERY_FAILED'].includes(selected.order.status) &&
+          selected.order.cancellationStatus !== 'REQUESTED'
         "
         class="admin-card mt-5"
         @submit.prevent="saveShipment"
@@ -300,7 +532,7 @@ onMounted(() => load())
       </form>
       <section
         v-if="
-          ['COMPLETED', 'CANCELLED'].includes(selected.order.status) &&
+          ['COMPLETED', 'CANCELLED', 'RETURNED'].includes(selected.order.status) &&
           ['PAID', 'REFUNDED'].includes(selected.order.paymentStatus)
         "
         class="admin-card mt-5"

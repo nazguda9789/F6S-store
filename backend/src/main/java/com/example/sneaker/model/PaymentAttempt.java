@@ -6,7 +6,9 @@ import java.time.Instant;
 import lombok.*;
 
 @Entity
-@Table(name = "payment_attempts")
+@Table(
+    name = "payment_attempts",
+    indexes = @Index(name = "idx_payment_expiry", columnList = "expires_at,status"))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -35,4 +37,11 @@ public class PaymentAttempt {
   private Instant expiresAt;
 
   private Instant settledAt;
+  private Instant reconciledAt;
+
+  @Column(length = 100)
+  private String reconciledBy;
+
+  @Column(length = 120)
+  private String reconciliationReference;
 }

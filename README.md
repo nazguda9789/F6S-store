@@ -2,6 +2,8 @@
 
 Bản phát triển chính hiện nằm tại `backend/` và `frontend/`. Giữ thương hiệu F6S, giao diện xanh rừng/kem/lime và nghiệp vụ quản lý bán giày.
 
+Đợt cập nhật giao hàng: tách hiển thị giao hàng/thanh toán; khách yêu cầu hủy và admin duyệt; giao thất bại/giao lại/nhận hoàn; hàng chờ VNPAY quá hạn để admin đối soát trước khi hủy. [Hướng dẫn và cách sao lưu ảnh](docs/FULFILLMENT-AND-MEDIA.md). Database đã nâng 03/04 chạy thêm `database/05_upgrade_fulfillment.sql` sau khi backup và dừng backend.
+
 Đã bổ sung đăng ký/đăng nhập khách bằng email OTP, VNPAY có kiểm tra IPN, phí giao hàng/vận đơn demo và hồ sơ hoàn toàn bộ tiền. [Hướng dẫn chạy demo online/offline, hộp thư OTP cục bộ và cấu hình VNPAY](docs/DEMO-CHECKOUT-PAYMENTS.md). Database đã có module Bee chạy thêm `database/04_upgrade_integrations.sql` sau khi sao lưu và dừng backend.
 
 Đợt hoàn thiện theo Bee: [module, phân quyền, ảnh và cách nâng cấp database không xóa dữ liệu](docs/BEE-MODULES.md). Database đã có dữ liệu dùng `database/03_upgrade_bee_modules.sql`, không chạy lại schema 01.

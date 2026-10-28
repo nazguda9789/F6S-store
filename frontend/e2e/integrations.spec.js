@@ -8,7 +8,7 @@ test('email OTP registers a customer using local SMTP inbox', async ({ page, req
   const send = page.getByRole('button', { name: 'Gửi mã OTP', exact: true })
   await expect(send).toBeEnabled()
   await send.click()
-  await expect(page.getByLabel('Mã OTP', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('Mã OTP', { exact: true })).toBeVisible({ timeout: 15000 })
   let id
   await expect
     .poll(async () => {

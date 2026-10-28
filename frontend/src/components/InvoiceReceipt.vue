@@ -1,5 +1,6 @@
 <script setup>
 import { money } from '../lib/api'
+import { orderLabels, paymentLabels } from '../lib/order'
 defineProps({ invoice: Object })
 function print() {
   window.print()
@@ -66,8 +67,10 @@ function print() {
         >
       </div>
       <p class="text-xs mt-5">
-        Trạng thái: {{ invoice.status }} · {{ invoice.paymentMethod }} / {{ invoice.paymentStatus
-        }}<br />Cảm ơn bạn đã mua sắm tại F6S.<br />Bản in bán hàng, không phải hóa đơn VAT.
+        Giao hàng: {{ orderLabels[invoice.fulfillmentStatus || invoice.status] || invoice.status
+        }}<br />Thanh toán: {{ paymentLabels[invoice.paymentStatus] || invoice.paymentStatus }} ·
+        {{ invoice.paymentMethod }}<br />Cảm ơn bạn đã mua sắm tại F6S.<br />Bản in bán hàng, không
+        phải hóa đơn VAT.
       </p>
     </div>
   </section>

@@ -1,5 +1,7 @@
 # Các module theo demo Bee — F6S
 
+Luồng giao hàng hiện đã mở rộng: [khách yêu cầu hủy, giao thất bại/nhận hoàn, VNPAY quá hạn và lưu ảnh](FULFILLMENT-AND-MEDIA.md), nâng cấp SQL 05 cho bản đã có 03/04.
+
 Giữ thương hiệu F6S và màu xanh đậm; bố cục quản trị chia sáu nhóm như video Bee: tổng quan, giao dịch, sản phẩm, tài khoản, giảm giá, thư viện ảnh. Đây là bản triển khai theo nghiệp vụ quan sát được, không phải mã nguồn Bee và chưa tương đương mọi chi tiết.
 
 ## Đã bổ sung

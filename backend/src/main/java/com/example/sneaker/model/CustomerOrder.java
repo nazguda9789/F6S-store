@@ -7,7 +7,10 @@ import java.util.*;
 import lombok.*;
 
 @Entity
-@Table(name = "orders")
+@Table(
+    name = "orders",
+    indexes =
+        @Index(name = "idx_orders_cancellation", columnList = "cancellation_status,created_at"))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -90,6 +93,26 @@ public class CustomerOrder {
 
   @Column(precision = 19, scale = 0)
   private BigDecimal refundedAmount;
+
+  private Instant stockReleasedAt;
+
+  @Column(length = 20)
+  private String cancellationStatus;
+
+  @Column(length = 500)
+  private String cancellationReason;
+
+  private Instant cancellationRequestedAt;
+  private Instant cancellationResolvedAt;
+
+  @Column(length = 100)
+  private String cancellationResolvedBy;
+
+  @Column(length = 500)
+  private String cancellationDecisionReason;
+
+  @Column(length = 500)
+  private String deliveryIssue;
 
   @Column(nullable = false)
   private Instant createdAt = Instant.now();

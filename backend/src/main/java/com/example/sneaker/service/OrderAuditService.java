@@ -16,7 +16,13 @@ public class OrderAuditService {
     e.setFromStatus(from);
     e.setToStatus(order.getStatus());
     e.setActor(actor);
-    e.setNote(note == null ? "" : note.trim());
+    String text = note == null ? "" : note.trim();
+    if (text.length() > 500) {
+      int end = 499;
+      if (Character.isHighSurrogate(text.charAt(end - 1))) end--;
+      text = text.substring(0, end) + "…";
+    }
+    e.setNote(text);
     events.save(e);
   }
 }

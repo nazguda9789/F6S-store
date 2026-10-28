@@ -129,6 +129,14 @@ public class CheckoutService {
                 : "UNPAID")
             : o.getPaymentStatus(),
         o.getShippingFee() == null ? java.math.BigDecimal.ZERO : o.getShippingFee(),
-        paymentUrl);
+        paymentUrl,
+        o.getStatus(),
+        o.getCancellationStatus(),
+        o.getCancellationReason(),
+        o.getCancellationRequestedAt(),
+        o.getCarrier(),
+        o.getTrackingCode(),
+        o.getStockReleasedAt() != null,
+        o.getCancellationDecisionReason());
   }
 }
