@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${adminTitle} + ' | ShoeAdmin'">ShoeAdmin</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/anh/bieu-trung-quan-tri.svg}">
+    <link rel="stylesheet" href="/css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/he-thong-thiet-ke.css}">
+    <link rel="stylesheet" th:href="@{/css/quan-tri.css}">
+    <link rel="stylesheet" th:href="@{/css/retail-refresh.css}">
+    <script th:src="@{/js/combo-box.js}" defer></script>
+    <script th:src="@{/js/quan-tri.js}" defer></script>
+    <script th:src="@{/js/quan-tri-danh-muc.js}" defer></script>
+</head>
+<body class="admin-body">
+<dialog id="admin-confirm" class="catalog-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-description">
+    <h2 id="confirm-title">Xác nhận thao tác</h2><p id="confirm-description"></p>
+    <div class="catalog-form-actions"><button type="button" class="btn btn-outline-secondary" data-dialog-cancel autofocus>Hủy</button><button type="button" class="btn btn-danger" data-dialog-accept>Xóa</button></div>
+</dialog>
+<a class="admin-skip" href="#admin-content">Đến nội dung chính</a>
+<aside th:replace="~{fragments/thanh-ben-quan-tri :: sidebar}"></aside>
+<button class="admin-backdrop" aria-label="Đóng menu" tabindex="-1" hidden></button>
+<div class="admin-shell">
+    <header th:replace="~{fragments/thanh-dau-quan-tri :: topbar}"></header>
+    <main id="admin-content" class="admin-content" tabindex="-1">
+        <nav th:replace="~{fragments/duong-dan-quan-tri :: breadcrumb}"></nav>
+        <div th:replace="~{fragments/thong-bao-quan-tri :: flash}"></div>
+        <th:block th:replace="${content}"></th:block>
+    </main>
+    <footer class="admin-footer">F6S · Không gian quản trị</footer>
+</div>
+</body>
+</html>

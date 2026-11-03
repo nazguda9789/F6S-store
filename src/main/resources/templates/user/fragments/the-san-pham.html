@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="card(p)" class="card h-100 shadow-sm border-0 product-card position-relative">
+    <span class="product-sale-badge position-absolute top-0 start-0 m-2 badge bg-danger"
+          th:if="${p.hasPromotion}" th:text="|GIẢM -${p.discountPercentage}%|">GIẢM</span>
+
+    <a th:href="@{/products/{id}(id=${p.id})}">
+        <img th:with="resolvedImage=${@productImageUrl.source(p.imageUrl)}" th:src="${resolvedImage}"
+             class="product-image card-img-top" th:alt="${p.name}" loading="lazy"
+
+            >
+    </a>
+
+    <div class="card-body d-flex flex-column">
+        <small class="text-muted" th:if="${p.categoryName != null}" th:text="${p.categoryName}">Brand</small>
+        <h6 class="card-title text-truncate mb-1">
+            <a th:href="@{/products/{id}(id=${p.id})}" class="text-decoration-none text-dark" th:text="${p.name}">Tên SP</a>
+        </h6>
+
+        <p class="small text-muted mb-2" th:if="${!#strings.isEmpty(p.materialNames)}" th:text="'Chất liệu: '+${p.materialNames}"></p>
+        <div class="mb-2">
+            <span class="fw-bold text-danger me-2"
+                  th:text="${@money.format(p.minFinalPrice)} + ' đ'">0 đ</span>
+            <span class="text-muted text-decoration-line-through small" th:if="${p.hasPromotion}"
+                  th:text="${@money.format(p.minOriginalPrice)} + ' đ'">0 đ</span>
+        </div>
+
+        <div class="small mb-2">
+            <span th:if="${p.totalStock > 10}" class="text-success"><i class="bi bi-check-circle"></i> Còn hàng</span>
+            <span th:if="${p.totalStock > 0 and p.totalStock <= 10}" class="text-warning"><i class="bi bi-exclamation-triangle"></i> Sắp hết</span>
+            <span th:if="${p.totalStock <= 0}" class="text-danger"><i class="bi bi-x-circle"></i> Hết hàng</span>
+        </div>
+
+        <div class="mt-auto dropdown">
+            <button class="btn btn-primary btn-sm w-100" type="button" data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside" aria-expanded="false" th:disabled="${p.totalStock <= 0}">
+                Thêm nhanh
+            </button>
+            <div class="quick-add-menu dropdown-menu p-3 shadow">
+                <form class="quick-add-form" th:action="@{/cart/add}" method="post">
+                    <div class="fw-bold small mb-2">Chọn kích cỡ:</div>
+                    <div class="d-flex flex-wrap gap-2 mb-2" data-material-picker>
+                        <th:block th:each="v : ${p.variants}">
+                            <input type="radio" class="btn-check" name="variantId"
+                                   th:id="|qa-${p.id}-${v.id}|" th:value="${v.id}" th:data-size-id="${v.sizeId}" th:data-size-name="${v.sizeValue}" th:data-material-id="${v.materialId}" th:data-material-name="${v.materialName}" th:disabled="${v.quantity <= 0}">
+                            <label class="btn btn-outline-dark btn-sm" th:for="|qa-${p.id}-${v.id}|"
+                                   th:classappend="${v.quantity <= 0} ? 'opacity-50'" th:text="${v.sizeValue}+' · '+${v.materialName}">39</label>
+                        </th:block>
+                    </div>
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-dark btn-sm w-100">Thêm vào giỏ</button>
+                    <div class="quick-add-msg small mt-2 d-none"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

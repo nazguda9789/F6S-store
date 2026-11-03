@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="deadline(order,isAdmin)" th:with="deadline=${isAdmin ? @bankTransferDeadline.autoCancelAt(order) : @bankTransferDeadline.paymentDeadline(order)}">
+    <p th:if="${deadline!=null}" class="alert alert-info" role="status" data-bank-deadline>
+        <time th:datetime="${deadline}" th:text="${(isAdmin ? 'Tự hủy lúc ' : 'Vui lòng chuyển khoản trước ') + #temporals.format(deadline,'HH:mm dd/MM/yyyy')}"></time>
+    </p>
+</th:block>
+</body></html>

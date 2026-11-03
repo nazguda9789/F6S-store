@@ -1,0 +1,11 @@
+<!DOCTYPE html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><body>
+<nav th:fragment="phan-trang(page,paramName)" th:if="${page!=null and page.totalPages>1}" class="shared-pagination" aria-label="Phân trang" th:attr="data-page=${page.number},data-total=${page.totalElements},data-size=${page.size},data-page-param=${paramName}">
+ <p class="mb-0" th:text="'Hiển thị '+${page.number*page.size+1}+'–'+${page.number*page.size+page.numberOfElements}+' / '+${page.totalElements}"></p>
+ <ul class="pagination mb-0 flex-wrap">
+  <li class="page-item" th:classappend="${page.first}?'disabled'"><span th:if="${page.first}" class="page-link" aria-disabled="true">Trước</span><a th:unless="${page.first}" class="page-link" th:href="${pagingLinks.url(paramName,page.number-1)}">Trước</a></li>
+  <li th:each="n:${pagingLinks.numbers(page.number,page.totalPages)}" class="page-item" th:classappend="${n==page.number}?'active'">
+   <span th:if="${n==-1}" class="page-link" aria-hidden="true">...</span><span th:if="${n==page.number}" class="page-link" aria-current="page" th:text="${n+1}"></span><a th:if="${n>=0 and n!=page.number}" class="page-link" th:href="${pagingLinks.url(paramName,n)}" th:attr="aria-label='Trang '+${n+1}" th:text="${n+1}"></a>
+  </li>
+  <li class="page-item" th:classappend="${page.last}?'disabled'"><span th:if="${page.last}" class="page-link" aria-disabled="true">Sau</span><a th:unless="${page.last}" class="page-link" th:href="${pagingLinks.url(paramName,page.number+1)}">Sau</a></li>
+ </ul>
+</nav></body></html>

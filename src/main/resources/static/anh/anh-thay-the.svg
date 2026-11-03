@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450" viewBox="0 0 600 450">
+  <rect width="600" height="450" fill="#f1f3f5"/>
+  <g fill="none" stroke="#adb5bd" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M140 300 L180 210 L250 230 L300 270 L440 285 Q470 290 470 315 L470 330 L140 330 Z"/>
+    <path d="M140 330 L470 330"/>
+  </g>
+  <text x="300" y="390" font-family="Arial, sans-serif" font-size="22" fill="#59636f" text-anchor="middle">SHOP GIAY</text>
+</svg>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <link rel="icon" type="image/svg+xml" href="/anh/bieu-trung-quan-tri.svg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F6S · Giày thể thao</title>
+    <!-- Bootstrap CSS -->
+    <link href="/css/vendor/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Design System CSS -->
+    <link href="/css/he-thong-thiet-ke.css" rel="stylesheet">
+    <link href="/css/retail-refresh.css" rel="stylesheet">
+
+    <!-- CSRF Meta Tags for AJAX -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<a class="store-skip" href="#store-content">Đến nội dung chính</a>
+<dialog id="store-confirm" class="user-dialog" aria-labelledby="store-confirm-title"><h2 id="store-confirm-title">Xóa khỏi giỏ hàng?</h2><p id="store-confirm-description"></p><div class="user-dialog-actions"><button type="button" class="btn btn-outline-secondary" data-store-cancel autofocus>Hủy</button><button type="button" class="btn btn-danger" data-store-accept>Xóa</button></div></dialog>
+
+    <!-- Header -->
+    <div th:replace="~{fragments/dau-trang :: header}"></div>
+
+    <!-- Main Content -->
+    <main id="store-content" tabindex="-1" class="store-main container my-4">
+        <!-- Flash Messages -->
+        <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${message}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng thông báo"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng thông báo"></button>
+        </div>
+
+        <p id="store-message" class="user-message" role="status" aria-live="polite"></p><div th:replace="~{::content}"></div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/chan-trang :: footer}"></div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="/js/vendor/bootstrap.bundle.min.js"></script>
+    <script src="/js/combo-box.js"></script><script src="/js/chon-bien-the.js"></script><script src="/js/giao-dien-cua-hang.js"></script><script th:src="@{/js/them-nhanh.js}"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/bo-cuc/bo-cuc-nguoi-dung :: html}">
+<head>
+    <title th:text="${product.name} + ' - SHOP GIÀY'">Chi tiết sản phẩm</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="py-3">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a th:href="@{/}">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/products}">Sản phẩm</a></li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="${product.name}">Tên sản phẩm</li>
+            </ol>
+        </nav>
+
+        <div class="stock-summary mb-4" role="status"><span><strong th:text="${variantCount}"></strong> biến thể đang bán</span><span><strong th:text="${availableStock}"></strong> đôi còn trong kho</span><span th:if="${storeAccountName == null}">Đăng nhập để đặt hàng và theo dõi đơn.</span></div>
+        <div class="row mb-5">
+            <!-- Product Image -->
+            <div class="col-md-6 mb-4 mb-md-0">
+                <section class="product-gallery" data-product-gallery tabindex="0" aria-label="Bộ ảnh sản phẩm. Dùng phím trái, phải để chuyển ảnh.">
+                    <div class="product-gallery-frame">
+                        <img data-gallery-large th:with="resolvedImage=${@productImageUrl.source(product.displayImageUrl)}" th:src="${resolvedImage}" th:alt="${product.name}+' — ảnh sản phẩm'" width="600" height="600">
+                        <button th:if="${#lists.size(productImages)>1}" type="button" class="gallery-arrow gallery-prev" data-gallery-prev aria-label="Xem ảnh trước"><span aria-hidden="true">&lt;</span></button>
+                        <button th:if="${#lists.size(productImages)>1}" type="button" class="gallery-arrow gallery-next" data-gallery-next aria-label="Xem ảnh tiếp theo"><span aria-hidden="true">&gt;</span></button>
+                    </div>
+                    <div class="gallery-thumbnails" th:if="${#lists.size(productImages)>1}">
+                        <button th:each="image,it:${productImages}" type="button" data-gallery-thumb th:data-main="${image.main}" th:attr="aria-label='Xem góc ảnh '+${it.count}">
+                            <img th:with="resolvedImage=${@productImageUrl.source(image.displayPath)}" th:src="${resolvedImage}" th:alt="${product.name}+' — góc ảnh '+${it.count}" width="72" height="72" loading="lazy">
+                        </button>
+                    </div>
+                    <p data-gallery-status class="field-help" aria-live="polite" th:if="${#lists.size(productImages)>1}"></p>
+                </section>
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-md-6">
+                <h2 class="fw-bold mb-2" th:text="${product.name}">Tên sản phẩm</h2>
+                <div class="text-muted mb-3">Mã SP: <span th:text="${product.code}">SP001</span> | Thương hiệu: <span th:text="${product.category != null ? product.category.name : 'Chưa phân loại'}">Thể thao</span></div>
+
+                <p>Đế giày: <span th:text="${product.sole!=null ? product.sole.name : 'Chưa chọn'}"></span></p>
+
+                <!-- Display Price from the first variant by default -->
+                <div class="price-display mb-4" th:if="${!variants.isEmpty()}" th:with="firstPrice=${variantPrices.get(variants[0].id)}">
+                    <h3 class="text-danger fw-bold d-inline-block" id="displayFinalPrice" th:text="${@money.format(firstPrice.finalPrice)} + ' ₫'">0 ₫</h3>
+                    <del class="text-muted ms-2 fs-5" id="displayOriginalPrice" th:if="${firstPrice.hasPromotion}" th:text="${@money.format(firstPrice.originalPrice)} + ' ₫'">0 ₫</del>
+                    <span class="badge bg-danger ms-2" id="displayDiscount" th:if="${firstPrice.hasPromotion}" th:text="'GIẢM -' + ${firstPrice.discountPercentage} + '%'">-0%</span>
+                </div>
+
+                <form id="addToCartForm" novalidate th:action="@{/cart/add}" method="post">
+                    <!-- Kích cỡ Selection (Buttons) -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold d-block">Chọn kích cỡ và chất liệu:</label>
+                        <div class="d-flex flex-wrap gap-2" id="size-container" data-material-picker>
+                            <th:block th:each="v : ${variants}">
+                                <input type="radio" class="btn-check size-radio" name="variantId" th:id="'size-' + ${v.id}" th:value="${v.id}"
+                                       th:disabled="${v.quantity <= 0}"
+                                       th:data-qty="${v.quantity}" th:data-size-id="${v.size.id}" th:data-size-name="${v.size.sizeValue}" th:data-material-id="${v.material.id}" th:data-material-name="${v.material.name}"
+                                       th:data-finalprice="${variantPrices.get(v.id).finalPrice}"
+                                       th:data-origprice="${variantPrices.get(v.id).originalPrice}"
+                                       th:data-haspromo="${variantPrices.get(v.id).hasPromotion}"
+                                       th:data-discount="${variantPrices.get(v.id).discountPercentage}">
+                                <label class="btn btn-outline-primary" th:for="'size-' + ${v.id}" th:classappend="${v.quantity <= 0 ? 'disabled' : ''}" th:text="${v.size.sizeValue}+' · '+${v.material.name}">39</label>
+                            </th:block>
+                        </div>
+                        <div id="size-error" class="text-danger small mt-2 d-none">Vui lòng chọn kích cỡ và chất liệu còn hàng!</div>
+                    </div>
+
+                    <!-- Quantity & Stock -->
+                    <div class="product-quantity mb-4 d-flex align-items-center">
+                        <label for="quantity" class="form-label fw-bold me-3 mb-0">Số lượng:</label>
+                        <div class="quantity-control input-group">
+                            <button class="btn btn-outline-secondary" type="button" id="btn-minus" aria-label="Giảm số lượng">-</button>
+                            <input type="number" class="form-control text-center" id="quantity" name="quantity" value="1" min="1" max="1" step="1" inputmode="numeric" required aria-describedby="stock-status">
+                            <button class="btn btn-outline-secondary" type="button" id="btn-plus" aria-label="Tăng số lượng">+</button>
+                        </div>
+                        <span class="ms-3 text-muted" id="stock-status">Vui lòng chọn kích cỡ và chất liệu</span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="button" class="btn btn-outline-primary btn-lg px-4" id="btn-add-cart">THÊM VÀO GIỎ</button>
+                        <button type="button" class="btn btn-primary btn-lg px-4" id="btn-buy-now">MUA NGAY</button>
+                    </div>
+
+                    <!-- Mobile Sticky Add to Cart -->
+                    <div class="product-mobile-actions d-block d-md-none fixed-bottom bg-white p-3 border-top shadow-lg z-3">
+                        <button type="button" class="btn btn-primary w-100 btn-lg" id="btn-mobile-buy">THÊM VÀO GIỎ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Description & Details -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">Mô tả sản phẩm</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Thông tin chi tiết</button>
+                    </li>
+                </ul>
+                <div class="tab-content p-4 border border-top-0 bg-white" id="productTabsContent">
+                    <div class="tab-pane fade show active" id="desc" role="tabpanel">
+                        <p th:text="${product.description}">Mô tả</p>
+                    </div>
+                    <div class="tab-pane fade" id="info" role="tabpanel">
+                        <ul>
+                            <li><strong>Thương hiệu:</strong> Đang cập nhật</li>
+                            <li><strong>Chất liệu:</strong> <span th:each="m,it:${productMaterials}" th:text="${m.name} + (${it.last} ? '' : ', ')"></span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        <div class="row mb-5" th:if="${!relatedProducts.isEmpty()}">
+            <div class="col-12 mb-4">
+                <h4 class="fw-bold border-bottom pb-2">Sản phẩm liên quan</h4>
+            </div>
+            <div class="col-6 col-md-3 mb-4" th:each="rp : ${relatedProducts}">
+                <div class="card h-100 shadow-sm border-0 product-card">
+                    <a th:href="@{/products/{id}(id=${rp.id})}">
+                        <img th:with="resolvedImage=${@productImageUrl.source(rp.imageUrl)}" th:src="${resolvedImage}" class="card-img-top" alt="Hình ảnh">
+                    </a>
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title text-truncate">
+                            <a th:href="@{/products/{id}(id=${rp.id})}" class="text-decoration-none text-dark" th:text="${rp.name}">Tên SP</a>
+                        </h6>
+                        <div class="mt-auto" th:with="rpVariants=${@productService.getVariantsByProductId(rp.id)}">
+                            <p class="small text-muted mb-2" th:if="${!rpVariants.isEmpty()}" th:with="names=${#sets.toSet(rpVariants.![material.name])}">Chất liệu: <span th:each="name,it:${names}" th:text="${name}+(${it.last} ? '' : ', ')"></span></p>
+                            <th:block th:if="${!rpVariants.isEmpty()}">
+                                <th:block th:with="rpPriceInfo=${@pricingService.calculatePrice(rpVariants[0])}">
+                                    <div class="text-danger fw-bold" th:text="${@money.format(rpPriceInfo.finalPrice)} + ' ₫'">0 ₫</div>
+                                    <div th:if="${rpPriceInfo.hasPromotion}">
+                                        <del class="text-muted small" th:text="${@money.format(rpPriceInfo.originalPrice)} + ' ₫'"></del>
+                                        <span class="badge bg-danger ms-1" th:text="'-' + ${rpPriceInfo.discountPercentage} + '%'"></span>
+                                    </div>
+                                </th:block>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="/js/chi-tiet-san-pham.js" defer></script>
+        <script src="/js/bo-anh-san-pham.js" defer></script>
+    </div>
+</body>
+</html>

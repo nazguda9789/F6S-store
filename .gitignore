@@ -1,14 +1,4 @@
 HELP.md
-backend/uploads/
-**/node_modules/
-**/dist/
-**/test-results/
-**/playwright-report/
-**/.vite/
-.env.*
-!.env.example
-shoptthieu_bot*
-.env
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -41,3 +31,28 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local Phase 5 browser evidence and generated audit files (no session data in Git)
+/.playwright-cli/
+/output/playwright/
+target/
+*.log
+.idea/
+.vscode/
+
+/uploads/
+/verify/uploads/
+/verify/
+/application-local.properties
+/application-verify.properties
+/deploy-local.sql
+/.env
+/_untracked_backup/
+
+# Tệp cách ly sau đợt dọn dẹp, không đưa dữ liệu phiên hoặc capture lên Git.
+/_cho_xoa/
+
+# Browser test dependencies/results and rendered pages may contain test CSRF tokens.
+ui-tests/node_modules/
+ui-tests/test-results/
+ui-tests/playwright-report/

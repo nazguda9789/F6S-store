@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/bo-cuc/bo-cuc-quan-tri :: layout(~{::section})}"><body><section>
+<div class="admin-heading"><div><span class="eyebrow">QUẢN TRỊ</span><h1>Hồ sơ của tôi</h1><p class="admin-description">Thông tin cá nhân và bảo mật tài khoản đang đăng nhập.</p></div></div>
+<div class="admin-panel"><h2>Hồ sơ tài khoản</h2><dl class="row">
+<dt class="col-sm-4">Tên đăng nhập</dt><dd class="col-sm-8" th:text="${account.username}"></dd>
+<dt class="col-sm-4">Họ tên</dt><dd class="col-sm-8" th:text="${accountProfile.fullName ?: 'Chưa cập nhật'}"></dd>
+<dt class="col-sm-4">Thư điện tử</dt><dd class="col-sm-8" th:text="${accountProfile.email ?: 'Chưa cập nhật'}"></dd>
+<dt class="col-sm-4">Số điện thoại</dt><dd class="col-sm-8" th:text="${accountProfile.phone ?: 'Chưa cập nhật'}"></dd>
+<dt class="col-sm-4">Vai trò</dt><dd class="col-sm-8" th:text="${account.role == null ? 'Chưa có vai trò' : (account.role.name=='ROLE_ADMIN'?'Quản trị viên':account.role.name=='ROLE_USER'?'Khách hàng':'Quyền khác')}"></dd>
+<dt class="col-sm-4">Trạng thái</dt><dd class="col-sm-8" th:text="${account.status == true ? 'Đang hoạt động' : 'Đã vô hiệu hóa'}"></dd>
+<dt class="col-sm-4">Ngày tạo</dt><dd class="col-sm-8" th:text="${account.createdAt != null ? #temporals.format(account.createdAt,'dd/MM/yyyy HH:mm') : 'Chưa có dữ liệu'}"></dd></dl></div>
+<div class="row g-4 mt-1"><div class="col-lg-6"><div class="admin-panel"><div class="panel-heading"><h2>Sửa thông tin</h2></div>
+<form th:action="@{/admin/account/profile}" method="post" th:object="${profileForm}" data-admin-form novalidate>
+<div class="sales-field"><label for="fullName">Họ tên</label><input id="fullName" class="form-control" th:field="*{fullName}" required maxlength="100" aria-describedby="fullName-error"><p id="fullName-error" class="field-error"><span th:errors="*{fullName}"></span></p></div>
+<div class="sales-field"><label for="email">Thư điện tử</label><input id="email" class="form-control" type="email" th:field="*{email}" required maxlength="254" aria-describedby="email-error"><p id="email-error" class="field-error"><span th:errors="*{email}"></span></p></div>
+<div class="sales-field"><label for="phone">Số điện thoại</label><input id="phone" class="form-control" type="tel" th:field="*{phone}" required pattern="(?:0[0-9]{9}|\+84[0-9]{9})" aria-describedby="phone-error"><p id="phone-error" class="field-error"><span th:errors="*{phone}"></span></p></div>
+<p class="form-message" role="alert" hidden></p><button class="btn btn-primary" type="submit">Lưu thông tin</button></form></div></div>
+<div class="col-lg-6"><div class="admin-panel"><div class="panel-heading"><h2>Đổi mật khẩu</h2></div><form th:action="@{/admin/account/password}" th:object="${passwordForm}" method="post" data-admin-form novalidate>
+<div class="sales-field"><label for="currentPassword">Mật khẩu hiện tại</label><input id="currentPassword" name="currentPassword" type="password" class="form-control" required maxlength="72" data-byte-limit="72" autocomplete="current-password" aria-describedby="currentPassword-error"><p id="currentPassword-error" class="field-error"><span th:errors="*{currentPassword}"></span></p></div>
+<div class="sales-field"><label for="newPassword">Mật khẩu mới</label><p class="form-text">Ít nhất 8 ký tự, có chữ và số; tối đa 72 byte UTF-8.</p><input id="newPassword" name="newPassword" type="password" class="form-control" required minlength="8" maxlength="72" data-byte-limit="72" autocomplete="new-password" aria-describedby="newPassword-error"><p id="newPassword-error" class="field-error"><span th:errors="*{newPassword}"></span></p></div>
+<div class="sales-field"><label for="confirmPassword">Xác nhận mật khẩu mới</label><input id="confirmPassword" name="confirmPassword" type="password" class="form-control" required maxlength="72" data-byte-limit="72" autocomplete="new-password" data-match="newPassword" aria-describedby="confirmPassword-error"><p id="confirmPassword-error" class="field-error"><span th:errors="*{confirmPassword}"></span></p></div>
+<p class="form-message" role="alert" hidden></p><button class="btn btn-primary" type="submit">Đổi mật khẩu</button></form></div></div></div>
+</section></body></html>

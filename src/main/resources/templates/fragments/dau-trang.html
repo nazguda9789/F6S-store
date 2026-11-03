@@ -1,0 +1,75 @@
+<div th:fragment="header">
+    <nav class="navbar navbar-expand-lg sticky-top bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" th:href="@{/}">
+                <i class="bi bi-box-seam text-primary"></i> F6S
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Mở menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold" th:href="@{/}">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold" th:href="@{/products}">Sản phẩm</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <button type="button" class="nav-link dropdown-toggle fw-bold" data-bs-toggle="dropdown" aria-expanded="false">Thương hiệu</button>
+                        <ul class="dropdown-menu border-0 shadow-sm">
+                            <li th:each="cat : ${globalCategories}">
+                                <a class="dropdown-item" th:href="@{/category/{id}(id=${cat.id})}" th:text="${cat.name}"></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold text-danger" th:href="@{/products(promotion=true)}"><i class="bi bi-tags"></i> Khuyến mãi</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <a th:if="${storeAccountName == null}" class="btn btn-outline-primary store-account-link" href="/login">Đăng nhập / Đăng ký</a>
+                    <a th:if="${storeAccountName != null}" class="store-account-link" th:href="${storeAdmin ? '/admin' : '/profile'}" th:text="'Xin chào, ' + ${storeAccountName}"></a>
+                    <form class="d-flex position-relative store-search" th:action="@{/products}" method="get">
+                        <input class="form-control rounded-pill ps-4" type="search" name="keyword" aria-label="Tìm sản phẩm" placeholder="Tìm kiếm...">
+                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+                    </form>
+
+                    <a th:href="@{/cart}" class="nav-link position-relative text-dark fs-5" aria-label="Giỏ hàng">
+                        <i class="bi bi-cart3"></i>
+                        <span class="cart-badge badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle" id="cartBadge" th:text="${cartCount}">0</span>
+                    </a>
+
+                    <div class="nav-item dropdown ms-2">
+                        <button type="button" class="nav-link fs-5 text-dark" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Tài khoản">
+                            <i class="bi bi-person-circle"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
+                            <li th:if="${storeAccountName == null}">
+                                <a class="dropdown-item" th:href="@{/login}">Đăng nhập</a>
+                            </li>
+                            <li th:if="${storeAccountName == null}">
+                                <a class="dropdown-item" th:href="@{/register}">Đăng ký</a>
+                            </li>
+                            <li th:if="${storeAccountName != null and !storeAdmin}">
+                                <a class="dropdown-item" th:href="@{/profile}"><i class="bi bi-person"></i> Hồ sơ</a>
+                            </li>
+                            <li th:if="${storeAccountName != null and !storeAdmin}">
+                                <a class="dropdown-item" th:href="@{/orders}"><i class="bi bi-bag-check"></i> Đơn hàng</a>
+                            </li>
+                            <li th:if="${storeAdmin}">
+                                <a class="dropdown-item text-danger" th:href="@{/admin}"><i class="bi bi-shield-lock"></i> Quản Trị</a>
+                            </li>
+                            <li th:if="${storeAccountName != null}"><hr class="dropdown-divider"></li>
+                            <li th:if="${storeAccountName != null}">
+                                <form th:action="@{/logout}" method="post" class="d-inline">
+                                    <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i> Đăng xuất</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</div>

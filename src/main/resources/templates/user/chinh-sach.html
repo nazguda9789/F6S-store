@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/bo-cuc/bo-cuc-nguoi-dung :: html}">
+<head>
+    <title>Chính sách - SHOP GIÀY</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div th:replace="~{fragments/duong-dan :: breadcrumb(null, 'Chính sách')}"></div>
+        <div class="card p-4 border-0">
+            <h3>Chính sách cửa hàng</h3>
+            <hr>
+            <h5>1. Chính sách bảo mật</h5>
+            <p>Chúng tôi cam kết bảo mật thông tin cá nhân của bạn.</p>
+
+            <h5>2. Chính sách đổi trả</h5>
+            <p>Hỗ trợ đổi trả trong vòng 7 ngày với điều kiện giày còn nguyên tem mác.</p>
+
+            <h5>3. Giao hàng & Thanh toán</h5>
+            <p>Giao hàng toàn quốc. Hỗ trợ thanh toán COD, chuyển khoản hoặc quét mã VNPay.</p>
+        </div>
+    </div>
+</body>
+</html>

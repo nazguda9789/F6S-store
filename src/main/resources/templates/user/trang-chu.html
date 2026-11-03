@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/bo-cuc/bo-cuc-nguoi-dung :: html}">
+<head>
+    <title>Trang Chủ | SHOP GIÀY</title>
+</head>
+<body>
+<div th:fragment="content" class="px-0">
+    <!-- Hero Section -->
+    <section class="store-hero bg-primary text-white text-center py-5 mb-5 rounded shadow-sm">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-lg-6 text-lg-start text-center mb-4 mb-lg-0">
+                    <h1 class="display-4 fw-bolder mb-3">GIÀY THỂ THAO CHÍNH HÃNG</h1>
+                    <p class="lead mb-4">Phong cách của bạn – Bước đi của bạn.</p>
+                    <a th:href="@{/products}" class="btn btn-light btn-lg px-5 fw-bold text-primary rounded-pill shadow">MUA NGAY</a>
+                </div>
+                <div class="col-lg-6">
+                    <img th:if="${heroProduct != null and heroProduct.imageUrl != null}"
+                         th:with="resolvedImage=${@productImageUrl.source(heroProduct.imageUrl)}" th:src="${resolvedImage}" alt="Hero"
+                         class="hero-image img-fluid rounded shadow-lg">
+                    <img th:if="${heroProduct == null or heroProduct.imageUrl == null}"
+                         src="/anh/anh-thay-the.svg" alt="Hero"
+                         class="hero-image img-fluid rounded shadow-lg bg-white p-2">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Thương hiệu nổi bật -->
+    <section class="mb-5" th:if="${brands != null and !brands.isEmpty()}">
+        <div class="store-section-heading d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <h3 class="fw-bold m-0"><i class="bi bi-tags text-primary"></i> Thương hiệu nổi bật</h3>
+        </div>
+        <div class="row row-cols-2 row-cols-md-4 g-4 text-center">
+            <div class="col" th:each="c : ${brands}">
+                <a th:href="@{/category/{id}(id=${c.id})}" class="text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100 bg-white">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold text-dark m-0" th:text="${c.name}">Nike</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sản phẩm bán chạy -->
+    <section class="mb-5" th:if="${bestSellers != null and !bestSellers.isEmpty()}">
+        <div class="store-section-heading d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <h3 class="fw-bold m-0">
+                <i class="bi bi-fire text-danger"></i> Sản phẩm bán chạy
+            </h3>
+            <a th:href="@{/products(sort='best_seller')}" class="text-decoration-none">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+            <div class="col" th:each="p : ${bestSellers}">
+                <div th:replace="~{user/fragments/the-san-pham :: card(${p})}"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="empty-state mb-5" th:if="${#lists.isEmpty(newest)}" role="status">
+        <h2>Cửa hàng chưa có sản phẩm</h2>
+        <p>Sản phẩm mới sẽ được cập nhật tại đây. Bạn có thể quay lại sau để xem bộ sưu tập mới.</p>
+        <a class="btn btn-outline-primary" href="/products">Xem danh sách sản phẩm</a>
+    </section>
+
+    <!-- Khuyến mãi -->
+    <section class="mb-5" th:if="${promotions != null and !promotions.isEmpty()}">
+        <div class="store-section-heading d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <h3 class="fw-bold m-0"><i class="bi bi-gift text-warning"></i> Đang Khuyến Mãi</h3>
+            <a th:href="@{/products(promotion=true)}" class="text-decoration-none">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+            <div class="col" th:each="p : ${promotions}">
+                <div th:replace="~{user/fragments/the-san-pham :: card(${p})}"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sản phẩm mới -->
+    <section class="mb-5" th:if="${newest != null and !newest.isEmpty()}">
+        <div class="store-section-heading d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <h3 class="fw-bold m-0"><i class="bi bi-stars text-info"></i> Sản phẩm mới</h3>
+            <a th:href="@{/products(sort='newest')}" class="text-decoration-none">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+            <div class="col" th:each="p : ${newest}">
+                <div th:replace="~{user/fragments/the-san-pham :: card(${p})}"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lý do chọn shop -->
+    <section class="py-5 bg-white rounded shadow-sm text-center px-4 mb-2">
+        <h3 class="fw-bold mb-5">Tại sao nên chọn chúng tôi?</h3>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <i class="benefit-icon bi bi-shield-check text-primary"></i>
+                <h5 class="fw-bold">Chính hãng 100%</h5>
+                <p class="text-muted small">Cam kết hàng thật, chất lượng đảm bảo.</p>
+            </div>
+            <div class="col-md-3">
+                <i class="benefit-icon bi bi-arrow-repeat text-primary"></i>
+                <h5 class="fw-bold">Đổi trả dễ dàng</h5>
+                <p class="text-muted small">Đổi trả miễn phí trong vòng 7 ngày.</p>
+            </div>
+            <div class="col-md-3">
+                <i class="benefit-icon bi bi-truck text-primary"></i>
+                <h5 class="fw-bold">Giao hàng nhanh</h5>
+                <p class="text-muted small">Giao tận nơi trên toàn quốc.</p>
+            </div>
+            <div class="col-md-3">
+                <i class="benefit-icon bi bi-headset text-primary"></i>
+                <h5 class="fw-bold">Hỗ trợ 24/7</h5>
+                <p class="text-muted small">Luôn sẵn sàng giải đáp thắc mắc.</p>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

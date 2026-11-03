@@ -1,0 +1,44 @@
+/* Shared retail UI: consistent controls, explicit steps, legible inventory. */
+:root { --bs-primary:#136b59; --bs-primary-rgb:19,107,89; --bs-border-radius:10px; }
+body { font-family:Inter,system-ui,-apple-system,sans-serif; color:#20362f; }
+.btn-primary { --bs-btn-bg:#136b59; --bs-btn-border-color:#136b59; --bs-btn-hover-bg:#0d5345; --bs-btn-hover-border-color:#0d5345; --bs-btn-active-bg:#0b463b; --bs-btn-disabled-bg:#136b59; --bs-btn-disabled-border-color:#136b59; }
+.btn-outline-primary { --bs-btn-color:#136b59; --bs-btn-border-color:#136b59; --bs-btn-hover-bg:#136b59; --bs-btn-hover-border-color:#136b59; --bs-btn-active-bg:#136b59; --bs-btn-disabled-color:#136b59; --bs-btn-disabled-border-color:#136b59; }
+.eyebrow { color:#136b59; }
+.form-control,.form-select,.combo-input { min-height:44px; border-color:#cad8d2; background-color:#fff; color:#20362f; }
+.form-control:focus,.form-select:focus { border-color:#136b59; box-shadow:0 0 0 3px #136b5920; }
+.btn { min-height:42px; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-weight:600; }
+.admin-body { background:#f3f6f5; }
+.admin-panel { box-shadow:0 3px 14px #193b2f05; border-color:#e0e9e5; }
+.admin-nav a.is-active,.admin-nav-submenu a.is-active { background:#e6f3ed!important; color:#12634f!important; }
+.sale-steps { display:flex; flex-wrap:wrap; gap:10px; margin:0 0 24px; }
+.sale-steps>a,.sale-steps>span { flex:1 1 180px; display:flex; align-items:center; gap:10px; padding:12px 16px; border:1px solid #dce8e1; border-radius:10px; background:#fff; color:#38554a; text-decoration:none; font-size:14px; }
+.sale-steps b { display:grid; place-items:center; width:28px; height:28px; flex:none; background:#e5f2ec; color:#0d5c48; border-radius:50%; }
+.sale-steps [aria-current] { border-color:#136b59; background:#f1faf6; }
+.stock-summary { display:flex; flex-wrap:wrap; gap:8px 18px; padding:10px 12px; border-radius:9px; background:#eaf6ef; color:#1d634b; font-size:13px; }
+.sale-section-title { font-size:18px!important; font-weight:700!important; margin-bottom:18px!important; }
+.pos-layout { grid-template-columns:minmax(0,1fr); gap:22px; }
+.pos-grid { grid-template-columns:repeat(4,minmax(0,1fr)); max-height:480px; overflow:auto; padding:2px; }
+.pos-product { border-color:#dfe9e3; padding:15px; transition:border-color .15s,box-shadow .15s; }
+.pos-product:hover { border-color:#136b59; box-shadow:0 4px 18px #183f2e0c; }
+.pos-product img { height:130px; background:#f5f8f6; }
+.pos-product .stock-summary { font-size:12px; padding:8px; gap:5px 12px; }
+.pos-basket { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:24px; }
+.pos-lines-panel { min-width:0; }
+.pos-payment-panel { padding:20px; background:#f6faf8; border:1px solid #dce8e1; border-radius:12px; min-width:0; }
+.pos-payment-panel .pos-grand-total { color:#0b5e46; font-size:20px; }
+.pos-payment-panel textarea { min-height:72px; height:auto; }
+.pos-line-actions input { min-width:76px; }
+.pos-line-actions .btn { margin-top:6px; }
+.pos-basket .admin-table { font-size:13px; }
+.pos-basket .admin-table th { background:#eef5f1; white-space:nowrap; }
+.pos-basket .admin-table td { padding:12px 8px; }
+#pos-pay { min-height:52px; }
+.store-account-link { font-size:13px; font-weight:650; max-width:220px; overflow-wrap:anywhere; }
+.checkout-page { max-width:1280px; }
+.checkout-page #checkoutForm>.row>.col-lg-7 { background:#fff; border:1px solid #dfe9e3; border-radius:12px; padding:24px; }
+.checkout-page .data-table-scroll { max-height:320px; overflow:auto; }
+.checkout-page .col-lg-5>.bg-light { position:sticky; top:95px; border:1px solid #dfe9e3; }
+.checkout-page input:not([type=hidden]) { cursor:text; }
+:is(#pos-catalog,#pos-cart,#pos-payment) { scroll-margin-top:24px; }
+@media(max-width:1150px) { .pos-basket { grid-template-columns:1fr; } .pos-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(max-width:640px) { .pos-grid { grid-template-columns:repeat(2,minmax(0,1fr)); max-height:500px; } .pos-product { padding:10px; } .pos-product img { height:105px; } .pos-basket,.pos-payment-panel { padding:14px; } .sale-steps>a,.sale-steps>span { flex-basis:42%; font-size:12px; padding:10px; } .admin-heading { flex-wrap:wrap; } .store-account-link { max-width:150px; } }
